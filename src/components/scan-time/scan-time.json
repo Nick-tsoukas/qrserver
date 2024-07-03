@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_scan_time_scan_times",
+  "info": {
+    "displayName": "scanTime"
+  },
+  "options": {},
+  "attributes": {
+    "date": {
+      "type": "string"
+    }
+  }
+}

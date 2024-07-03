@@ -1,0 +1,56 @@
+{
+  "kind": "collectionType",
+  "collectionName": "qrs",
+  "info": {
+    "singularName": "qr",
+    "pluralName": "qrs",
+    "displayName": "Qr",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "q_image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "url": {
+      "type": "string"
+    },
+    "q_type": {
+      "type": "string"
+    },
+    "band": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::band.band"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "qrs"
+    },
+    "link": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "scanTime": {
+      "displayName": "scanTime",
+      "type": "component",
+      "repeatable": true,
+      "component": "scan-time.scan-time"
+    }
+  }
+}
