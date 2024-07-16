@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_album_songs",
+  "info": {
+    "name": "song",
+    "icon": "music"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "file": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["audios"]
+    }
+  }
+}

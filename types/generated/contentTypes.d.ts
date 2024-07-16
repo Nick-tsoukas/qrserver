@@ -362,18 +362,66 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
-export interface ApiBandBand extends Schema.CollectionType {
-  collectionName: 'bands';
+export interface ApiAlbumAlbum extends Schema.CollectionType {
+  collectionName: 'albums';
   info: {
-    singularName: 'band';
-    pluralName: 'bands';
-    displayName: 'band';
+    singularName: 'album';
+    pluralName: 'albums';
+    displayName: 'Album';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    b_name: Attribute.String;
+    title: Attribute.String & Attribute.Required;
+    releaseDate: Attribute.Date & Attribute.Required;
+    cover: Attribute.Media<'images'>;
+    songs: Attribute.Component<'album.song', true>;
+    band: Attribute.Relation<'api::album.album', 'manyToOne', 'api::band.band'>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::album.album',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::album.album',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiBandBand extends Schema.CollectionType {
+  collectionName: 'bands';
+  info: {
+    singularName: 'band';
+    pluralName: 'bands';
+    displayName: 'Band';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String & Attribute.Required;
+    genre: Attribute.String & Attribute.Required;
+    bio: Attribute.Text & Attribute.Required;
+    bandImg: Attribute.Media<'images'>;
+    members: Attribute.Component<'member.members', true>;
+    facebook: Attribute.String;
+    instagram: Attribute.String;
+    twitch: Attribute.String;
+    appleMusic: Attribute.String;
+    soundcloud: Attribute.String;
+    albums: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::album.album'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -863,6 +911,7 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
+      'api::album.album': ApiAlbumAlbum;
       'api::band.band': ApiBandBand;
       'api::qr.qr': ApiQrQr;
       'plugin::upload.file': PluginUploadFile;

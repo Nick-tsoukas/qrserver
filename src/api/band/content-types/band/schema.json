@@ -4,15 +4,55 @@
   "info": {
     "singularName": "band",
     "pluralName": "bands",
-    "displayName": "band"
+    "displayName": "Band"
   },
   "options": {
     "draftAndPublish": true
   },
-  "pluginOptions": {},
   "attributes": {
-    "b_name": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "genre": {
+      "type": "string",
+      "required": true
+    },
+    "bio": {
+      "type": "text",
+      "required": true
+    },
+    "bandImg": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "members": {
+      "type": "component",
+      "repeatable": true,
+      "component": "member.members"
+    },
+    "facebook": {
       "type": "string"
+    },
+    "instagram": {
+      "type": "string"
+    },
+    "twitch": {
+      "type": "string"
+    },
+    "appleMusic": {
+      "type": "string"
+    },
+    "soundcloud": {
+      "type": "string"
+    },
+    "albums": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::album.album",
+      "mappedBy": "band"
     }
   }
 }
