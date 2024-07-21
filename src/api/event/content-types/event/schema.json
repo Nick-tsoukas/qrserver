@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "qrs",
+  "collectionName": "events",
   "info": {
-    "singularName": "qr",
-    "pluralName": "qrs",
-    "displayName": "Qr",
+    "singularName": "event",
+    "pluralName": "events",
+    "displayName": "event",
     "description": ""
   },
   "options": {
@@ -12,7 +12,13 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "q_image": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "image": {
       "type": "media",
       "multiple": false,
       "required": false,
@@ -23,37 +29,38 @@
         "audios"
       ]
     },
-    "url": {
-      "type": "string"
+    "date": {
+      "type": "date"
     },
-    "q_type": {
+    "time": {
+      "type": "time"
+    },
+    "link": {
       "type": "string"
     },
     "band": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::band.band"
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "inversedBy": "events"
     },
     "users_permissions_user": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "qrs"
+      "inversedBy": "events"
     },
-    "link": {
+    "venue": {
       "type": "string"
     },
-    "name": {
+    "city": {
       "type": "string"
     },
-    "scanTime": {
-      "displayName": "scanTime",
-      "type": "component",
-      "repeatable": true,
-      "component": "scan-time.scan-time"
+    "state": {
+      "type": "string"
     },
-    "options": {
-      "type": "json"
+    "address": {
+      "type": "string"
     }
   }
 }

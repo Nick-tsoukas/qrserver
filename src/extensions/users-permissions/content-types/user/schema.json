@@ -65,15 +65,34 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "bands": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::band.band"
-    },
     "qrs": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::qr.qr",
+      "mappedBy": "users_permissions_user"
+    },
+    "albums": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::album.album",
+      "mappedBy": "users_permissions_user"
+    },
+    "events": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::event.event",
+      "mappedBy": "users_permissions_user"
+    },
+    "bands": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::band.band",
+      "mappedBy": "users_permissions_user"
+    },
+    "tours": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::tour.tour",
       "mappedBy": "users_permissions_user"
     }
   }

@@ -362,110 +362,6 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
-export interface ApiAlbumAlbum extends Schema.CollectionType {
-  collectionName: 'albums';
-  info: {
-    singularName: 'album';
-    pluralName: 'albums';
-    displayName: 'Album';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    title: Attribute.String & Attribute.Required;
-    releaseDate: Attribute.Date & Attribute.Required;
-    cover: Attribute.Media<'images'>;
-    songs: Attribute.Component<'album.song', true>;
-    band: Attribute.Relation<'api::album.album', 'manyToOne', 'api::band.band'>;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::album.album',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::album.album',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiBandBand extends Schema.CollectionType {
-  collectionName: 'bands';
-  info: {
-    singularName: 'band';
-    pluralName: 'bands';
-    displayName: 'Band';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    name: Attribute.String & Attribute.Required;
-    genre: Attribute.String & Attribute.Required;
-    bio: Attribute.Text & Attribute.Required;
-    bandImg: Attribute.Media<'images'>;
-    members: Attribute.Component<'member.members', true>;
-    facebook: Attribute.String;
-    instagram: Attribute.String;
-    twitch: Attribute.String;
-    appleMusic: Attribute.String;
-    soundcloud: Attribute.String;
-    albums: Attribute.Relation<
-      'api::band.band',
-      'oneToMany',
-      'api::album.album'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiQrQr extends Schema.CollectionType {
-  collectionName: 'qrs';
-  info: {
-    singularName: 'qr';
-    pluralName: 'qrs';
-    displayName: 'Qr';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    q_image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    url: Attribute.String;
-    q_type: Attribute.String;
-    band: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::band.band'>;
-    users_permissions_user: Attribute.Relation<
-      'api::qr.qr',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    link: Attribute.String;
-    name: Attribute.String;
-    scanTime: Attribute.Component<'scan-time.scan-time', true>;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -874,15 +770,30 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    qrs: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::qr.qr'
+    >;
+    albums: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::album.album'
+    >;
+    events: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::event.event'
+    >;
     bands: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
       'api::band.band'
     >;
-    qrs: Attribute.Relation<
+    tours: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
-      'api::qr.qr'
+      'api::tour.tour'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -901,6 +812,212 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
+export interface ApiAlbumAlbum extends Schema.CollectionType {
+  collectionName: 'albums';
+  info: {
+    singularName: 'album';
+    pluralName: 'albums';
+    displayName: 'Album';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String & Attribute.Required;
+    releaseDate: Attribute.Date & Attribute.Required;
+    cover: Attribute.Media<'images'>;
+    songs: Attribute.Component<'album.song', true>;
+    band: Attribute.Relation<'api::album.album', 'manyToOne', 'api::band.band'>;
+    users_permissions_user: Attribute.Relation<
+      'api::album.album',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::album.album',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::album.album',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiBandBand extends Schema.CollectionType {
+  collectionName: 'bands';
+  info: {
+    singularName: 'band';
+    pluralName: 'bands';
+    displayName: 'Band';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String & Attribute.Required;
+    genre: Attribute.String & Attribute.Required;
+    bio: Attribute.Text & Attribute.Required;
+    bandImg: Attribute.Media<'images'>;
+    members: Attribute.Component<'member.members', true>;
+    facebook: Attribute.String;
+    instagram: Attribute.String;
+    twitch: Attribute.String;
+    appleMusic: Attribute.String;
+    soundcloud: Attribute.String;
+    albums: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::album.album'
+    >;
+    events: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::event.event'
+    >;
+    users_permissions_user: Attribute.Relation<
+      'api::band.band',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    tours: Attribute.Relation<'api::band.band', 'manyToMany', 'api::tour.tour'>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiEventEvent extends Schema.CollectionType {
+  collectionName: 'events';
+  info: {
+    singularName: 'event';
+    pluralName: 'events';
+    displayName: 'event';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    description: Attribute.String;
+    image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    date: Attribute.Date;
+    time: Attribute.Time;
+    link: Attribute.String;
+    band: Attribute.Relation<'api::event.event', 'manyToOne', 'api::band.band'>;
+    users_permissions_user: Attribute.Relation<
+      'api::event.event',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    venue: Attribute.String;
+    city: Attribute.String;
+    state: Attribute.String;
+    address: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::event.event',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::event.event',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiQrQr extends Schema.CollectionType {
+  collectionName: 'qrs';
+  info: {
+    singularName: 'qr';
+    pluralName: 'qrs';
+    displayName: 'Qr';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    q_image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    url: Attribute.String;
+    q_type: Attribute.String;
+    band: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::band.band'>;
+    users_permissions_user: Attribute.Relation<
+      'api::qr.qr',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    link: Attribute.String;
+    name: Attribute.String;
+    scanTime: Attribute.Component<'scan-time.scan-time', true>;
+    options: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiTourTour extends Schema.CollectionType {
+  collectionName: 'tours';
+  info: {
+    singularName: 'tour';
+    pluralName: 'tours';
+    displayName: 'tour';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    startDate: Attribute.Date;
+    endDate: Attribute.Date;
+    events: Attribute.Relation<
+      'api::tour.tour',
+      'oneToMany',
+      'api::event.event'
+    >;
+    bands: Attribute.Relation<'api::tour.tour', 'manyToMany', 'api::band.band'>;
+    users_permissions_user: Attribute.Relation<
+      'api::tour.tour',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::tour.tour', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::tour.tour', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -911,9 +1028,6 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
-      'api::album.album': ApiAlbumAlbum;
-      'api::band.band': ApiBandBand;
-      'api::qr.qr': ApiQrQr;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::content-releases.release': PluginContentReleasesRelease;
@@ -922,6 +1036,11 @@ declare module '@strapi/types' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'api::album.album': ApiAlbumAlbum;
+      'api::band.band': ApiBandBand;
+      'api::event.event': ApiEventEvent;
+      'api::qr.qr': ApiQrQr;
+      'api::tour.tour': ApiTourTour;
     }
   }
 }

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "band",
     "pluralName": "bands",
-    "displayName": "Band"
+    "displayName": "Band",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -26,7 +27,9 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "members": {
       "type": "component",
@@ -53,6 +56,24 @@
       "relation": "oneToMany",
       "target": "api::album.album",
       "mappedBy": "band"
+    },
+    "events": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::event.event",
+      "mappedBy": "band"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "bands"
+    },
+    "tours": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tour.tour",
+      "mappedBy": "bands"
     }
   }
 }
