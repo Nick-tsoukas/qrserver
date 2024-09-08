@@ -21,6 +21,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "5.3.4",
+    "strapi-plugin-oembed": "^1.2.1",
     "styled-components": "5.3.3",
     "vue-chartjs": "^5.3.1"
   },
@@ -34,5 +35,8 @@
     "node": ">=18.0.0 <=20.x.x",
     "npm": ">=6.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@nuxtjs/date-fns": "^1.5.0"
+  }
 }

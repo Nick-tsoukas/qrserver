@@ -94,6 +94,18 @@
       "relation": "oneToMany",
       "target": "api::tour.tour",
       "mappedBy": "users_permissions_user"
+    },
+    "streams": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::stream.stream",
+      "mappedBy": "users_permissions_user"
+    },
+    "socialpages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::socialpage.socialpage",
+      "mappedBy": "users_permissions_user"
     }
   }
 }

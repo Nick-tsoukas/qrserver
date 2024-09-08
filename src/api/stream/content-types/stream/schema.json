@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "tours",
+  "collectionName": "streams",
   "info": {
-    "singularName": "tour",
-    "pluralName": "tours",
-    "displayName": "tour",
+    "singularName": "stream",
+    "pluralName": "streams",
+    "displayName": "stream",
     "description": ""
   },
   "options": {
@@ -12,33 +12,25 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
+    "applemusic": {
       "type": "string"
     },
-    "startDate": {
-      "type": "date"
+    "spotify": {
+      "type": "string"
     },
-    "endDate": {
-      "type": "date"
+    "soundcloud": {
+      "type": "string"
     },
-    "events": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::event.event"
-    },
-    "bands": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::band.band",
-      "inversedBy": "tours"
+    "youtubemusic": {
+      "type": "string"
     },
     "users_permissions_user": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "tours"
+      "inversedBy": "streams"
     },
-    "image": {
+    "img": {
       "type": "media",
       "multiple": false,
       "required": false,
@@ -49,8 +41,8 @@
         "audios"
       ]
     },
-    "description": {
-      "type": "text"
+    "bandTitle": {
+      "type": "string"
     }
   }
 }

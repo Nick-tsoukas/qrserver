@@ -795,6 +795,16 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::tour.tour'
     >;
+    streams: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::stream.stream'
+    >;
+    socialpages: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::socialpage.socialpage'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -971,12 +981,103 @@ export interface ApiQrQr extends Schema.CollectionType {
     name: Attribute.String;
     scanTime: Attribute.Component<'scan-time.scan-time', true>;
     options: Attribute.JSON;
+    album: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::album.album'>;
+    event: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::event.event'>;
+    tour: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::tour.tour'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiSocialpageSocialpage extends Schema.CollectionType {
+  collectionName: 'socialpages';
+  info: {
+    singularName: 'socialpage';
+    pluralName: 'socialpages';
+    displayName: 'socialpage';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    facebook: Attribute.String;
+    snapchat: Attribute.String;
+    whatsapp: Attribute.String;
+    twitch: Attribute.String;
+    tictok: Attribute.String;
+    img: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    title: Attribute.String;
+    users_permissions_user: Attribute.Relation<
+      'api::socialpage.socialpage',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    band: Attribute.Relation<
+      'api::socialpage.socialpage',
+      'oneToOne',
+      'api::band.band'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::socialpage.socialpage',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::socialpage.socialpage',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiStreamStream extends Schema.CollectionType {
+  collectionName: 'streams';
+  info: {
+    singularName: 'stream';
+    pluralName: 'streams';
+    displayName: 'stream';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    applemusic: Attribute.String;
+    spotify: Attribute.String;
+    soundcloud: Attribute.String;
+    youtubemusic: Attribute.String;
+    users_permissions_user: Attribute.Relation<
+      'api::stream.stream',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    img: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    bandTitle: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::stream.stream',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::stream.stream',
+      'oneToOne',
+      'admin::user'
+    > &
       Attribute.Private;
   };
 }
@@ -1008,6 +1109,7 @@ export interface ApiTourTour extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    description: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1040,6 +1142,8 @@ declare module '@strapi/types' {
       'api::band.band': ApiBandBand;
       'api::event.event': ApiEventEvent;
       'api::qr.qr': ApiQrQr;
+      'api::socialpage.socialpage': ApiSocialpageSocialpage;
+      'api::stream.stream': ApiStreamStream;
       'api::tour.tour': ApiTourTour;
     }
   }

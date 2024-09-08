@@ -1,0 +1,56 @@
+{
+  "kind": "collectionType",
+  "collectionName": "socialpages",
+  "info": {
+    "singularName": "socialpage",
+    "pluralName": "socialpages",
+    "displayName": "socialpage",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "facebook": {
+      "type": "string"
+    },
+    "snapchat": {
+      "type": "string"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "twitch": {
+      "type": "string"
+    },
+    "tictok": {
+      "type": "string"
+    },
+    "img": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "socialpages"
+    },
+    "band": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::band.band"
+    }
+  }
+}
