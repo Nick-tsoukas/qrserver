@@ -15,7 +15,14 @@
               },
             },
             actionOptions: {
-              upload: {},
+              upload: {
+                async beforeUpload() {
+                  console.log('Uploading file to AWS S3...');
+                },
+                async afterUpload(file, { data }) {
+                  console.log('S3 Upload Response:', data);
+                },
+              },
               uploadStream: {},
               delete: {},
             },
