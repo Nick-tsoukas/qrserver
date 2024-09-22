@@ -1,34 +1,39 @@
 module.exports = [
   {
-  name: 'strapi::security',
-  config: {
-    contentSecurityPolicy: {
-      useDefaults: true,
-      directives: {
-        'connect-src': ["'self'", 'https:'],
-        'img-src': [
-          "'self'",
-          'data:',
-          'blob:',
-          'dl.airtable.com',
-          'qrcode101.s3.us-east-1.amazonaws.com',
-        ],
-        'media-src': [
-          "'self'",
-          'data:',
-          'blob:',
-          'dl.airtable.com',
-          'qrcode101.s3.us-east-1.amazonaws.com',
-
-        ],
-        upgradeInsecureRequests: null,
+    name: 'strapi::security',
+    config: {
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          'connect-src': ["'self'", 'https:'],
+          'img-src': [
+            "'self'",
+            'data:',
+            'blob:',
+            'dl.airtable.com',
+            'qrcode101.s3.us-east-1.amazonaws.com',
+          ],
+          'media-src': [
+            "'self'",
+            'data:',
+            'blob:',
+            'dl.airtable.com',
+            'qrcode101.s3.us-east-1.amazonaws.com',
+          ],
+          upgradeInsecureRequests: null,
+        },
       },
     },
   },
-},
-  'strapi::logger',
+  {
+    name: 'strapi::logger',
+    config: {
+      level: 'debug', // or 'trace' for even more detailed logs
+      exposeInContext: true,
+      requests: true,
+    },
+  },
   'strapi::errors',
-  'strapi::security',
   'strapi::cors',
   'strapi::poweredBy',
   'strapi::query',
