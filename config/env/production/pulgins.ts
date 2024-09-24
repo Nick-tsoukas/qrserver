@@ -1,9 +1,3 @@
-// config/plugins.js or config/env/production/plugins.ts
-console.log('AWS_ACCESS_KEY_ID:', env('AWS_ACCESS_KEY_ID') ? 'Loaded' : 'Not Loaded');
-console.log('AWS_ACCESS_SECRET:', env('AWS_ACCESS_SECRET') ? 'Loaded' : 'Not Loaded');
-console.log('AWS_REGION:', env('AWS_REGION'));
-console.log('AWS_BUCKET:', env('AWS_BUCKET'));
-
 module.exports = ({ env }) => ({
   upload: {
     config: {
