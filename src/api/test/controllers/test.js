@@ -1,19 +1,25 @@
-const { S3Client } = require('@aws-sdk/client-s3');
+// Correct CommonJS import for AWS SDK v3 in Strapi
+const { S3Client, ListBucketsCommand } = require('@aws-sdk/client-s3');
 
 module.exports = {
   async testConnectivity(ctx) {
     try {
-      // Create an S3 client using the same credentials and region as in Strapi
+      // Initialize the S3 client using your credentials and region
       const s3Client = new S3Client({
-        region: process.env.AWS_REGION,
+        region: process.env.AWS_REGION, // Ensure the region is properly set in your env vars
         credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Make sure this env var is correctly named
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,  // AWS Access Key ID
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,  // AWS Secret Key
         },
       });
 
-      // Try listing the buckets to check connectivity
-      const data = await s3Client.send(new ListBucketsCommand({}));
+      // Create a new ListBucketsCommand with no additional input (optional)
+      const command = new ListBucketsCommand({});
+
+      // Send the command to list buckets
+      const data = await s3Client.send(command);
+
+      // Respond with the list of buckets
       ctx.send({
         message: 'AWS S3 connectivity test successful.',
         data: data.Buckets,
