@@ -12,6 +12,10 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "oembed": {
+      "type": "customField",
+      "customField": "plugin::oembed.oembed"
+    },
     "q_image": {
       "type": "media",
       "multiple": false,
