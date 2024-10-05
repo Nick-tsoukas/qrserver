@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-09-29T18:03:58.738Z"
+    "x-generation-date": "2024-09-29T18:34:18.866Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -23849,6 +23849,9 @@
           "data": {
             "type": "object",
             "properties": {
+              "oembed": {
+                "type": "string"
+              },
               "title": {
                 "type": "string"
               }
@@ -23905,6 +23908,9 @@
       "Video": {
         "type": "object",
         "properties": {
+          "oembed": {
+            "type": "string"
+          },
           "title": {
             "type": "string"
           },

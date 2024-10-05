@@ -1131,6 +1131,7 @@ export interface ApiVideoVideo extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
+    oembed: Attribute.Text & Attribute.CustomField<'plugin::oembed.oembed'>;
     title: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
