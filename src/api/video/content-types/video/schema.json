@@ -21,7 +21,7 @@
     },
     "users_permissions_users": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "videos"
     }
