@@ -805,6 +805,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::socialpage.socialpage'
     >;
+    videos: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'api::video.video'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1126,6 +1131,7 @@ export interface ApiVideoVideo extends Schema.CollectionType {
     singularName: 'video';
     pluralName: 'videos';
     displayName: 'video';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -1133,6 +1139,11 @@ export interface ApiVideoVideo extends Schema.CollectionType {
   attributes: {
     oembed: Attribute.Text & Attribute.CustomField<'plugin::oembed.oembed'>;
     title: Attribute.String;
+    users_permissions_users: Attribute.Relation<
+      'api::video.video',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
