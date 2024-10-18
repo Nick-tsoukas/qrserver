@@ -12,18 +12,33 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "oembed": {
-      "type": "customField",
-      "customField": "plugin::oembed.oembed"
+    "bandimg": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     },
-    "title": {
+    "bandname": {
       "type": "string"
     },
-    "users_permissions_users": {
+    "bandlink": {
+      "type": "string"
+    },
+    "users_permissions_user": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "videos"
+    },
+    "youtubevideos": {
+      "type": "component",
+      "repeatable": true,
+      "component": "videos.video"
     }
   }
 }

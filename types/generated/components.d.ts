@@ -45,6 +45,16 @@ export interface SongSongs extends Schema.Component {
   };
 }
 
+export interface VideosVideo extends Schema.Component {
+  collectionName: 'components_videos_videos';
+  info: {
+    displayName: 'video';
+  };
+  attributes: {
+    youtube: Attribute.String;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface Components {
@@ -52,6 +62,7 @@ declare module '@strapi/types' {
       'member.members': MemberMembers;
       'scan-time.scan-time': ScanTimeScanTime;
       'song.songs': SongSongs;
+      'videos.video': VideosVideo;
     }
   }
 }
