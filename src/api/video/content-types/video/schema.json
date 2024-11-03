@@ -23,6 +23,26 @@
       "type": "component",
       "repeatable": true,
       "component": "youtube.videoyoutube"
+    },
+    "bandImg": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "bandlink": {
+      "type": "string"
+    },
+    "bandname": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
     }
   }
 }

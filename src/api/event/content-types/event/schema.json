@@ -4,7 +4,7 @@
   "info": {
     "singularName": "event",
     "pluralName": "events",
-    "displayName": "event",
+    "displayName": "Event",
     "description": ""
   },
   "options": {
@@ -16,18 +16,13 @@
       "type": "string"
     },
     "description": {
-      "type": "string"
+      "type": "text"
     },
     "image": {
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
+      "allowedTypes": ["images", "files", "videos", "audios"]
     },
     "date": {
       "type": "date"
@@ -43,6 +38,18 @@
       "relation": "manyToOne",
       "target": "api::band.band",
       "inversedBy": "events"
+    },
+    "contactEmail": {
+      "type": "email",
+      "required": false
+    },
+    "contactPhone": {
+      "type": "string",
+      "required": false
+    },
+    "ageRestriction": {
+      "type": "string",
+      "required": false
     },
     "users_permissions_user": {
       "type": "relation",
@@ -61,6 +68,30 @@
     },
     "address": {
       "type": "string"
+    },
+    "facebook": {
+      "type": "string",
+      "required": false
+    },
+    "twitter": {
+      "type": "string",
+      "required": false
+    },
+    "instagram": {
+      "type": "string",
+      "required": false
+    },
+    "youtube": {
+      "type": "string",
+      "required": false
+    },
+    "tiktok": {
+      "type": "string",
+      "required": false
+    },
+    "website": {
+      "type": "string",
+      "required": false
     }
   }
 }

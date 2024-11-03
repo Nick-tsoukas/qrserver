@@ -920,7 +920,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
   info: {
     singularName: 'event';
     pluralName: 'events';
-    displayName: 'event';
+    displayName: 'Event';
     description: '';
   };
   options: {
@@ -928,12 +928,15 @@ export interface ApiEventEvent extends Schema.CollectionType {
   };
   attributes: {
     title: Attribute.String;
-    description: Attribute.String;
+    description: Attribute.Text;
     image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     date: Attribute.Date;
     time: Attribute.Time;
     link: Attribute.String;
     band: Attribute.Relation<'api::event.event', 'manyToOne', 'api::band.band'>;
+    contactEmail: Attribute.Email;
+    contactPhone: Attribute.String;
+    ageRestriction: Attribute.String;
     users_permissions_user: Attribute.Relation<
       'api::event.event',
       'manyToOne',
@@ -943,6 +946,12 @@ export interface ApiEventEvent extends Schema.CollectionType {
     city: Attribute.String;
     state: Attribute.String;
     address: Attribute.String;
+    facebook: Attribute.String;
+    twitter: Attribute.String;
+    instagram: Attribute.String;
+    youtube: Attribute.String;
+    tiktok: Attribute.String;
+    website: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1173,6 +1182,10 @@ export interface ApiVideoVideo extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     mediayoutube: Attribute.Component<'youtube.videoyoutube', true>;
+    bandImg: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    bandlink: Attribute.String;
+    bandname: Attribute.String;
+    title: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
