@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_youtube_videoyoutubes",
+  "info": {
+    "displayName": "videoyoutube",
+    "icon": "calendar"
+  },
+  "options": {},
+  "attributes": {
+    "videoid": {
+      "type": "string"
+    }
+  }
+}

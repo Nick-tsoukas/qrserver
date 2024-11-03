@@ -807,7 +807,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     >;
     videos: Attribute.Relation<
       'plugin::users-permissions.user',
-      'manyToMany',
+      'oneToMany',
       'api::video.video'
     >;
     createdAt: Attribute.DateTime;
@@ -1167,13 +1167,12 @@ export interface ApiVideoVideo extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    oembed: Attribute.Text & Attribute.CustomField<'plugin::oembed.oembed'>;
-    title: Attribute.String;
     users_permissions_users: Attribute.Relation<
       'api::video.video',
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    mediayoutube: Attribute.Component<'youtube.videoyoutube', true>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

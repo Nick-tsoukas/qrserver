@@ -12,18 +12,17 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "oembed": {
-      "type": "customField",
-      "customField": "plugin::oembed.oembed"
-    },
-    "title": {
-      "type": "string"
-    },
     "users_permissions_users": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "videos"
+    },
+    "mediayoutube": {
+      "displayName": "videoyoutube",
+      "type": "component",
+      "repeatable": true,
+      "component": "youtube.videoyoutube"
     }
   }
 }

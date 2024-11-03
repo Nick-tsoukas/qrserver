@@ -109,7 +109,7 @@
     },
     "videos": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::video.video",
       "mappedBy": "users_permissions_users"
     }

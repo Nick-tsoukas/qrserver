@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-11-03T18:57:10.816Z"
+    "x-generation-date": "2024-11-03T20:14:25.261Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3119,12 +3119,6 @@
                                                           "attributes": {
                                                             "type": "object",
                                                             "properties": {
-                                                              "oembed": {
-                                                                "type": "string"
-                                                              },
-                                                              "title": {
-                                                                "type": "string"
-                                                              },
                                                               "users_permissions_users": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -3138,6 +3132,20 @@
                                                                         "type": "object",
                                                                         "properties": {}
                                                                       }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "mediayoutube": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "type": "object",
+                                                                  "properties": {
+                                                                    "id": {
+                                                                      "type": "number"
+                                                                    },
+                                                                    "videoid": {
+                                                                      "type": "string"
                                                                     }
                                                                   }
                                                                 }
@@ -6683,12 +6691,6 @@
                                                                         "attributes": {
                                                                           "type": "object",
                                                                           "properties": {
-                                                                            "oembed": {
-                                                                              "type": "string"
-                                                                            },
-                                                                            "title": {
-                                                                              "type": "string"
-                                                                            },
                                                                             "users_permissions_users": {
                                                                               "type": "object",
                                                                               "properties": {
@@ -6702,6 +6704,20 @@
                                                                                       "type": "object",
                                                                                       "properties": {}
                                                                                     }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            },
+                                                                            "mediayoutube": {
+                                                                              "type": "array",
+                                                                              "items": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                  "id": {
+                                                                                    "type": "number"
+                                                                                  },
+                                                                                  "videoid": {
+                                                                                    "type": "string"
                                                                                   }
                                                                                 }
                                                                               }
@@ -10358,12 +10374,6 @@
                                                           "attributes": {
                                                             "type": "object",
                                                             "properties": {
-                                                              "oembed": {
-                                                                "type": "string"
-                                                              },
-                                                              "title": {
-                                                                "type": "string"
-                                                              },
                                                               "users_permissions_users": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -10377,6 +10387,20 @@
                                                                         "type": "object",
                                                                         "properties": {}
                                                                       }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "mediayoutube": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "type": "object",
+                                                                  "properties": {
+                                                                    "id": {
+                                                                      "type": "number"
+                                                                    },
+                                                                    "videoid": {
+                                                                      "type": "string"
                                                                     }
                                                                   }
                                                                 }
@@ -14190,12 +14214,6 @@
                                                           "attributes": {
                                                             "type": "object",
                                                             "properties": {
-                                                              "oembed": {
-                                                                "type": "string"
-                                                              },
-                                                              "title": {
-                                                                "type": "string"
-                                                              },
                                                               "users_permissions_users": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -14209,6 +14227,20 @@
                                                                         "type": "object",
                                                                         "properties": {}
                                                                       }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "mediayoutube": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                  "type": "object",
+                                                                  "properties": {
+                                                                    "id": {
+                                                                      "type": "number"
+                                                                    },
+                                                                    "videoid": {
+                                                                      "type": "string"
                                                                     }
                                                                   }
                                                                 }
@@ -17835,12 +17867,6 @@
                                 "attributes": {
                                   "type": "object",
                                   "properties": {
-                                    "oembed": {
-                                      "type": "string"
-                                    },
-                                    "title": {
-                                      "type": "string"
-                                    },
                                     "users_permissions_users": {
                                       "type": "object",
                                       "properties": {
@@ -17854,6 +17880,20 @@
                                               "type": "object",
                                               "properties": {}
                                             }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "mediayoutube": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "number"
+                                          },
+                                          "videoid": {
+                                            "type": "string"
                                           }
                                         }
                                       }
@@ -21084,12 +21124,6 @@
                                 "attributes": {
                                   "type": "object",
                                   "properties": {
-                                    "oembed": {
-                                      "type": "string"
-                                    },
-                                    "title": {
-                                      "type": "string"
-                                    },
                                     "users_permissions_users": {
                                       "type": "object",
                                       "properties": {
@@ -21103,6 +21137,20 @@
                                               "type": "object",
                                               "properties": {}
                                             }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "mediayoutube": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "number"
+                                          },
+                                          "videoid": {
+                                            "type": "string"
                                           }
                                         }
                                       }
@@ -24243,12 +24291,6 @@
                                                                         "attributes": {
                                                                           "type": "object",
                                                                           "properties": {
-                                                                            "oembed": {
-                                                                              "type": "string"
-                                                                            },
-                                                                            "title": {
-                                                                              "type": "string"
-                                                                            },
                                                                             "users_permissions_users": {
                                                                               "type": "object",
                                                                               "properties": {
@@ -24262,6 +24304,20 @@
                                                                                       "type": "object",
                                                                                       "properties": {}
                                                                                     }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            },
+                                                                            "mediayoutube": {
+                                                                              "type": "array",
+                                                                              "items": {
+                                                                                "type": "object",
+                                                                                "properties": {
+                                                                                  "id": {
+                                                                                    "type": "number"
+                                                                                  },
+                                                                                  "videoid": {
+                                                                                    "type": "string"
                                                                                   }
                                                                                 }
                                                                               }
@@ -24869,12 +24925,6 @@
           "data": {
             "type": "object",
             "properties": {
-              "oembed": {
-                "type": "string"
-              },
-              "title": {
-                "type": "string"
-              },
               "users_permissions_users": {
                 "oneOf": [
                   {
@@ -24885,6 +24935,12 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "mediayoutube": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/YoutubeVideoyoutubeComponent"
+                }
               }
             }
           }
@@ -24939,12 +24995,6 @@
       "Video": {
         "type": "object",
         "properties": {
-          "oembed": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
           "users_permissions_users": {
             "type": "object",
             "properties": {
@@ -27872,12 +27922,6 @@
                                 "attributes": {
                                   "type": "object",
                                   "properties": {
-                                    "oembed": {
-                                      "type": "string"
-                                    },
-                                    "title": {
-                                      "type": "string"
-                                    },
                                     "users_permissions_users": {
                                       "type": "object",
                                       "properties": {
@@ -27891,6 +27935,20 @@
                                               "type": "object",
                                               "properties": {}
                                             }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "mediayoutube": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "number"
+                                          },
+                                          "videoid": {
+                                            "type": "string"
                                           }
                                         }
                                       }
@@ -27996,6 +28054,12 @@
               }
             }
           },
+          "mediayoutube": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/YoutubeVideoyoutubeComponent"
+            }
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -28063,6 +28127,17 @@
           },
           "meta": {
             "type": "object"
+          }
+        }
+      },
+      "YoutubeVideoyoutubeComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "videoid": {
+            "type": "string"
           }
         }
       },
