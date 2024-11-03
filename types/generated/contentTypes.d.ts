@@ -961,6 +961,36 @@ export interface ApiEventEvent extends Schema.CollectionType {
   };
 }
 
+export interface ApiFuntestFuntest extends Schema.CollectionType {
+  collectionName: 'funtests';
+  info: {
+    singularName: 'funtest';
+    pluralName: 'funtests';
+    displayName: 'funtest';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    testingsomething: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::funtest.funtest',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::funtest.funtest',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiQrQr extends Schema.CollectionType {
   collectionName: 'qrs';
   info: {
@@ -1141,7 +1171,7 @@ export interface ApiVideoVideo extends Schema.CollectionType {
     title: Attribute.String;
     users_permissions_users: Attribute.Relation<
       'api::video.video',
-      'manyToMany',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     createdAt: Attribute.DateTime;
@@ -1183,6 +1213,7 @@ declare module '@strapi/types' {
       'api::album.album': ApiAlbumAlbum;
       'api::band.band': ApiBandBand;
       'api::event.event': ApiEventEvent;
+      'api::funtest.funtest': ApiFuntestFuntest;
       'api::qr.qr': ApiQrQr;
       'api::socialpage.socialpage': ApiSocialpageSocialpage;
       'api::stream.stream': ApiStreamStream;

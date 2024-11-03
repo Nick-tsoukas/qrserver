@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "funtests",
+  "info": {
+    "singularName": "funtest",
+    "pluralName": "funtests",
+    "displayName": "funtest"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "testingsomething": {
+      "type": "string"
+    }
+  }
+}
