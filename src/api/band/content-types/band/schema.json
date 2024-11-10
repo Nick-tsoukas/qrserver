@@ -74,6 +74,15 @@
       "relation": "manyToMany",
       "target": "api::tour.tour",
       "mappedBy": "bands"
+    },
+    "dezzer": {
+      "type": "string"
+    },
+    "youtube": {
+      "type": "string"
+    },
+    "bandcamp": {
+      "type": "string"
     }
   }
 }

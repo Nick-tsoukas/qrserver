@@ -905,6 +905,9 @@ export interface ApiBandBand extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     tours: Attribute.Relation<'api::band.band', 'manyToMany', 'api::tour.tour'>;
+    dezzer: Attribute.String;
+    youtube: Attribute.String;
+    bandcamp: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
