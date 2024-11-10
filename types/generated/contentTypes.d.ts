@@ -1070,6 +1070,7 @@ export interface ApiSocialpageSocialpage extends Schema.CollectionType {
       'oneToOne',
       'api::band.band'
     >;
+    instagram: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

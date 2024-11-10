@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-11-10T18:53:02.484Z"
+    "x-generation-date": "2024-11-10T19:56:46.855Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3079,6 +3079,9 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "instagram": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -6827,6 +6830,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "instagram": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -10750,6 +10756,9 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "instagram": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -14804,6 +14813,9 @@
                                                                   }
                                                                 }
                                                               },
+                                                              "instagram": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -15543,6 +15555,9 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "instagram": {
+                "type": "string"
               }
             }
           }
@@ -18651,6 +18666,9 @@
                                         }
                                       }
                                     },
+                                    "instagram": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -19014,6 +19032,9 @@
                 }
               }
             }
+          },
+          "instagram": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",
@@ -22092,6 +22113,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "instagram": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -25407,6 +25431,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "instagram": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -29280,6 +29307,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "instagram": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
