@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "scans",
+  "info": {
+    "singularName": "scan",
+    "pluralName": "scans",
+    "displayName": "scan"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "qrs": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::qr.qr",
+      "inversedBy": "scans"
+    },
+    "date": {
+      "type": "string"
+    },
+    "custom": {
+      "type": "json"
+    }
+  }
+}

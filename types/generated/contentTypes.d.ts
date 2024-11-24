@@ -1031,12 +1031,37 @@ export interface ApiQrQr extends Schema.CollectionType {
     album: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::album.album'>;
     event: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::event.event'>;
     tour: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::tour.tour'>;
+    scans: Attribute.Relation<'api::qr.qr', 'manyToMany', 'api::scan.scan'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiScanScan extends Schema.CollectionType {
+  collectionName: 'scans';
+  info: {
+    singularName: 'scan';
+    pluralName: 'scans';
+    displayName: 'scan';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    qrs: Attribute.Relation<'api::scan.scan', 'manyToMany', 'api::qr.qr'>;
+    date: Attribute.String;
+    custom: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::scan.scan', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::scan.scan', 'oneToOne', 'admin::user'> &
       Attribute.Private;
   };
 }
@@ -1231,6 +1256,7 @@ declare module '@strapi/types' {
       'api::event.event': ApiEventEvent;
       'api::funtest.funtest': ApiFuntestFuntest;
       'api::qr.qr': ApiQrQr;
+      'api::scan.scan': ApiScanScan;
       'api::socialpage.socialpage': ApiSocialpageSocialpage;
       'api::stream.stream': ApiStreamStream;
       'api::tour.tour': ApiTourTour;
