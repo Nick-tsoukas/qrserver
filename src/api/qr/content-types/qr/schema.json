@@ -71,10 +71,7 @@
       "target": "api::tour.tour"
     },
     "scans": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::scan.scan",
-      "mappedBy": "qrs"
+      "type": "integer"
     }
   }
 }

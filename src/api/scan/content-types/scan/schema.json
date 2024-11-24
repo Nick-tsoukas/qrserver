@@ -11,12 +11,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "qrs": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::qr.qr",
-      "inversedBy": "scans"
-    },
     "date": {
       "type": "string"
     },
