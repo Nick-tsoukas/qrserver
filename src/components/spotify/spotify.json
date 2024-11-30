@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_spotify_spotifies",
+  "info": {
+    "displayName": "spotify",
+    "icon": "cast"
+  },
+  "options": {},
+  "attributes": {
+    "spotifyAlbumId": {
+      "type": "string"
+    },
+    "embedUrl": {
+      "type": "string"
+    }
+  }
+}

@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-11-24T19:42:27.518Z"
+    "x-generation-date": "2024-11-30T17:57:58.722Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -144,6 +144,32 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "streamingService": {
+                "type": "string",
+                "enum": [
+                  "Spotify",
+                  "Apple Music",
+                  "YouTube Music",
+                  "Amazon Music",
+                  "Tidal",
+                  "Deezer"
+                ]
+              },
+              "albumId": {
+                "type": "string"
+              },
+              "albumUrl": {
+                "type": "string"
+              },
+              "embedUrl": {
+                "type": "string"
+              },
+              "isApproved": {
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string"
               }
             }
           }
@@ -3433,6 +3459,32 @@
                                         }
                                       }
                                     },
+                                    "streamingService": {
+                                      "type": "string",
+                                      "enum": [
+                                        "Spotify",
+                                        "Apple Music",
+                                        "YouTube Music",
+                                        "Amazon Music",
+                                        "Tidal",
+                                        "Deezer"
+                                      ]
+                                    },
+                                    "albumId": {
+                                      "type": "string"
+                                    },
+                                    "albumUrl": {
+                                      "type": "string"
+                                    },
+                                    "embedUrl": {
+                                      "type": "string"
+                                    },
+                                    "isApproved": {
+                                      "type": "boolean"
+                                    },
+                                    "type": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -3620,6 +3672,32 @@
                 }
               }
             }
+          },
+          "streamingService": {
+            "type": "string",
+            "enum": [
+              "Spotify",
+              "Apple Music",
+              "YouTube Music",
+              "Amazon Music",
+              "Tidal",
+              "Deezer"
+            ]
+          },
+          "albumId": {
+            "type": "string"
+          },
+          "albumUrl": {
+            "type": "string"
+          },
+          "embedUrl": {
+            "type": "string"
+          },
+          "isApproved": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",
@@ -7385,6 +7463,32 @@
                             }
                           }
                         },
+                        "streamingService": {
+                          "type": "string",
+                          "enum": [
+                            "Spotify",
+                            "Apple Music",
+                            "YouTube Music",
+                            "Amazon Music",
+                            "Tidal",
+                            "Deezer"
+                          ]
+                        },
+                        "albumId": {
+                          "type": "string"
+                        },
+                        "albumUrl": {
+                          "type": "string"
+                        },
+                        "embedUrl": {
+                          "type": "string"
+                        },
+                        "isApproved": {
+                          "type": "boolean"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -11115,6 +11219,32 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "streamingService": {
+                                      "type": "string",
+                                      "enum": [
+                                        "Spotify",
+                                        "Apple Music",
+                                        "YouTube Music",
+                                        "Amazon Music",
+                                        "Tidal",
+                                        "Deezer"
+                                      ]
+                                    },
+                                    "albumId": {
+                                      "type": "string"
+                                    },
+                                    "albumUrl": {
+                                      "type": "string"
+                                    },
+                                    "embedUrl": {
+                                      "type": "string"
+                                    },
+                                    "isApproved": {
+                                      "type": "boolean"
+                                    },
+                                    "type": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -15178,6 +15308,32 @@
                                         }
                                       }
                                     },
+                                    "streamingService": {
+                                      "type": "string",
+                                      "enum": [
+                                        "Spotify",
+                                        "Apple Music",
+                                        "YouTube Music",
+                                        "Amazon Music",
+                                        "Tidal",
+                                        "Deezer"
+                                      ]
+                                    },
+                                    "albumId": {
+                                      "type": "string"
+                                    },
+                                    "albumUrl": {
+                                      "type": "string"
+                                    },
+                                    "embedUrl": {
+                                      "type": "string"
+                                    },
+                                    "isApproved": {
+                                      "type": "boolean"
+                                    },
+                                    "type": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -17704,6 +17860,32 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "streamingService": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "Spotify",
+                                                                  "Apple Music",
+                                                                  "YouTube Music",
+                                                                  "Amazon Music",
+                                                                  "Tidal",
+                                                                  "Deezer"
+                                                                ]
+                                                              },
+                                                              "albumId": {
+                                                                "type": "string"
+                                                              },
+                                                              "albumUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "embedUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "isApproved": {
+                                                                "type": "boolean"
+                                                              },
+                                                              "type": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -21155,6 +21337,32 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "streamingService": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "Spotify",
+                                                                  "Apple Music",
+                                                                  "YouTube Music",
+                                                                  "Amazon Music",
+                                                                  "Tidal",
+                                                                  "Deezer"
+                                                                ]
+                                                              },
+                                                              "albumId": {
+                                                                "type": "string"
+                                                              },
+                                                              "albumUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "embedUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "isApproved": {
+                                                                "type": "boolean"
+                                                              },
+                                                              "type": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -26201,6 +26409,32 @@
                                                       }
                                                     }
                                                   },
+                                                  "streamingService": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                      "Spotify",
+                                                      "Apple Music",
+                                                      "YouTube Music",
+                                                      "Amazon Music",
+                                                      "Tidal",
+                                                      "Deezer"
+                                                    ]
+                                                  },
+                                                  "albumId": {
+                                                    "type": "string"
+                                                  },
+                                                  "albumUrl": {
+                                                    "type": "string"
+                                                  },
+                                                  "embedUrl": {
+                                                    "type": "string"
+                                                  },
+                                                  "isApproved": {
+                                                    "type": "boolean"
+                                                  },
+                                                  "type": {
+                                                    "type": "string"
+                                                  },
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -28355,6 +28589,32 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "streamingService": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "Spotify",
+                                                                  "Apple Music",
+                                                                  "YouTube Music",
+                                                                  "Amazon Music",
+                                                                  "Tidal",
+                                                                  "Deezer"
+                                                                ]
+                                                              },
+                                                              "albumId": {
+                                                                "type": "string"
+                                                              },
+                                                              "albumUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "embedUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "isApproved": {
+                                                                "type": "boolean"
+                                                              },
+                                                              "type": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",

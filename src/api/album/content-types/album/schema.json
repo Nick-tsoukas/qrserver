@@ -43,6 +43,33 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "albums"
+    },
+    "streamingService": {
+      "type": "enumeration",
+      "enum": [
+        "Spotify",
+        "Apple Music",
+        "YouTube Music",
+        "Amazon Music",
+        "Tidal",
+        "Deezer"
+      ]
+    },
+    "albumId": {
+      "type": "string"
+    },
+    "albumUrl": {
+      "type": "string"
+    },
+    "embedUrl": {
+      "type": "string"
+    },
+    "isApproved": {
+      "type": "boolean",
+      "default": true
+    },
+    "type": {
+      "type": "string"
     }
   }
 }

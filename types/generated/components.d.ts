@@ -45,6 +45,18 @@ export interface SongSongs extends Schema.Component {
   };
 }
 
+export interface SpotifySpotify extends Schema.Component {
+  collectionName: 'components_spotify_spotifies';
+  info: {
+    displayName: 'spotify';
+    icon: 'cast';
+  };
+  attributes: {
+    spotifyAlbumId: Attribute.String;
+    embedUrl: Attribute.String;
+  };
+}
+
 export interface YoutubeVideoyoutube extends Schema.Component {
   collectionName: 'components_youtube_videoyoutubes';
   info: {
@@ -63,6 +75,7 @@ declare module '@strapi/types' {
       'member.members': MemberMembers;
       'scan-time.scan-time': ScanTimeScanTime;
       'song.songs': SongSongs;
+      'spotify.spotify': SpotifySpotify;
       'youtube.videoyoutube': YoutubeVideoyoutube;
     }
   }

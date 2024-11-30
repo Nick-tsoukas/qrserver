@@ -849,6 +849,21 @@ export interface ApiAlbumAlbum extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    streamingService: Attribute.Enumeration<
+      [
+        'Spotify',
+        'Apple Music',
+        'YouTube Music',
+        'Amazon Music',
+        'Tidal',
+        'Deezer'
+      ]
+    >;
+    albumId: Attribute.String;
+    albumUrl: Attribute.String;
+    embedUrl: Attribute.String;
+    isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
+    type: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
