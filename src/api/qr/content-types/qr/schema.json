@@ -72,6 +72,12 @@
     },
     "scans": {
       "type": "integer"
+    },
+    "scan": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::scan.scan",
+      "mappedBy": "qr"
     }
   }
 }

@@ -97,6 +97,10 @@
     "website": {
       "type": "string",
       "required": false
+    },
+    "isApproved": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

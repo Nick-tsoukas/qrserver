@@ -43,6 +43,16 @@
     },
     "title": {
       "type": "string"
+    },
+    "bands": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::band.band",
+      "inversedBy": "videos"
+    },
+    "isApproved": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "scan",
     "pluralName": "scans",
-    "displayName": "scan"
+    "displayName": "scan",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -16,6 +17,12 @@
     },
     "custom": {
       "type": "json"
+    },
+    "qr": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::qr.qr",
+      "inversedBy": "scan"
     }
   }
 }

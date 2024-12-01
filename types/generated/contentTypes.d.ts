@@ -923,6 +923,11 @@ export interface ApiBandBand extends Schema.CollectionType {
     dezzer: Attribute.String;
     youtube: Attribute.String;
     bandcamp: Attribute.String;
+    videos: Attribute.Relation<
+      'api::band.band',
+      'manyToMany',
+      'api::video.video'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -970,6 +975,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
     youtube: Attribute.String;
     tiktok: Attribute.String;
     website: Attribute.String;
+    isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1047,6 +1053,7 @@ export interface ApiQrQr extends Schema.CollectionType {
     event: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::event.event'>;
     tour: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::tour.tour'>;
     scans: Attribute.Integer;
+    scan: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::scan.scan'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1063,6 +1070,7 @@ export interface ApiScanScan extends Schema.CollectionType {
     singularName: 'scan';
     pluralName: 'scans';
     displayName: 'scan';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -1070,6 +1078,7 @@ export interface ApiScanScan extends Schema.CollectionType {
   attributes: {
     date: Attribute.String;
     custom: Attribute.JSON;
+    qr: Attribute.Relation<'api::scan.scan', 'oneToOne', 'api::qr.qr'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1229,6 +1238,12 @@ export interface ApiVideoVideo extends Schema.CollectionType {
     bandlink: Attribute.String;
     bandname: Attribute.String;
     title: Attribute.String;
+    bands: Attribute.Relation<
+      'api::video.video',
+      'manyToMany',
+      'api::band.band'
+    >;
+    isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

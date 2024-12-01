@@ -83,6 +83,12 @@
     },
     "bandcamp": {
       "type": "string"
+    },
+    "videos": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::video.video",
+      "mappedBy": "bands"
     }
   }
 }
