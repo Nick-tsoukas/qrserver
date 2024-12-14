@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_singlevideo_singlevideos",
+  "info": {
+    "displayName": "singlevideo",
+    "icon": "calendar"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "youtubeid": {
+      "type": "string"
+    }
+  }
+}

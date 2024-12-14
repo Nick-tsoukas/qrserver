@@ -935,6 +935,13 @@ export interface ApiBandBand extends Schema.CollectionType {
       'manyToMany',
       'api::video.video'
     >;
+    twitter: Attribute.String;
+    whatsapp: Attribute.String;
+    tictok: Attribute.String;
+    singlesong: Attribute.Component<'singlesong.singlesong'>;
+    singlevideo: Attribute.Component<'singlevideo.singlevideo'>;
+    spotify: Attribute.String;
+    snapchat: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

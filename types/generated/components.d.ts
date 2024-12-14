@@ -44,6 +44,31 @@ export interface ScanTimeScanTime extends Schema.Component {
   };
 }
 
+export interface SinglesongSinglesong extends Schema.Component {
+  collectionName: 'components_singlesong_singlesongs';
+  info: {
+    displayName: 'singlesong';
+    icon: 'earth';
+    description: '';
+  };
+  attributes: {
+    title: Attribute.String;
+    song: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+  };
+}
+
+export interface SinglevideoSinglevideo extends Schema.Component {
+  collectionName: 'components_singlevideo_singlevideos';
+  info: {
+    displayName: 'singlevideo';
+    icon: 'calendar';
+  };
+  attributes: {
+    title: Attribute.String;
+    youtubeid: Attribute.String;
+  };
+}
+
 export interface SongSongs extends Schema.Component {
   collectionName: 'components_song_songs';
   info: {
@@ -85,6 +110,8 @@ declare module '@strapi/types' {
       'gallery.gallery': GalleryGallery;
       'member.members': MemberMembers;
       'scan-time.scan-time': ScanTimeScanTime;
+      'singlesong.singlesong': SinglesongSinglesong;
+      'singlevideo.singlevideo': SinglevideoSinglevideo;
       'song.songs': SongSongs;
       'spotify.spotify': SpotifySpotify;
       'youtube.videoyoutube': YoutubeVideoyoutube;

@@ -89,6 +89,33 @@
       "relation": "manyToMany",
       "target": "api::video.video",
       "mappedBy": "bands"
+    },
+    "twitter": {
+      "type": "string"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "tictok": {
+      "type": "string"
+    },
+    "singlesong": {
+      "displayName": "singlesong",
+      "type": "component",
+      "repeatable": false,
+      "component": "singlesong.singlesong"
+    },
+    "singlevideo": {
+      "displayName": "singlevideo",
+      "type": "component",
+      "repeatable": false,
+      "component": "singlevideo.singlevideo"
+    },
+    "spotify": {
+      "type": "string"
+    },
+    "snapchat": {
+      "type": "string"
     }
   }
 }
