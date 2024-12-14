@@ -12,6 +12,16 @@ export interface AlbumSong extends Schema.Component {
   };
 }
 
+export interface GalleryGallery extends Schema.Component {
+  collectionName: 'components_gallery_galleries';
+  info: {
+    displayName: 'gallery';
+  };
+  attributes: {
+    image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+  };
+}
+
 export interface MemberMembers extends Schema.Component {
   collectionName: 'components_member_members';
   info: {
@@ -72,6 +82,7 @@ declare module '@strapi/types' {
   export module Shared {
     export interface Components {
       'album.song': AlbumSong;
+      'gallery.gallery': GalleryGallery;
       'member.members': MemberMembers;
       'scan-time.scan-time': ScanTimeScanTime;
       'song.songs': SongSongs;

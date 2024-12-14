@@ -810,6 +810,12 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::video.video'
     >;
+    subscriptionStatus: Attribute.Enumeration<
+      ['active', 'trialing', 'past_due', 'canceled', 'unpaid']
+    >;
+    subscriptionId: Attribute.String;
+    customerId: Attribute.String;
+    trialEndsAt: Attribute.Date;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -864,6 +870,7 @@ export interface ApiAlbumAlbum extends Schema.CollectionType {
     embedUrl: Attribute.String;
     isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
     type: Attribute.String;
+    gallery: Attribute.Component<'gallery.gallery', true>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1052,7 +1059,7 @@ export interface ApiQrQr extends Schema.CollectionType {
     album: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::album.album'>;
     event: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::event.event'>;
     tour: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::tour.tour'>;
-    scans: Attribute.Integer;
+    scans: Attribute.Integer & Attribute.DefaultTo<0>;
     scan: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::scan.scan'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;

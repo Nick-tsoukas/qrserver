@@ -112,6 +112,25 @@
       "relation": "oneToMany",
       "target": "api::video.video",
       "mappedBy": "users_permissions_users"
+    },
+    "subscriptionStatus": {
+      "type": "enumeration",
+      "enum": [
+        "active",
+        "trialing",
+        "past_due",
+        "canceled",
+        "unpaid"
+      ]
+    },
+    "subscriptionId": {
+      "type": "string"
+    },
+    "customerId": {
+      "type": "string"
+    },
+    "trialEndsAt": {
+      "type": "date"
     }
   }
 }

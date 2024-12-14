@@ -71,7 +71,8 @@
       "target": "api::tour.tour"
     },
     "scans": {
-      "type": "integer"
+      "type": "integer",
+      "default": 0
     },
     "scan": {
       "type": "relation",
