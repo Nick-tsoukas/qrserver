@@ -76,10 +76,11 @@ module.exports = [
       enabled: true,
       origin: [
         'http://localhost:3000',          // Frontend development URL
-        'https://musicbizqr.com/', // Replace with your actual frontend domain
+        'https://musicbizqr.com', // Replace with your actual frontend domain
       ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      headers: '*',
+      headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'], // Explicitly allowed headers
+
       keepHeaderOnError: true,
     },
   },
