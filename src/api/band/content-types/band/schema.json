@@ -119,6 +119,9 @@
     },
     "websitelink": {
       "type": "string"
+    },
+    "websitelinktext": {
+      "type": "string"
     }
   }
 }
