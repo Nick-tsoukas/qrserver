@@ -122,6 +122,9 @@
     },
     "websitelinktext": {
       "type": "string"
+    },
+    "biotagline": {
+      "type": "string"
     }
   }
 }

@@ -76,6 +76,9 @@
       "type": "component",
       "repeatable": true,
       "component": "gallery.gallery"
+    },
+    "biotagline": {
+      "type": "string"
     }
   }
 }

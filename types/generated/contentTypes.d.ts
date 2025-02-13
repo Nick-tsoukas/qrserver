@@ -871,6 +871,7 @@ export interface ApiAlbumAlbum extends Schema.CollectionType {
     isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
     type: Attribute.String;
     gallery: Attribute.Component<'gallery.gallery', true>;
+    biotagline: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -943,6 +944,8 @@ export interface ApiBandBand extends Schema.CollectionType {
     spotify: Attribute.String;
     snapchat: Attribute.String;
     websitelink: Attribute.String;
+    websitelinktext: Attribute.String;
+    biotagline: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
