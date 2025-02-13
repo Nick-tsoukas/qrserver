@@ -942,6 +942,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     singlevideo: Attribute.Component<'singlevideo.singlevideo'>;
     spotify: Attribute.String;
     snapchat: Attribute.String;
+    websitelink: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

@@ -116,6 +116,9 @@
     },
     "snapchat": {
       "type": "string"
+    },
+    "websitelink": {
+      "type": "string"
     }
   }
 }

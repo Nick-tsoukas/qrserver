@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-12-21T16:31:57.901Z"
+    "x-generation-date": "2025-02-13T02:00:05.991Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -4090,6 +4090,9 @@
                       "snapchat": {
                         "type": "string"
                       },
+                      "websitelink": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -4708,6 +4711,9 @@
                 "type": "string"
               },
               "snapchat": {
+                "type": "string"
+              },
+              "websitelink": {
                 "type": "string"
               }
             }
@@ -8398,6 +8404,9 @@
                                     "snapchat": {
                                       "type": "string"
                                     },
+                                    "websitelink": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -8801,6 +8810,9 @@
             "type": "string"
           },
           "snapchat": {
+            "type": "string"
+          },
+          "websitelink": {
             "type": "string"
           },
           "createdAt": {
@@ -13205,6 +13217,9 @@
                         "type": "string"
                       },
                       "snapchat": {
+                        "type": "string"
+                      },
+                      "websitelink": {
                         "type": "string"
                       },
                       "createdAt": {
@@ -17789,6 +17804,9 @@
                       "snapchat": {
                         "type": "string"
                       },
+                      "websitelink": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -21579,6 +21597,9 @@
                                   "snapchat": {
                                     "type": "string"
                                   },
+                                  "websitelink": {
+                                    "type": "string"
+                                  },
                                   "createdAt": {
                                     "type": "string",
                                     "format": "date-time"
@@ -25008,6 +25029,9 @@
                                                   "type": "string"
                                                 },
                                                 "snapchat": {
+                                                  "type": "string"
+                                                },
+                                                "websitelink": {
                                                   "type": "string"
                                                 },
                                                 "createdAt": {
@@ -28965,6 +28989,9 @@
                                                   "type": "string"
                                                 },
                                                 "snapchat": {
+                                                  "type": "string"
+                                                },
+                                                "websitelink": {
                                                   "type": "string"
                                                 },
                                                 "createdAt": {
@@ -33859,6 +33886,9 @@
                                     "snapchat": {
                                       "type": "string"
                                     },
+                                    "websitelink": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -37194,6 +37224,9 @@
                                                   "type": "string"
                                                 },
                                                 "snapchat": {
+                                                  "type": "string"
+                                                },
+                                                "websitelink": {
                                                   "type": "string"
                                                 },
                                                 "createdAt": {
