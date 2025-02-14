@@ -1,5 +1,5 @@
 module.exports = [
-  // Enable security middleware with updated Content Security Policy
+  // Security middleware
   {
     name: 'strapi::security',
     config: {
@@ -17,7 +17,7 @@ module.exports = [
             'https://accounts.google.com',
             'https://graph.facebook.com',
             'https://www.facebook.com',
-            'http://your-frontend-domain.com', // Replace with your actual frontend domain
+            'http://your-frontend-domain.com',
           ],
           'img-src': [
             "'self'",
@@ -46,10 +46,7 @@ module.exports = [
             'https://connect.facebook.net',
             'https://apis.google.com',
           ],
-          'style-src': [
-            "'self'",
-            "'unsafe-inline'",
-          ],
+          'style-src': ["'self'", "'unsafe-inline'"],
           upgradeInsecureRequests: null,
         },
       },
@@ -60,7 +57,7 @@ module.exports = [
   {
     name: 'strapi::logger',
     config: {
-      level: 'debug', // or 'trace' for even more detailed logs
+      level: 'debug',
       exposeInContext: true,
       requests: true,
     },
@@ -69,28 +66,44 @@ module.exports = [
   // Error handling middleware
   'strapi::errors',
 
-  // CORS middleware with configuration
+  // CORS middleware
   {
     name: 'strapi::cors',
     config: {
       enabled: true,
       origin: [
-        'http://localhost:3000', 
-        'http://172.20.10.4:3000',        
-         'https://musicbizqr.com', 
+        'http://localhost:3000',
+        'http://172.20.10.4:3000',
+        'https://musicbizqr.com',
       ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-      headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'], // Explicitly allowed headers
-
+      headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
       keepHeaderOnError: true,
     },
   },
 
-  // Other middlewares
+  // Powered By header
   'strapi::poweredBy',
+
+  // Query middleware
   'strapi::query',
-  'strapi::body',
+
+  // Body middleware WITH UPDATED LIMITS
+  {
+    name: 'strapi::body',
+    config: {
+      formLimit: '50mb',  // Adjust the size as needed
+      jsonLimit: '50mb',
+      textLimit: '50mb',
+    },
+  },
+
+  // Session middleware
   'strapi::session',
+
+  // Favicon middleware
   'strapi::favicon',
+
+  // Public middleware
   'strapi::public',
 ];
