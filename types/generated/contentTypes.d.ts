@@ -946,6 +946,12 @@ export interface ApiBandBand extends Schema.CollectionType {
     websitelink: Attribute.String;
     websitelinktext: Attribute.String;
     biotagline: Attribute.String;
+    link_clicks: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::link-click.link-click'
+    >;
+    reverbnation: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1035,6 +1041,43 @@ export interface ApiFuntestFuntest extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::funtest.funtest',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiLinkClickLinkClick extends Schema.CollectionType {
+  collectionName: 'link_clicks';
+  info: {
+    singularName: 'link-click';
+    pluralName: 'link-clicks';
+    displayName: 'link-click';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::link-click.link-click',
+      'manyToOne',
+      'api::band.band'
+    >;
+    platform: Attribute.String;
+    clickCount: Attribute.Integer & Attribute.DefaultTo<0>;
+    timestamp: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::link-click.link-click',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::link-click.link-click',
       'oneToOne',
       'admin::user'
     > &
@@ -1302,6 +1345,7 @@ declare module '@strapi/types' {
       'api::band.band': ApiBandBand;
       'api::event.event': ApiEventEvent;
       'api::funtest.funtest': ApiFuntestFuntest;
+      'api::link-click.link-click': ApiLinkClickLinkClick;
       'api::qr.qr': ApiQrQr;
       'api::scan.scan': ApiScanScan;
       'api::socialpage.socialpage': ApiSocialpageSocialpage;

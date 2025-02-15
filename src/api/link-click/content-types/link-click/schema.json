@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "link_clicks",
+  "info": {
+    "singularName": "link-click",
+    "pluralName": "link-clicks",
+    "displayName": "link-click"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "inversedBy": "link_clicks"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "clickCount": {
+      "type": "integer",
+      "default": 0
+    },
+    "timestamp": {
+      "type": "datetime"
+    }
+  }
+}

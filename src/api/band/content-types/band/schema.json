@@ -125,6 +125,15 @@
     },
     "biotagline": {
       "type": "string"
+    },
+    "link_clicks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::link-click.link-click",
+      "mappedBy": "band"
+    },
+    "reverbnation": {
+      "type": "string"
     }
   }
 }
