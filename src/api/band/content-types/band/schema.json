@@ -75,7 +75,7 @@
       "target": "api::tour.tour",
       "mappedBy": "bands"
     },
-    "dezzer": {
+    "deezer": {
       "type": "string"
     },
     "youtube": {
@@ -96,7 +96,7 @@
     "whatsapp": {
       "type": "string"
     },
-    "tictok": {
+    "tiktok": {
       "type": "string"
     },
     "singlesong": {

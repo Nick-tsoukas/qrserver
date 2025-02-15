@@ -928,7 +928,7 @@ export interface ApiBandBand extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     tours: Attribute.Relation<'api::band.band', 'manyToMany', 'api::tour.tour'>;
-    dezzer: Attribute.String;
+    deezer: Attribute.String;
     youtube: Attribute.String;
     bandcamp: Attribute.String;
     videos: Attribute.Relation<
@@ -938,7 +938,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     >;
     twitter: Attribute.String;
     whatsapp: Attribute.String;
-    tictok: Attribute.String;
+    tiktok: Attribute.String;
     singlesong: Attribute.Component<'singlesong.singlesong'>;
     singlevideo: Attribute.Component<'singlevideo.singlevideo'>;
     spotify: Attribute.String;

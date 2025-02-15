@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-02-15T22:08:49.853Z"
+    "x-generation-date": "2025-02-15T22:49:16.415Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3888,7 +3888,7 @@
                           }
                         }
                       },
-                      "dezzer": {
+                      "deezer": {
                         "type": "string"
                       },
                       "youtube": {
@@ -3923,7 +3923,7 @@
                       "whatsapp": {
                         "type": "string"
                       },
-                      "tictok": {
+                      "tiktok": {
                         "type": "string"
                       },
                       "singlesong": {
@@ -4781,7 +4781,7 @@
                   "example": "string or id"
                 }
               },
-              "dezzer": {
+              "deezer": {
                 "type": "string"
               },
               "youtube": {
@@ -4810,7 +4810,7 @@
               "whatsapp": {
                 "type": "string"
               },
-              "tictok": {
+              "tiktok": {
                 "type": "string"
               },
               "singlesong": {
@@ -8331,7 +8331,7 @@
                                         }
                                       }
                                     },
-                                    "dezzer": {
+                                    "deezer": {
                                       "type": "string"
                                     },
                                     "youtube": {
@@ -8366,7 +8366,7 @@
                                     "whatsapp": {
                                       "type": "string"
                                     },
-                                    "tictok": {
+                                    "tiktok": {
                                       "type": "string"
                                     },
                                     "singlesong": {
@@ -9003,7 +9003,7 @@
               }
             }
           },
-          "dezzer": {
+          "deezer": {
             "type": "string"
           },
           "youtube": {
@@ -9038,7 +9038,7 @@
           "whatsapp": {
             "type": "string"
           },
-          "tictok": {
+          "tiktok": {
             "type": "string"
           },
           "singlesong": {
@@ -13284,7 +13284,7 @@
                           }
                         }
                       },
-                      "dezzer": {
+                      "deezer": {
                         "type": "string"
                       },
                       "youtube": {
@@ -13319,7 +13319,7 @@
                       "whatsapp": {
                         "type": "string"
                       },
-                      "tictok": {
+                      "tiktok": {
                         "type": "string"
                       },
                       "singlesong": {
@@ -17706,7 +17706,7 @@
                           }
                         }
                       },
-                      "dezzer": {
+                      "deezer": {
                         "type": "string"
                       },
                       "youtube": {
@@ -17741,7 +17741,7 @@
                       "whatsapp": {
                         "type": "string"
                       },
-                      "tictok": {
+                      "tiktok": {
                         "type": "string"
                       },
                       "singlesong": {
@@ -21957,7 +21957,7 @@
                           }
                         }
                       },
-                      "dezzer": {
+                      "deezer": {
                         "type": "string"
                       },
                       "youtube": {
@@ -21992,7 +21992,7 @@
                       "whatsapp": {
                         "type": "string"
                       },
-                      "tictok": {
+                      "tiktok": {
                         "type": "string"
                       },
                       "singlesong": {
@@ -25856,7 +25856,7 @@
                                       }
                                     }
                                   },
-                                  "dezzer": {
+                                  "deezer": {
                                     "type": "string"
                                   },
                                   "youtube": {
@@ -25891,7 +25891,7 @@
                                   "whatsapp": {
                                     "type": "string"
                                   },
-                                  "tictok": {
+                                  "tiktok": {
                                     "type": "string"
                                   },
                                   "singlesong": {
@@ -29147,7 +29147,7 @@
                                                     }
                                                   }
                                                 },
-                                                "dezzer": {
+                                                "deezer": {
                                                   "type": "string"
                                                 },
                                                 "youtube": {
@@ -29431,7 +29431,7 @@
                                                 "whatsapp": {
                                                   "type": "string"
                                                 },
-                                                "tictok": {
+                                                "tiktok": {
                                                   "type": "string"
                                                 },
                                                 "singlesong": {
@@ -33213,7 +33213,7 @@
                                                     }
                                                   }
                                                 },
-                                                "dezzer": {
+                                                "deezer": {
                                                   "type": "string"
                                                 },
                                                 "youtube": {
@@ -33497,7 +33497,7 @@
                                                 "whatsapp": {
                                                   "type": "string"
                                                 },
-                                                "tictok": {
+                                                "tiktok": {
                                                   "type": "string"
                                                 },
                                                 "singlesong": {
@@ -38463,7 +38463,7 @@
                                         }
                                       }
                                     },
-                                    "dezzer": {
+                                    "deezer": {
                                       "type": "string"
                                     },
                                     "youtube": {
@@ -38498,7 +38498,7 @@
                                     "whatsapp": {
                                       "type": "string"
                                     },
-                                    "tictok": {
+                                    "tiktok": {
                                       "type": "string"
                                     },
                                     "singlesong": {
@@ -41660,7 +41660,7 @@
                                                     }
                                                   }
                                                 },
-                                                "dezzer": {
+                                                "deezer": {
                                                   "type": "string"
                                                 },
                                                 "youtube": {
@@ -41944,7 +41944,7 @@
                                                 "whatsapp": {
                                                   "type": "string"
                                                 },
-                                                "tictok": {
+                                                "tiktok": {
                                                   "type": "string"
                                                 },
                                                 "singlesong": {
