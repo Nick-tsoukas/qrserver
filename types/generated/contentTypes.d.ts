@@ -952,6 +952,7 @@ export interface ApiBandBand extends Schema.CollectionType {
       'api::link-click.link-click'
     >;
     reverbnation: Attribute.String;
+    isBandNameInLogo: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

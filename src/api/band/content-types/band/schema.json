@@ -134,6 +134,10 @@
     },
     "reverbnation": {
       "type": "string"
+    },
+    "isBandNameInLogo": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
