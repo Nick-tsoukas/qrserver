@@ -54,6 +54,8 @@ export interface SinglesongSinglesong extends Schema.Component {
   attributes: {
     title: Attribute.String;
     song: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    embedUrl: Attribute.String;
+    isEmbeded: Attribute.Boolean;
   };
 }
 
