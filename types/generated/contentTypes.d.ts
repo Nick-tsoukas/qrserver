@@ -953,6 +953,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     >;
     reverbnation: Attribute.String;
     isBandNameInLogo: Attribute.Boolean & Attribute.DefaultTo<false>;
+    slug: Attribute.UID<'api::band.band', 'name'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
