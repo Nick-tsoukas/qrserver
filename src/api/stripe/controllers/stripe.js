@@ -49,8 +49,8 @@ module.exports = {
         payment_method_types: ["card"],
         mode: "setup", // storing card for future use
         success_url:
-          "https://musicbizqr.com/signup-success?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url: "https://musicbizqr.com/signup-cancelled",
+          "https://musicbizqr.com/signupSuccess?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url: "https://musicbizqr.com/signupCancelled",
       });
 
       // 2) Return the Stripe Checkout URL
