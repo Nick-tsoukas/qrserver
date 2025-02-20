@@ -75,6 +75,7 @@ module.exports = [
         'http://localhost:3000',
         'http://172.20.10.4:3000',
         'https://musicbizqr.com',
+        'https://www.musicbizqr.com'
       ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
