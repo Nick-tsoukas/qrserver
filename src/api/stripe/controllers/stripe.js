@@ -73,26 +73,39 @@ module.exports = {
   async confirmPayment(ctx) {
     try {
       const { session_id, email, password, name } = ctx.request.body;
+      console.log("🔹 Confirm Payment Triggered");
+      console.log("✅ Received Data:", { session_id, email, name });
       if (!session_id || !email || !password || !name) {
+        console.log("❌ Missing required fields");
         return ctx.badRequest("Missing required fields.");
       }
 
       // 1) Retrieve session from Stripe
+      console.log("🔍 Retrieving Stripe session...");
       const session = await stripe.checkout.sessions.retrieve(session_id);
       if (!session || !session.customer) {
+        console.error("❌ Invalid session or customer not found");
         return ctx.badRequest("Invalid session or no customer found.");
       }
 
       const customerId = session.customer;
+      console.log("✅ Stripe Customer ID:", customerId);
+
 
       // 2) Check if there's a saved payment method
       const paymentMethods = await stripe.paymentMethods.list({
         customer: customerId,
         type: "card",
       });
+      console.log('checking payment')
       if (!paymentMethods.data.length) {
+        console.error("❌ No payment method found for customer:", customerId);
+
         return ctx.badRequest("No payment method found for this customer.");
       }
+
+      console.log("✅ Payment method found:", paymentMethods.data[0].id);
+
 
       // 3) Create a Stripe subscription with a 30-day trial
       //    Replace "price_12345" with your actual Price ID from Stripe.
@@ -101,9 +114,13 @@ module.exports = {
         items: [{ price: "price_12345" }], // your plan/price
         trial_period_days: 30,             // 30-day free trial
       });
+      console.log("✅ Subscription Created:", subscription.id);
+
 
       // 4) Create user in Strapi with 30-day trial and store subscription info
       //    Using Strapi's Users-Permissions plugin
+      console.log("🔹 Creating user in Strapi...");
+
       const newUser = await strapi
         .plugin("users-permissions")
         .service("user")
