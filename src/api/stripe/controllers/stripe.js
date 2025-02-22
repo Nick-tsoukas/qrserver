@@ -4,7 +4,7 @@ const Stripe = require("stripe");
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  // Optionally set apiVersion if needed. Otherwise, Stripe uses your default account version.
+  // Optionally set apiVersion if needed.
 });
 
 module.exports = {
@@ -20,10 +20,8 @@ module.exports = {
         return ctx.badRequest("Missing email or name.");
       }
 
-      // 1) Create Stripe customer
+      // Create Stripe customer
       const customer = await stripe.customers.create({ email, name });
-
-      // 2) Return the customer's ID
       return ctx.send({ customerId: customer.id });
     } catch (error) {
       console.error(error);
@@ -43,7 +41,7 @@ module.exports = {
         return ctx.badRequest("Missing customerId.");
       }
 
-      // 1) Create a "setup" session (no immediate charge)
+      // Create a "setup" session (no immediate charge)
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ["card"],
@@ -53,7 +51,6 @@ module.exports = {
         cancel_url: "https://musicbizqr.com/signupCancelled",
       });
 
-      // 2) Return the Stripe Checkout URL
       return ctx.send({ url: session.url });
     } catch (error) {
       console.error(error);
@@ -68,7 +65,7 @@ module.exports = {
    * 1) Retrieve the session from Stripe
    * 2) Check for a stored payment method
    * 3) Create a 30-day trial subscription in Stripe
-   * 4) Create the user in Strapi
+   * 4) Create the user in Strapi (using fields that match your schema)
    */
   async confirmPayment(ctx) {
     try {
@@ -80,89 +77,72 @@ module.exports = {
         return ctx.badRequest("Missing required fields.");
       }
 
-      // 1) Retrieve session from Stripe
+      // Retrieve session from Stripe
       console.log("🔍 Retrieving Stripe session...");
       const session = await stripe.checkout.sessions.retrieve(session_id);
       if (!session || !session.customer) {
         console.error("❌ Invalid session or customer not found");
         return ctx.badRequest("Invalid session or no customer found.");
       }
-
       const customerId = session.customer;
       console.log("✅ Stripe Customer ID:", customerId);
 
-
-      // 2) Check if there's a saved payment method
+      // Check if there's a saved payment method
+      console.log("Checking payment method...");
       const paymentMethods = await stripe.paymentMethods.list({
         customer: customerId,
         type: "card",
       });
-      console.log('checking payment')
       if (!paymentMethods.data.length) {
         console.error("❌ No payment method found for customer:", customerId);
-
         return ctx.badRequest("No payment method found for this customer.");
       }
-
       console.log("✅ Payment method found:", paymentMethods.data[0].id);
 
-
-      // 3) Create a Stripe subscription with a 30-day trial
-      //    Replace "price_12345" with your actual Price ID from Stripe.
+      // Create a Stripe subscription with a 30-day trial
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
-        items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }], // your plan/price
-        trial_period_days: 30,             // 30-day free trial
+        items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }], // Replace with your valid Price ID
+        trial_period_days: 30,
       });
       console.log("✅ Subscription Created:", subscription.id);
 
-
-      // 4) Create user in Strapi with 30-day trial and store subscription info
-      //    Using Strapi's Users-Permissions plugin
+      // Create user in Strapi using the correct field names per your schema
       console.log("🔹 Creating user in Strapi...");
-
       const newUser = await strapi
-      .plugin("users-permissions")
-      .service("user")
-      .add({
-        email,
-        password,
-        username: email, // or another unique username if needed
-        // Remove "name" unless you add it to your schema
-        customerId: customerId,
-        subscriptionId: subscription.id,
-        subscriptionStatus: "trialing",
-        trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        confirmed: true,
-      });
-      // 5) Return the created user
-      console.log('trying to create a new users ', newUser)
+        .plugin("users-permissions")
+        .service("user")
+        .add({
+          email,
+          password,
+          username: email, // using email as username (must be unique)
+          // Remove the 'name' field unless added to the schema
+          customerId: customerId,
+          subscriptionId: subscription.id,
+          subscriptionStatus: "trialing",
+          trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          confirmed: true,
+        });
+      console.log("✅ New User Created:", newUser);
       return ctx.send({ user: newUser });
     } catch (error) {
-      console.error(error, 'this is an error ');
-      return ctx.badRequest("Payment confirmation failed. no user created ");
+      console.error("Error in confirmPayment:", error);
+      return ctx.badRequest("Payment confirmation failed. No user created.");
     }
   },
 
   /**
    * POST /api/stripe/webhook
    * Handles subscription lifecycle events from Stripe
-   *
-   * Make sure to:
-   * - Define this route in src/api/stripe/routes/stripe.js
-   * - Allow Public access in Strapi Roles & Permissions
-   * - Set STRIPE_WEBHOOK_SECRET in your .env (e.g., whsec_12345)
    */
   async testRoute(ctx) {
     return ctx.send({ message: "This is a test route" });
   },
+
   async webhook(ctx) {
     let event;
     try {
-      // 1) Get the Stripe signature from the headers
       const sig = ctx.request.headers["stripe-signature"];
-
-      // 2) Construct the event using rawBody & your webhook secret
       event = stripe.webhooks.constructEvent(
         ctx.request.rawBody,
         sig,
@@ -173,16 +153,15 @@ module.exports = {
       return ctx.badRequest(`Webhook Error: ${err.message}`);
     }
 
-    // 3) Handle the event by type
+    // Handle the event by type
     switch (event.type) {
       case "invoice.payment_succeeded": {
         const invoice = event.data.object;
         const subscriptionId = invoice.subscription;
 
-        // Mark user subscription as active
         try {
           await strapi.db.query("plugin::users-permissions.user").update({
-            where: { stripeSubscriptionId: subscriptionId },
+            where: { subscriptionId: subscriptionId },
             data: { subscriptionStatus: "active" },
           });
         } catch (updateErr) {
@@ -195,10 +174,9 @@ module.exports = {
         const invoice = event.data.object;
         const subscriptionId = invoice.subscription;
 
-        // Mark user subscription as past_due
         try {
           await strapi.db.query("plugin::users-permissions.user").update({
-            where: { stripeSubscriptionId: subscriptionId },
+            where: { subscriptionId: subscriptionId },
             data: { subscriptionStatus: "past_due" },
           });
         } catch (updateErr) {
@@ -207,13 +185,12 @@ module.exports = {
         break;
       }
 
-      // Handle other events, e.g. customer.subscription.updated (for cancellations)
       case "customer.subscription.updated": {
         const subscription = event.data.object;
         if (subscription.status === "canceled") {
           try {
             await strapi.db.query("plugin::users-permissions.user").update({
-              where: { stripeSubscriptionId: subscription.id },
+              where: { subscriptionId: subscription.id },
               data: { subscriptionStatus: "canceled" },
             });
           } catch (updateErr) {
@@ -228,7 +205,6 @@ module.exports = {
         break;
     }
 
-    // 4) Return a 200 response to Stripe
     return ctx.send({ received: true });
   },
 };
