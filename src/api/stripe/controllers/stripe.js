@@ -137,10 +137,11 @@ module.exports = {
         });
 
       // 5) Return the created user
+      console.log('trying to create a new users ', newUser)
       return ctx.send({ user: newUser });
     } catch (error) {
-      console.error(error);
-      return ctx.badRequest("Payment confirmation failed.");
+      console.error(error, 'this is an error ');
+      return ctx.badRequest("Payment confirmation failed. no user created ");
     }
   },
 
