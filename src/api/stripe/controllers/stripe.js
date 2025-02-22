@@ -57,79 +57,90 @@ module.exports = {
       return ctx.badRequest("Failed to create checkout session.");
     }
   },
-
-  /**
-   * POST /api/stripe/confirm-payment
-   * Body: { session_id, email, password, name }
-   *
-   * 1) Retrieve the session from Stripe
-   * 2) Check for a stored payment method
-   * 3) Create a 30-day trial subscription in Stripe
-   * 4) Create the user in Strapi (using fields that match your schema)
-   */
-  async confirmPayment(ctx) {
-    try {
-      const { session_id, email, password, name } = ctx.request.body;
-      console.log("🔹 Confirm Payment Triggered");
-      console.log("✅ Received Data:", { session_id, email, name });
-      if (!session_id || !email || !password || !name) {
-        console.log("❌ Missing required fields");
-        return ctx.badRequest("Missing required fields.");
-      }
-
-      // Retrieve session from Stripe
-      console.log("🔍 Retrieving Stripe session...");
-      const session = await stripe.checkout.sessions.retrieve(session_id);
-      if (!session || !session.customer) {
-        console.error("❌ Invalid session or customer not found");
-        return ctx.badRequest("Invalid session or no customer found.");
-      }
-      const customerId = session.customer;
-      console.log("✅ Stripe Customer ID:", customerId);
-
-      // Check if there's a saved payment method
-      console.log("Checking payment method...");
-      const paymentMethods = await stripe.paymentMethods.list({
-        customer: customerId,
-        type: "card",
-      });
-      if (!paymentMethods.data.length) {
-        console.error("❌ No payment method found for customer:", customerId);
-        return ctx.badRequest("No payment method found for this customer.");
-      }
-      console.log("✅ Payment method found:", paymentMethods.data[0].id);
-
-      // Create a Stripe subscription with a 30-day trial
-      const subscription = await stripe.subscriptions.create({
-        customer: customerId,
-        items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }], // Replace with your valid Price ID
-        trial_period_days: 30,
-      });
-      console.log("✅ Subscription Created:", subscription.id);
-
-      // Create user in Strapi using the correct field names per your schema
-      console.log("🔹 Creating user in Strapi...");
-      const newUser = await strapi
-        .plugin("users-permissions")
-        .service("user")
-        .add({
-          email,
-          password,
-          username: email, // using email as username (must be unique)
-          // Remove the 'name' field unless added to the schema
-          customerId: customerId,
-          subscriptionId: subscription.id,
-          subscriptionStatus: "trialing",
-          trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          confirmed: true,
-        });
-      console.log("✅ New User Created:", newUser);
-      return ctx.send({ user: newUser });
-    } catch (error) {
-      console.error("Error in confirmPayment:", error);
-      return ctx.badRequest("Payment confirmation failed. No user created.");
+/**
+ * POST /api/stripe/confirm-payment
+ * Body: { session_id, email, password, name }
+ *
+ * 1) Retrieve the session from Stripe
+ * 2) Check for a stored payment method
+ * 3) Create a 30-day trial subscription in Stripe
+ * 4) Create the user in Strapi (using fields that match your schema)
+ */
+async confirmPayment(ctx) {
+  try {
+    const { session_id, email, password, name } = ctx.request.body;
+    console.log("🔹 Confirm Payment Triggered");
+    console.log("✅ Received Data:", { session_id, email, name });
+    if (!session_id || !email || !password || !name) {
+      console.log("❌ Missing required fields");
+      return ctx.badRequest("Missing required fields.");
     }
-  },
+
+    // Retrieve session from Stripe
+    console.log("🔍 Retrieving Stripe session...");
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    if (!session || !session.customer) {
+      console.error("❌ Invalid session or customer not found");
+      return ctx.badRequest("Invalid session or no customer found.");
+    }
+    const customerId = session.customer;
+    console.log("✅ Stripe Customer ID:", customerId);
+
+    // Check if there's a saved payment method
+    console.log("Checking payment method...");
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: customerId,
+      type: "card",
+    });
+    if (!paymentMethods.data.length) {
+      console.error("❌ No payment method found for customer:", customerId);
+      return ctx.badRequest("No payment method found for this customer.");
+    }
+    console.log("✅ Payment method found:", paymentMethods.data[0].id);
+
+    // Create a Stripe subscription with a 30-day trial
+    const subscription = await stripe.subscriptions.create({
+      customer: customerId,
+      items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }], // Replace with your valid Price ID
+      trial_period_days: 30,
+    });
+    console.log("✅ Subscription Created:", subscription.id);
+
+    // Retrieve the default public role
+    const publicRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+      where: { type: 'public' }
+    });
+    if (!publicRole) {
+      console.error("❌ Public role not found");
+      return ctx.badRequest("Public role not found.");
+    }
+
+    // Create user in Strapi with the correct field names and assign the public role,
+    // and explicitly set the provider to "local"
+    console.log("🔹 Creating user in Strapi...");
+    const newUser = await strapi
+      .plugin("users-permissions")
+      .service("user")
+      .add({
+        email,
+        password,
+        username: email, // using email as username (must be unique)
+        provider: "local", // explicitly set provider so login works
+        customerId: customerId,
+        subscriptionId: subscription.id,
+        subscriptionStatus: "trialing",
+        trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        confirmed: true,
+        role: publicRole.id, // assign the public role
+      });
+    console.log("✅ New User Created:", newUser);
+    return ctx.send({ user: newUser });
+  } catch (error) {
+    console.error("Error in confirmPayment:", error);
+    return ctx.badRequest("Payment confirmation failed. No user created.");
+  }
+}
+
 
   /**
    * POST /api/stripe/webhook
