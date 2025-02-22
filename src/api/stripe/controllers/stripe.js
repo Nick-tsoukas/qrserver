@@ -107,12 +107,12 @@ async confirmPayment(ctx) {
     console.log("✅ Subscription Created:", subscription.id);
 
     // Retrieve the default public role
-    const publicRole = await strapi.db.query('plugin::users-permissions.role').findOne({
-      where: { type: 'public' }
+    const authRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+      where: { type: 'authenticated' }
     });
-    if (!publicRole) {
-      console.error("❌ Public role not found");
-      return ctx.badRequest("Public role not found.");
+    if (!authRole) {
+      console.error("❌ Authenticated role not found");
+      return ctx.badRequest("Authenticated role not found.");
     }
 
     // Create user in Strapi with the correct field names and assign the public role,
@@ -131,7 +131,7 @@ async confirmPayment(ctx) {
         subscriptionStatus: "trialing",
         trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         confirmed: true,
-        role: publicRole.id, // assign the public role
+        role: authRole.id, // assign the authenticated role
       });
     console.log("✅ New User Created:", newUser);
     return ctx.send({ user: newUser });
