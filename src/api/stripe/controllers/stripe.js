@@ -140,7 +140,7 @@ async confirmPayment(ctx) {
     return ctx.badRequest("Payment confirmation failed. No user created.");
   }
 }
-
+,
 
   /**
    * POST /api/stripe/webhook
