@@ -111,7 +111,7 @@ module.exports = {
       //    Replace "price_12345" with your actual Price ID from Stripe.
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
-        items: [{ price: "price_12345" }], // your plan/price
+        items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }], // your plan/price
         trial_period_days: 30,             // 30-day free trial
       });
       console.log("✅ Subscription Created:", subscription.id);
