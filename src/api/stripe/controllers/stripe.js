@@ -122,20 +122,19 @@ module.exports = {
       console.log("🔹 Creating user in Strapi...");
 
       const newUser = await strapi
-        .plugin("users-permissions")
-        .service("user")
-        .add({
-          email,
-          password,
-          username: email, // or however you handle the username field
-          name,
-          stripeCustomerId: customerId,
-          stripeSubscriptionId: subscription.id, // store the subscription ID
-          subscriptionStatus: "trialing",
-          trialEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-          confirmed: true, // set to false if you want them to confirm via email
-        });
-
+      .plugin("users-permissions")
+      .service("user")
+      .add({
+        email,
+        password,
+        username: email, // or another unique username if needed
+        // Remove "name" unless you add it to your schema
+        customerId: customerId,
+        subscriptionId: subscription.id,
+        subscriptionStatus: "trialing",
+        trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        confirmed: true,
+      });
       // 5) Return the created user
       console.log('trying to create a new users ', newUser)
       return ctx.send({ user: newUser });
