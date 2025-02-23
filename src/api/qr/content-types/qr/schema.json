@@ -76,7 +76,7 @@
     },
     "scan": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::scan.scan",
       "mappedBy": "qr"
     }
