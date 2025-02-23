@@ -1116,7 +1116,7 @@ export interface ApiQrQr extends Schema.CollectionType {
     event: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::event.event'>;
     tour: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::tour.tour'>;
     scans: Attribute.Integer & Attribute.DefaultTo<0>;
-    scan: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::scan.scan'>;
+    scan: Attribute.Relation<'api::qr.qr', 'oneToMany', 'api::scan.scan'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1141,7 +1141,7 @@ export interface ApiScanScan extends Schema.CollectionType {
   attributes: {
     date: Attribute.String;
     custom: Attribute.JSON;
-    qr: Attribute.Relation<'api::scan.scan', 'oneToOne', 'api::qr.qr'>;
+    qr: Attribute.Relation<'api::scan.scan', 'manyToOne', 'api::qr.qr'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
