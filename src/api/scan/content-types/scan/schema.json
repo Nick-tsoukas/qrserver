@@ -4,16 +4,16 @@
   "info": {
     "singularName": "scan",
     "pluralName": "scans",
-    "displayName": "scan",
+    "displayName": "Scan",
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
     "date": {
-      "type": "string"
+      "type": "datetime"
     },
     "custom": {
       "type": "json"
@@ -22,7 +22,7 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::qr.qr",
-      "inversedBy": "scan"
+      "inversedBy": "scans"
     }
   }
 }

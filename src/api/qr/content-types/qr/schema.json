@@ -70,11 +70,7 @@
       "relation": "oneToOne",
       "target": "api::tour.tour"
     },
-    "scans": {
-      "type": "integer",
-      "default": 0
-    },
-    "scan": {
+   "scans": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::scan.scan",

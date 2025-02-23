@@ -1115,8 +1115,7 @@ export interface ApiQrQr extends Schema.CollectionType {
     album: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::album.album'>;
     event: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::event.event'>;
     tour: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::tour.tour'>;
-    scans: Attribute.Integer & Attribute.DefaultTo<0>;
-    scan: Attribute.Relation<'api::qr.qr', 'oneToMany', 'api::scan.scan'>;
+    scans: Attribute.Relation<'api::qr.qr', 'oneToMany', 'api::scan.scan'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1132,19 +1131,18 @@ export interface ApiScanScan extends Schema.CollectionType {
   info: {
     singularName: 'scan';
     pluralName: 'scans';
-    displayName: 'scan';
+    displayName: 'Scan';
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
-    date: Attribute.String;
+    date: Attribute.DateTime;
     custom: Attribute.JSON;
     qr: Attribute.Relation<'api::scan.scan', 'manyToOne', 'api::qr.qr'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::scan.scan', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::scan.scan', 'oneToOne', 'admin::user'> &

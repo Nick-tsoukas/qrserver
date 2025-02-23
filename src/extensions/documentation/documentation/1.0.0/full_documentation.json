@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-02-23T00:13:08.143Z"
+    "x-generation-date": "2025-02-23T16:54:16.336Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2543,9 +2543,6 @@
                                                                 }
                                                               },
                                                               "scans": {
-                                                                "type": "integer"
-                                                              },
-                                                              "scan": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -2560,7 +2557,8 @@
                                                                           "type": "object",
                                                                           "properties": {
                                                                             "date": {
-                                                                              "type": "string"
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "custom": {},
                                                                             "qr": {
@@ -2585,10 +2583,6 @@
                                                                               "format": "date-time"
                                                                             },
                                                                             "updatedAt": {
-                                                                              "type": "string",
-                                                                              "format": "date-time"
-                                                                            },
-                                                                            "publishedAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
                                                                             },
@@ -7173,9 +7167,6 @@
                                                                               }
                                                                             },
                                                                             "scans": {
-                                                                              "type": "integer"
-                                                                            },
-                                                                            "scan": {
                                                                               "type": "object",
                                                                               "properties": {
                                                                                 "data": {
@@ -7190,7 +7181,8 @@
                                                                                         "type": "object",
                                                                                         "properties": {
                                                                                           "date": {
-                                                                                            "type": "string"
+                                                                                            "type": "string",
+                                                                                            "format": "date-time"
                                                                                           },
                                                                                           "custom": {},
                                                                                           "qr": {
@@ -7215,10 +7207,6 @@
                                                                                             "format": "date-time"
                                                                                           },
                                                                                           "updatedAt": {
-                                                                                            "type": "string",
-                                                                                            "format": "date-time"
-                                                                                          },
-                                                                                          "publishedAt": {
                                                                                             "type": "string",
                                                                                             "format": "date-time"
                                                                                           },
@@ -11987,9 +11975,6 @@
                                                                 }
                                                               },
                                                               "scans": {
-                                                                "type": "integer"
-                                                              },
-                                                              "scan": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -12004,7 +11989,8 @@
                                                                           "type": "object",
                                                                           "properties": {
                                                                             "date": {
-                                                                              "type": "string"
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "custom": {},
                                                                             "qr": {
@@ -12029,10 +12015,6 @@
                                                                               "format": "date-time"
                                                                             },
                                                                             "updatedAt": {
-                                                                              "type": "string",
-                                                                              "format": "date-time"
-                                                                            },
-                                                                            "publishedAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
                                                                             },
@@ -16424,9 +16406,6 @@
                                                                 }
                                                               },
                                                               "scans": {
-                                                                "type": "integer"
-                                                              },
-                                                              "scan": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -16441,7 +16420,8 @@
                                                                           "type": "object",
                                                                           "properties": {
                                                                             "date": {
-                                                                              "type": "string"
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "custom": {},
                                                                             "qr": {
@@ -16466,10 +16446,6 @@
                                                                               "format": "date-time"
                                                                             },
                                                                             "updatedAt": {
-                                                                              "type": "string",
-                                                                              "format": "date-time"
-                                                                            },
-                                                                            "publishedAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
                                                                             },
@@ -18325,9 +18301,6 @@
                 "example": "string or id"
               },
               "scans": {
-                "type": "integer"
-              },
-              "scan": {
                 "type": "array",
                 "items": {
                   "oneOf": [
@@ -20693,9 +20666,6 @@
                                                                 }
                                                               },
                                                               "scans": {
-                                                                "type": "integer"
-                                                              },
-                                                              "scan": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -20710,7 +20680,8 @@
                                                                           "type": "object",
                                                                           "properties": {
                                                                             "date": {
-                                                                              "type": "string"
+                                                                              "type": "string",
+                                                                              "format": "date-time"
                                                                             },
                                                                             "custom": {},
                                                                             "qr": {
@@ -20735,10 +20706,6 @@
                                                                               "format": "date-time"
                                                                             },
                                                                             "updatedAt": {
-                                                                              "type": "string",
-                                                                              "format": "date-time"
-                                                                            },
-                                                                            "publishedAt": {
                                                                               "type": "string",
                                                                               "format": "date-time"
                                                                             },
@@ -22501,9 +22468,6 @@
             }
           },
           "scans": {
-            "type": "integer"
-          },
-          "scan": {
             "type": "object",
             "properties": {
               "data": {
@@ -22614,7 +22578,8 @@
             "type": "object",
             "properties": {
               "date": {
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               },
               "custom": {},
               "qr": {
@@ -22682,7 +22647,8 @@
         "type": "object",
         "properties": {
           "date": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "custom": {},
           "qr": {
@@ -26423,9 +26389,6 @@
                         }
                       },
                       "scans": {
-                        "type": "integer"
-                      },
-                      "scan": {
                         "type": "object",
                         "properties": {
                           "data": {
@@ -26440,7 +26403,8 @@
                                   "type": "object",
                                   "properties": {
                                     "date": {
-                                      "type": "string"
+                                      "type": "string",
+                                      "format": "date-time"
                                     },
                                     "custom": {},
                                     "qr": {
@@ -26465,10 +26429,6 @@
                                       "format": "date-time"
                                     },
                                     "updatedAt": {
-                                      "type": "string",
-                                      "format": "date-time"
-                                    },
-                                    "publishedAt": {
                                       "type": "string",
                                       "format": "date-time"
                                     },
@@ -26570,10 +26530,6 @@
             "format": "date-time"
           },
           "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "publishedAt": {
             "type": "string",
             "format": "date-time"
           },
@@ -29978,9 +29934,6 @@
                                       }
                                     },
                                     "scans": {
-                                      "type": "integer"
-                                    },
-                                    "scan": {
                                       "type": "object",
                                       "properties": {
                                         "data": {
@@ -29995,7 +29948,8 @@
                                                 "type": "object",
                                                 "properties": {
                                                   "date": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "format": "date-time"
                                                   },
                                                   "custom": {},
                                                   "qr": {
@@ -30020,10 +29974,6 @@
                                                     "format": "date-time"
                                                   },
                                                   "updatedAt": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                  },
-                                                  "publishedAt": {
                                                     "type": "string",
                                                     "format": "date-time"
                                                   },
@@ -34059,9 +34009,6 @@
                                       }
                                     },
                                     "scans": {
-                                      "type": "integer"
-                                    },
-                                    "scan": {
                                       "type": "object",
                                       "properties": {
                                         "data": {
@@ -34076,7 +34023,8 @@
                                                 "type": "object",
                                                 "properties": {
                                                   "date": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "format": "date-time"
                                                   },
                                                   "custom": {},
                                                   "qr": {
@@ -34101,10 +34049,6 @@
                                                     "format": "date-time"
                                                   },
                                                   "updatedAt": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                  },
-                                                  "publishedAt": {
                                                     "type": "string",
                                                     "format": "date-time"
                                                   },
@@ -37262,9 +37206,6 @@
                                                                               }
                                                                             },
                                                                             "scans": {
-                                                                              "type": "integer"
-                                                                            },
-                                                                            "scan": {
                                                                               "type": "object",
                                                                               "properties": {
                                                                                 "data": {
@@ -37279,7 +37220,8 @@
                                                                                         "type": "object",
                                                                                         "properties": {
                                                                                           "date": {
-                                                                                            "type": "string"
+                                                                                            "type": "string",
+                                                                                            "format": "date-time"
                                                                                           },
                                                                                           "custom": {},
                                                                                           "qr": {
@@ -37304,10 +37246,6 @@
                                                                                             "format": "date-time"
                                                                                           },
                                                                                           "updatedAt": {
-                                                                                            "type": "string",
-                                                                                            "format": "date-time"
-                                                                                          },
-                                                                                          "publishedAt": {
                                                                                             "type": "string",
                                                                                             "format": "date-time"
                                                                                           },
@@ -42536,9 +42474,6 @@
                                       }
                                     },
                                     "scans": {
-                                      "type": "integer"
-                                    },
-                                    "scan": {
                                       "type": "object",
                                       "properties": {
                                         "data": {
@@ -42553,7 +42488,8 @@
                                                 "type": "object",
                                                 "properties": {
                                                   "date": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "format": "date-time"
                                                   },
                                                   "custom": {},
                                                   "qr": {
@@ -42578,10 +42514,6 @@
                                                     "format": "date-time"
                                                   },
                                                   "updatedAt": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                  },
-                                                  "publishedAt": {
                                                     "type": "string",
                                                     "format": "date-time"
                                                   },
