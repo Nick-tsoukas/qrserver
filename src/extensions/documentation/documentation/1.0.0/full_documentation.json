@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-02-23T16:54:16.336Z"
+    "x-generation-date": "2025-02-23T17:35:02.898Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2626,6 +2626,9 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "slugId": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -7250,6 +7253,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "slugId": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -12059,6 +12065,9 @@
                                                                   }
                                                                 }
                                                               },
+                                                              "slugId": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -16490,6 +16499,9 @@
                                                                   }
                                                                 }
                                                               },
+                                                              "slugId": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -18313,6 +18325,9 @@
                   ],
                   "example": "string or id"
                 }
+              },
+              "slugId": {
+                "type": "string"
               }
             }
           }
@@ -20750,6 +20765,9 @@
                                                                   }
                                                                 }
                                                               },
+                                                              "slugId": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -22486,6 +22504,9 @@
                 }
               }
             }
+          },
+          "slugId": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",
@@ -26473,6 +26494,9 @@
                           }
                         }
                       },
+                      "slugId": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -30017,6 +30041,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "slugId": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -34093,6 +34120,9 @@
                                         }
                                       }
                                     },
+                                    "slugId": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -37289,6 +37319,9 @@
                                                                                   }
                                                                                 }
                                                                               }
+                                                                            },
+                                                                            "slugId": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -42557,6 +42590,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "slugId": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",

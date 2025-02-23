@@ -70,11 +70,14 @@
       "relation": "oneToOne",
       "target": "api::tour.tour"
     },
-   "scans": {
+    "scans": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::scan.scan",
       "mappedBy": "qr"
+    },
+    "slugId": {
+      "type": "string"
     }
   }
 }
