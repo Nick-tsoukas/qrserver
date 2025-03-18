@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-03-18T22:45:23.208Z"
+    "x-generation-date": "2025-03-18T22:49:41.664Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2155,10 +2155,6 @@
                                                                                 }
                                                                               }
                                                                             }
-                                                                          },
-                                                                          "contactEmail": {
-                                                                            "type": "string",
-                                                                            "format": "email"
                                                                           },
                                                                           "contactPhone": {
                                                                             "type": "string"
@@ -6431,10 +6427,6 @@
                                                       }
                                                     }
                                                   },
-                                                  "contactEmail": {
-                                                    "type": "string",
-                                                    "format": "email"
-                                                  },
                                                   "contactPhone": {
                                                     "type": "string"
                                                   },
@@ -9563,10 +9555,6 @@
                 ],
                 "example": "string or id"
               },
-              "contactEmail": {
-                "type": "string",
-                "format": "email"
-              },
               "contactPhone": {
                 "type": "string"
               },
@@ -11593,10 +11581,6 @@
                                                                                 }
                                                                               }
                                                                             }
-                                                                          },
-                                                                          "contactEmail": {
-                                                                            "type": "string",
-                                                                            "format": "email"
                                                                           },
                                                                           "contactPhone": {
                                                                             "type": "string"
@@ -13703,10 +13687,6 @@
                 }
               }
             }
-          },
-          "contactEmail": {
-            "type": "string",
-            "format": "email"
           },
           "contactPhone": {
             "type": "string"
@@ -16027,10 +16007,6 @@
                                                                                 }
                                                                               }
                                                                             }
-                                                                          },
-                                                                          "contactEmail": {
-                                                                            "type": "string",
-                                                                            "format": "email"
                                                                           },
                                                                           "contactPhone": {
                                                                             "type": "string"
@@ -20294,10 +20270,6 @@
                                                                               }
                                                                             }
                                                                           },
-                                                                          "contactEmail": {
-                                                                            "type": "string",
-                                                                            "format": "email"
-                                                                          },
                                                                           "contactPhone": {
                                                                             "type": "string"
                                                                           },
@@ -24406,10 +24378,6 @@
                                                                                 }
                                                                               }
                                                                             }
-                                                                          },
-                                                                          "contactEmail": {
-                                                                            "type": "string",
-                                                                            "format": "email"
                                                                           },
                                                                           "contactPhone": {
                                                                             "type": "string"
@@ -28834,10 +28802,6 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "contactEmail": {
-                                                                "type": "string",
-                                                                "format": "email"
-                                                              },
                                                               "contactPhone": {
                                                                 "type": "string"
                                                               },
@@ -32911,10 +32875,6 @@
                                                                     }
                                                                   }
                                                                 }
-                                                              },
-                                                              "contactEmail": {
-                                                                "type": "string",
-                                                                "format": "email"
                                                               },
                                                               "contactPhone": {
                                                                 "type": "string"
@@ -38959,10 +38919,6 @@
                             }
                           }
                         },
-                        "contactEmail": {
-                          "type": "string",
-                          "format": "email"
-                        },
                         "contactPhone": {
                           "type": "string"
                         },
@@ -41382,10 +41338,6 @@
                                                                     }
                                                                   }
                                                                 }
-                                                              },
-                                                              "contactEmail": {
-                                                                "type": "string",
-                                                                "format": "email"
                                                               },
                                                               "contactPhone": {
                                                                 "type": "string"

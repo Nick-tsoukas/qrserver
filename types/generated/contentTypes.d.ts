@@ -983,7 +983,6 @@ export interface ApiEventEvent extends Schema.CollectionType {
     time: Attribute.Time;
     link: Attribute.String;
     band: Attribute.Relation<'api::event.event', 'manyToOne', 'api::band.band'>;
-    contactEmail: Attribute.Email;
     contactPhone: Attribute.String;
     ageRestriction: Attribute.String;
     users_permissions_user: Attribute.Relation<

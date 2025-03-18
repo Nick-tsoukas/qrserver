@@ -44,9 +44,6 @@
       "target": "api::band.band",
       "inversedBy": "events"
     },
-    "contactEmail": {
-      "type": "email"
-    },
     "contactPhone": {
       "type": "string",
       "required": false
