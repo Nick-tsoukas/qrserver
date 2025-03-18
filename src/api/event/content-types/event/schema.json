@@ -45,8 +45,7 @@
       "inversedBy": "events"
     },
     "contactEmail": {
-      "type": "email",
-      "required": false
+      "type": "email"
     },
     "contactPhone": {
       "type": "string",
