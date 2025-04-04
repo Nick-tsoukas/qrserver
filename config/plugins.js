@@ -1,11 +1,12 @@
-// config/plugins.js or config/env/production/plugins.ts
-
+// config/plugins.js
 module.exports = ({ env }) => ({
+  //------------------------------------------------
+  // 1) UPLOAD PLUGIN CONFIG (AWS-S3)
+  //------------------------------------------------
   upload: {
     config: {
       provider: 'aws-s3',
       providerOptions: {
-        // Optional: If using a CDN or custom domain
         baseUrl: env('CDN_URL'),
         rootPath: env('CDN_ROOT_PATH'),
         s3Options: {
@@ -15,12 +16,8 @@ module.exports = ({ env }) => ({
             secretAccessKey: env('AWS_ACCESS_SECRET'),
           },
         },
-        // 'params' should be at the same level as 's3Options'
         params: {
           Bucket: env('AWS_BUCKET'),
-          // Optional: Set ACL and signed URL expiration if needed
-          // ACL: env('AWS_ACL', 'public-read'),
-          // signedUrlExpires: env('AWS_SIGNED_URL_EXPIRES', 15 * 60),
         },
       },
       actionOptions: {
@@ -30,8 +27,6 @@ module.exports = ({ env }) => ({
             console.log('File details:', JSON.stringify(file, null, 2));
             console.log('AWS Region:', env('AWS_REGION'));
             console.log('Bucket Name:', env('AWS_BUCKET'));
-
-            // Do not log secret access keys in production
             if (env('NODE_ENV') !== 'production') {
               console.log('AWS Access Key ID:', env('AWS_ACCESS_KEY_ID'));
               console.log('AWS Secret Access Key:', env('AWS_ACCESS_SECRET'));
@@ -49,6 +44,35 @@ module.exports = ({ env }) => ({
         uploadStream: {},
         delete: {},
       },
+    },
+  },
+
+  //------------------------------------------------
+  // 2) EMAIL PLUGIN CONFIG (RESEND-CUSTOM)
+  //------------------------------------------------
+  email: {
+    config: {
+      // Must match your provider’s package/folder name: "strapi-provider-email-resend-custom"
+      provider: 'resend-custom',
+      providerOptions: {
+        apiKey: env('RESEND_API_KEY'),
+      },
+      settings: {
+        defaultFrom: env('EMAIL_DEFAULT_FROM'),
+        defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO'),
+      },
+    },
+  },
+
+  //------------------------------------------------
+  // 3) USERS & PERMISSIONS CONFIG (Optional)
+  //------------------------------------------------
+  'users-permissions': {
+    config: {
+      // Enable email confirmations upon registration
+      emailConfirmation: true,
+      // If you have a custom frontend route for the confirmation redirect
+      emailConfirmationRedirection: 'https://my-frontend.com/after-confirmation',
     },
   },
 });

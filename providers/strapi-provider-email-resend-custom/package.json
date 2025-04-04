@@ -1,0 +1,9 @@
+{
+    "name": "strapi-provider-email-resend-custom",
+    "version": "1.0.0",
+    "main": "index.js",
+    "dependencies": {
+      "resend": "^4.2.0"
+    }
+  }
+  
