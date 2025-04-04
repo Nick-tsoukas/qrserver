@@ -1,9 +1,12 @@
+// config/env/production/plugins.ts (or plugins.js)
 module.exports = ({ env }) => ({
+  //------------------------------------------------
+  // 1) UPLOAD PLUGIN CONFIG (AWS S3)
+  //------------------------------------------------
   upload: {
     config: {
       provider: 'aws-s3',
       providerOptions: {
-        // Optional: If using a CDN or custom domain
         baseUrl: env('CDN_URL'),
         rootPath: env('CDN_ROOT_PATH'),
         s3Options: {
@@ -13,12 +16,8 @@ module.exports = ({ env }) => ({
             secretAccessKey: env('AWS_ACCESS_SECRET'),
           },
         },
-        // 'params' should be at the same level as 's3Options'
         params: {
           Bucket: env('AWS_BUCKET'),
-          // Optional: Set ACL and signed URL expiration if needed
-          // ACL: env('AWS_ACL', 'public-read'),
-          // signedUrlExpires: env('AWS_SIGNED_URL_EXPIRES', 15 * 60),
         },
       },
       actionOptions: {
@@ -29,7 +28,7 @@ module.exports = ({ env }) => ({
             console.log('AWS Region:', env('AWS_REGION'));
             console.log('Bucket Name:', env('AWS_BUCKET'));
 
-            // Do not log secret access keys in production
+            // In production, we typically avoid logging secret keys
             if (env('NODE_ENV') !== 'production') {
               console.log('AWS Access Key ID:', env('AWS_ACCESS_KEY_ID'));
               console.log('AWS Secret Access Key:', env('AWS_ACCESS_SECRET'));
@@ -47,6 +46,32 @@ module.exports = ({ env }) => ({
         uploadStream: {},
         delete: {},
       },
+    },
+  },
+
+  //------------------------------------------------
+  // 2) EMAIL PLUGIN CONFIG (RESEND-CUSTOM)
+  //------------------------------------------------
+  email: {
+    config: {
+      provider: 'resend-custom',
+      providerOptions: {
+        apiKey: env('RESEND_API_KEY'),
+      },
+      settings: {
+        defaultFrom: env('EMAIL_DEFAULT_FROM'),
+        defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO'),
+      },
+    },
+  },
+
+  //------------------------------------------------
+  // 3) USERS & PERMISSIONS CONFIG
+  //------------------------------------------------
+  'users-permissions': {
+    config: {
+      emailConfirmation: true,
+      emailConfirmationRedirection: 'https://my-frontend.com/after-confirmation',
     },
   },
 });
