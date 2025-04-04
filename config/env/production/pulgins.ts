@@ -49,29 +49,5 @@ module.exports = ({ env }) => ({
     },
   },
 
-  //------------------------------------------------
-  // 2) EMAIL PLUGIN CONFIG (RESEND-CUSTOM)
-  //------------------------------------------------
-  email: {
-    config: {
-      provider: 'resend-custom',
-      providerOptions: {
-        apiKey: env('RESEND_API_KEY'),
-      },
-      settings: {
-        defaultFrom: env('EMAIL_DEFAULT_FROM'),
-        defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO'),
-      },
-    },
-  },
 
-  //------------------------------------------------
-  // 3) USERS & PERMISSIONS CONFIG
-  //------------------------------------------------
-  'users-permissions': {
-    config: {
-      emailConfirmation: true,
-      emailConfirmationRedirection: 'https://my-frontend.com/after-confirmation',
-    },
-  },
 });
