@@ -27,6 +27,7 @@ module.exports = ({ env }) => ({
             console.log('File details:', JSON.stringify(file, null, 2));
             console.log('AWS Region:', env('AWS_REGION'));
             console.log('Bucket Name:', env('AWS_BUCKET'));
+
             if (env('NODE_ENV') !== 'production') {
               console.log('AWS Access Key ID:', env('AWS_ACCESS_KEY_ID'));
               console.log('AWS Secret Access Key:', env('AWS_ACCESS_SECRET'));
@@ -52,8 +53,7 @@ module.exports = ({ env }) => ({
   //------------------------------------------------
   email: {
     config: {
-      // Must match your provider’s package/folder name: "strapi-provider-email-resend-custom"
-      provider: 'resend-custom',
+      provider: 'strapi-provider-email-resend',
       providerOptions: {
         apiKey: env('RESEND_API_KEY'),
       },
@@ -69,9 +69,7 @@ module.exports = ({ env }) => ({
   //------------------------------------------------
   'users-permissions': {
     config: {
-      // Enable email confirmations upon registration
       emailConfirmation: true,
-      // If you have a custom frontend route for the confirmation redirect
       emailConfirmationRedirection: 'https://my-frontend.com/after-confirmation',
     },
   },

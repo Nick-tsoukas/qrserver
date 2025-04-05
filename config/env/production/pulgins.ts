@@ -1,4 +1,4 @@
-// config/env/production/plugins.ts (or plugins.js)
+// config/env/production/plugins.ts
 module.exports = ({ env }) => ({
   //------------------------------------------------
   // 1) UPLOAD PLUGIN CONFIG (AWS S3)
@@ -28,7 +28,6 @@ module.exports = ({ env }) => ({
             console.log('AWS Region:', env('AWS_REGION'));
             console.log('Bucket Name:', env('AWS_BUCKET'));
 
-            // In production, we typically avoid logging secret keys
             if (env('NODE_ENV') !== 'production') {
               console.log('AWS Access Key ID:', env('AWS_ACCESS_KEY_ID'));
               console.log('AWS Secret Access Key:', env('AWS_ACCESS_SECRET'));
@@ -49,5 +48,29 @@ module.exports = ({ env }) => ({
     },
   },
 
+  //------------------------------------------------
+  // 2) EMAIL PLUGIN CONFIG (RESEND-CUSTOM)
+  //------------------------------------------------
+  email: {
+    config: {
+      provider: 'strapi-provider-email-resend',
+      providerOptions: {
+        apiKey: env('RESEND_API_KEY'),
+      },
+      settings: {
+        defaultFrom: env('EMAIL_DEFAULT_FROM'),
+        defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO'),
+      },
+    },
+  },
 
+  //------------------------------------------------
+  // 3) USERS & PERMISSIONS CONFIG (Optional)
+  //------------------------------------------------
+  'users-permissions': {
+    config: {
+      emailConfirmation: true,
+      emailConfirmationRedirection: 'https://my-frontend.com/after-confirmation',
+    },
+  },
 });
