@@ -1,6 +1,8 @@
 "use strict";
 
 const Stripe = require("stripe");
+const crypto = require("crypto");
+
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
@@ -49,6 +51,9 @@ module.exports = {
         success_url:
           "https://musicbizqr.com/signupSuccess?session_id={CHECKOUT_SESSION_ID}",
         cancel_url: "https://musicbizqr.com/signupCancelled",
+      //   success_url:
+      //   "http://localhost:3000/signupSuccess?session_id={CHECKOUT_SESSION_ID}",
+      // cancel_url: "http//localhost:3000/signupCancelled",
       });
 
       return ctx.send({ url: session.url });
@@ -69,55 +74,45 @@ module.exports = {
 async confirmPayment(ctx) {
   try {
     const { session_id, email, password, name } = ctx.request.body;
-    console.log("🔹 Confirm Payment Triggered");
-    console.log("✅ Received Data:", { session_id, email, name });
     if (!session_id || !email || !password || !name) {
-      console.log("❌ Missing required fields");
       return ctx.badRequest("Missing required fields.");
     }
 
     // Retrieve session from Stripe
-    console.log("🔍 Retrieving Stripe session...");
     const session = await stripe.checkout.sessions.retrieve(session_id);
     if (!session || !session.customer) {
-      console.error("❌ Invalid session or customer not found");
       return ctx.badRequest("Invalid session or no customer found.");
     }
     const customerId = session.customer;
-    console.log("✅ Stripe Customer ID:", customerId);
 
-    // Check if there's a saved payment method
-    console.log("Checking payment method...");
+    // Ensure a payment method exists
     const paymentMethods = await stripe.paymentMethods.list({
       customer: customerId,
       type: "card",
     });
     if (!paymentMethods.data.length) {
-      console.error("❌ No payment method found for customer:", customerId);
       return ctx.badRequest("No payment method found for this customer.");
     }
-    console.log("✅ Payment method found:", paymentMethods.data[0].id);
 
     // Create a Stripe subscription with a 30-day trial
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
-      items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }], // Replace with your valid Price ID
+      items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }],
       trial_period_days: 30,
     });
-    console.log("✅ Subscription Created:", subscription.id);
 
     // Retrieve the default public role
-    const authRole = await strapi.db.query('plugin::users-permissions.role').findOne({
-      where: { type: 'authenticated' }
+    const authRole = await strapi.db.query("plugin::users-permissions.role").findOne({
+      where: { type: "authenticated" },
     });
     if (!authRole) {
-      console.error("❌ Authenticated role not found");
       return ctx.badRequest("Authenticated role not found.");
     }
 
-    // Create user in Strapi with the correct field names and assign the public role,
-    // and explicitly set the provider to "local"
-    console.log("🔹 Creating user in Strapi...");
+    // Generate a confirmation token
+    const confirmationToken = crypto.randomBytes(20).toString("hex");
+
+    // Create the user in Strapi with confirmed: false and store the token
     const newUser = await strapi
       .plugin("users-permissions")
       .service("user")
@@ -125,16 +120,29 @@ async confirmPayment(ctx) {
         email,
         password,
         username: email, // using email as username (must be unique)
-        provider: "local", // explicitly set provider so login works
+        provider: "local",
         customerId: customerId,
         subscriptionId: subscription.id,
         subscriptionStatus: "trialing",
         trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        confirmed: true,
-        role: authRole.id, // assign the authenticated role
+        confirmed: false, // user is not confirmed yet
+        confirmationToken, // store token for email confirmation
+        role: authRole.id,
       });
-    console.log("✅ New User Created:", newUser);
-    return ctx.send({ user: newUser });
+
+    // Send confirmation email using your email provider
+    await strapi
+      .plugin("email")
+      .service("email")
+      .send({
+        to: email,
+        from: "noreply@musicbizqr.com", // adjust as needed
+        subject: "Confirm your email",
+        text: `Hi ${name},\n\nPlease confirm your email by clicking the following link:\n\nhttps://musicbizqr.com/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
+      });
+
+    // Respond to the client that the confirmation email has been sent
+    return ctx.send({ message: "Confirmation email sent. Please check your inbox." });
   } catch (error) {
     console.error("Error in confirmPayment:", error);
     return ctx.badRequest("Payment confirmation failed. No user created.");
