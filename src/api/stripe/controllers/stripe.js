@@ -138,7 +138,7 @@ async confirmPayment(ctx) {
         to: email,
         from: "noreply@musicbizqr.com", // adjust as needed
         subject: "Confirm your email",
-        text: `Hi ${name},\n\nPlease confirm your email by clicking the following link:\n\nhttps://musicbizqr.com/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
+        text: `Hi ${name},\n\nPlease confirm your email by clicking the following link:\n\nhttps://qrserver-production.up.railway.app/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
       });
 
     // Respond to the client that the confirmation email has been sent
