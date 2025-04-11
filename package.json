@@ -15,7 +15,6 @@
     "@strapi/plugin-documentation": "^4.25.1",
     "@strapi/plugin-i18n": "4.24.4",
     "@strapi/plugin-users-permissions": "4.24.4",
-    "@strapi/provider-email-sendgrid": "^5.11.3",
     "@strapi/provider-upload-aws-s3": "^4.25.11",
     "@strapi/strapi": "4.24.4",
     "@types/stripe": "^8.0.416",
