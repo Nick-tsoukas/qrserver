@@ -141,7 +141,7 @@ async confirmPayment(ctx) {
         text: `Hi ${name},\n\nPlease confirm your email by clicking the following link:\n\nhttps://qrserver-production.up.railway.app/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
       });
 
-    // Respond to the client that the confirmation email has been sent
+    // Responding another test to the client that the confirmation email has been sent
     return ctx.send({ message: "Confirmation email sent. Please check your inbox." });
   } catch (error) {
     console.error("Error in confirmPayment:", error);
