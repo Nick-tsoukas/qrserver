@@ -10,6 +10,34 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 });
 
 module.exports = {
+
+  async getBillingInfo(ctx) {
+    const user = ctx.state.user;
+
+    if (!user || !user.stripeCustomerId) {
+      return ctx.badRequest('Stripe customer not found');
+    }
+
+    try {
+      const customer = await stripe.customers.retrieve(user.stripeCustomerId);
+      const subscriptions = await stripe.subscriptions.list({
+        customer: user.stripeCustomerId,
+        status: 'all',
+        limit: 1,
+      });
+
+      const subscription = subscriptions.data[0];
+
+      return {
+        customer,
+        subscription,
+        trialEndsAt: user.trialEndsAt,
+      };
+    } catch (error) {
+      console.error('Stripe fetch error:', error);
+      ctx.throw(500, 'Error retrieving billing information');
+    }
+  },
   /**
    * POST /api/stripe/create-customer
    * Body: { email, name }

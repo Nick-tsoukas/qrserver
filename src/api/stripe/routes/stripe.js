@@ -3,6 +3,16 @@
 module.exports = {
   routes: [
     {
+      method: 'GET',
+      path: '/stripe/billing',
+      handler: 'stripe.getBillingInfo',
+      config: {
+        auth: {
+          scope: [],
+        },
+      },
+    },
+    {
       method: "POST",
       path: "/stripe/create-customer",
       handler: "stripe.createCustomer",
