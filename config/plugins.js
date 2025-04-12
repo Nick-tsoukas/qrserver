@@ -19,6 +19,9 @@ module.exports = ({ env }) => ({
         params: {
           Bucket: env('AWS_BUCKET'),
         },
+        computeChecksums: false,
+        requestChecksumCalculation: async () => false,  // async function returning false
+        responseChecksumValidation: false, // explicitly disable response checksum validation
       },
       actionOptions: {
         upload: {

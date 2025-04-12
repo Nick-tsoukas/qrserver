@@ -19,23 +19,18 @@ module.exports = ({ env }) => ({
         params: {
           Bucket: env('AWS_BUCKET'),
         },
+        computeChecksums: false,
+        requestChecksumCalculation: async () => false,  // async function returning false
+        responseChecksumValidation: false, // explicitly disable response checksum validation
+
       },
       actionOptions: {
         upload: {
           async beforeUpload(file) {
-            console.log('Uploading file to AWS S3...');
-            console.log('File details:', JSON.stringify(file, null, 2));
-            console.log('AWS Region:', env('AWS_REGION'));
-            console.log('Bucket Name:', env('AWS_BUCKET'));
-
-            if (env('NODE_ENV') !== 'production') {
-              console.log('AWS Access Key ID:', env('AWS_ACCESS_KEY_ID'));
-              console.log('AWS Secret Access Key:', env('AWS_ACCESS_SECRET'));
-            }
+            // ...
           },
           async afterUpload(file, { data }) {
-            console.log('S3 Upload Response:', data);
-            console.log('Uploaded file details:', JSON.stringify(file, null, 2));
+            // ...
           },
           async onError(error) {
             console.error('Upload failed:', error.message);
@@ -47,6 +42,7 @@ module.exports = ({ env }) => ({
       },
     },
   },
+
 
   //------------------------------------------------
   // 2) EMAIL PLUGIN CONFIG (RESEND-CUSTOM)
