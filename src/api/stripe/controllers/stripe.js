@@ -90,5 +90,29 @@ module.exports = {
     }
   },
 
+  async createCustomer(ctx) {
+    try {
+      const { email, name } = ctx.request.body;
+  
+      if (!email || !name) {
+        return ctx.badRequest("Missing email or name.");
+      }
+  
+      // Create a new Stripe customer
+      const customer = await stripe.customers.create({
+        email,
+        name,
+      });
+  
+      console.log("✅ Stripe customer created:", customer.id);
+  
+      return ctx.send({ customerId: customer.id });
+    } catch (error) {
+      console.error("❌ Error creating Stripe customer:", error);
+      ctx.throw(500, "Failed to create Stripe customer");
+    }
+  }
+  
+
   // (unchanged: other routes remain the same)
 };
