@@ -1,5 +1,9 @@
 // config/env/production/plugins.ts
 module.exports = ({ env }) => ({
+
+  jwt: {
+    secret: env('JWT_SECRET'),
+  },
   //------------------------------------------------
   // 1) UPLOAD PLUGIN CONFIG (AWS S3)
   //------------------------------------------------
