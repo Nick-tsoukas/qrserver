@@ -133,45 +133,39 @@ module.exports = {
   async confirmPayment(ctx) {
     try {
       const { session_id, email, password, name } = ctx.request.body;
-  
+
       if (!session_id || !email || !password || !name) {
         return ctx.badRequest("Missing required fields.");
       }
-  
-      // 1. Retrieve the Stripe session
+
       const session = await stripe.checkout.sessions.retrieve(session_id);
       if (!session || !session.customer) {
         return ctx.badRequest("Invalid session or no customer found.");
       }
       const customerId = session.customer;
-  
-      // 2. Verify customer has payment method
+
       const paymentMethods = await stripe.paymentMethods.list({
         customer: customerId,
         type: "card",
       });
-  
+
       if (!paymentMethods.data.length) {
         return ctx.badRequest("No payment method found for this customer.");
       }
-  
-      // 3. Create 30-day trial subscription
+
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
-        items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }], // Replace with your actual price ID
+        items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }],
         trial_period_days: 30,
       });
-  
-      // 4. Get authenticated user role
+
       const authRole = await strapi.db.query("plugin::users-permissions.role").findOne({
         where: { type: "authenticated" },
       });
       if (!authRole) return ctx.badRequest("Authenticated role not found.");
-  
-      // 5. Generate confirmation token
+
       const confirmationToken = crypto.randomBytes(20).toString("hex");
-  
-      // 6. Create the user with pending confirmation
+
       const newUser = await strapi
         .plugin("users-permissions")
         .service("user")
@@ -188,24 +182,26 @@ module.exports = {
           confirmationToken,
           role: authRole.id,
         });
-  
-      // 7. Send confirmation email
+
       await strapi.plugin("email").service("email").send({
         to: email,
         from: "noreply@musicbizqr.com",
         subject: "Confirm your email",
         text: `Hi ${name},\n\nPlease confirm your email:\n\nhttps://qrserver-production.up.railway.app/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
       });
-  
+
       return ctx.send({
         message: "Confirmation email sent. Please check your inbox.",
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+        },
       });
     } catch (error) {
       console.error("🔥 Error in confirmPayment:", error);
-      ctx.throw(500, "Payment confirmation failed.");
+      ctx.send({ message: "Payment confirmation failed.", error: error?.message || "Unknown error" });
     }
   },
-  
 
   async webhook(ctx) {
     let event;
