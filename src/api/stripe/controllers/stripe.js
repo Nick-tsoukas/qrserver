@@ -11,6 +11,33 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 module.exports = {
 
+  async subscriptionStatus(ctx) {
+    const user = ctx.state.user
+
+    if (!user || !user.stripeCustomerId) {
+      return ctx.badRequest('Stripe customer not found')
+    }
+
+    try {
+      const subscriptions = await stripe.subscriptions.list({
+        customer: user.stripeCustomerId,
+        status: 'all',
+        limit: 1,
+      })
+
+      const subscription = subscriptions.data[0]
+
+      return ctx.send({
+        status: subscription ? subscription.status : 'inactive',
+        plan: subscription ? subscription.items.data[0].plan.nickname : null,
+        trialEndsAt: subscription ? subscription.trial_end : null,
+      })
+    } catch (error) {
+      console.error('Stripe fetch error:', error)
+      ctx.throw(500, 'Error retrieving subscription status')
+    }
+  },
+
   async getBillingInfo(ctx) {
     const user = ctx.state.user;
 
@@ -38,6 +65,29 @@ module.exports = {
       ctx.throw(500, 'Error retrieving billing information');
     }
   },
+
+  // billing 
+
+  async createBillingPortalSession(ctx) {
+    const user = ctx.state.user;
+  
+    if (!user || !user.stripeCustomerId) {
+      return ctx.badRequest('Stripe customer not found for user');
+    }
+  
+    try {
+      const session = await stripe.billingPortal.sessions.create({
+        customer: user.stripeCustomerId,
+        return_url: process.env.BILLING_RETURN_URL || 'https://musicbizqr.com/account',
+      });
+  
+      return ctx.send({ url: session.url });
+    } catch (error) {
+      console.error('Stripe Billing Portal Error:', error);
+      ctx.throw(500, 'Unable to create billing portal session');
+    }
+  },
+  
   /**
    * POST /api/stripe/create-customer
    * Body: { email, name }

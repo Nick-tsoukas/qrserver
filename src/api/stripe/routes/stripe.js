@@ -3,6 +3,26 @@
 module.exports = {
   routes: [
     {
+      method: 'POST',
+      path: '/stripe/create-billing-portal-session',
+      handler: 'stripe.createBillingPortalSession',
+      config: {
+        auth: {
+          scope: [], // ✅ this ensures authentication is required
+        },
+      },
+    },
+    {
+      method: 'GET',
+      path: '/stripe/subscription-status',
+      handler: 'stripe.subscriptionStatus',
+      config: {
+        auth: {
+          scope: [],
+        },
+      },
+    },
+    {
       method: 'GET',
       path: '/stripe/billing',
       handler: 'stripe.getBillingInfo',
@@ -12,6 +32,7 @@ module.exports = {
         },
       },
     },
+    
     {
       method: "POST",
       path: "/stripe/create-customer",
