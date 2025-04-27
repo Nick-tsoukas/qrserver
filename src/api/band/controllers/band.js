@@ -97,6 +97,19 @@ module.exports = createCoreController("api::band.band", ({ strapi }) => ({
       ctx.throw(500, "Internal Server Error: " + errMsg);
     }
   },
+// del
+  async delete(ctx) {
+    const { id } = ctx.params;
+    if (!id) return ctx.badRequest('Missing `id` parameter');
+    try {
+      // remove the record
+      const deleted = await strapi.entityService.delete('api::band.band', id);
+      return { data: deleted };
+    } catch (err) {
+      console.error('Error deleting band:', err);
+      ctx.throw(500, 'Internal Server Error');
+    }
+  },
 
   // PUT method to update an existing band
   async update(ctx) {

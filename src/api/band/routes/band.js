@@ -40,5 +40,10 @@ module.exports = {
         auth: { scope: [] }, // Requires authentication with no specific roles or permissions (public if empty)
       },
     },
+    {
+      method: "DELETE",
+      path: "/bands/:id",
+      handler: "band.delete",
+    },
   ],
 };
