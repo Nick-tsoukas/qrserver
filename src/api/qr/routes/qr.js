@@ -1,9 +1,67 @@
+// path: src/api/qr/routes/qr.js
 'use strict';
 
-/**
- * qr router
- */
-
-const { createCoreRouter } = require('@strapi/strapi').factories;
-
-module.exports = createCoreRouter('api::qr.qr');
+module.exports = {
+  type: 'content-api',
+  routes: [
+    {
+      method: 'GET',
+      path: '/qrs',
+      handler: 'qr.find',
+      config: {
+        policies: [
+          'plugin::users-permissions.isAuthenticated',  // ← fixed
+          'global::subscription-active',
+        ],
+      },
+    },
+    {
+      method: 'GET',
+      path: '/qrs/:id',
+      handler: 'qr.findOne',
+      config: {
+        policies: [
+          'plugin::users-permissions.isAuthenticated',
+          'global::subscription-active',
+          'api::qr.owns-qr',
+        ],
+      },
+    },
+    {
+      method: 'POST',
+      path: '/qrs',
+      handler: 'qr.create',
+      config: {
+        policies: [
+          'plugin::users-permissions.isAuthenticated',
+          'global::subscription-active',
+          'api::qr.only-one-qr',
+        ],
+      },
+    },
+    {
+      method: 'PUT',
+      path: '/qrs/:id',
+      handler: 'qr.update',
+      config: {
+        policies: [
+          'plugin::users-permissions.isAuthenticated',
+          'global::subscription-active',
+          'api::qr.owns-qr',
+        ],
+      },
+    },
+    {
+      method: 'DELETE',
+      path: '/qrs/:id',
+      handler: 'qr.delete',
+      config: {
+        policies: [
+          'plugin::users-permissions.isAuthenticated',
+          'global::subscription-active',
+          'api::qr.owns-qr',
+        ],
+      },
+    },
+  ],
+};

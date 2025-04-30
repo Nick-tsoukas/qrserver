@@ -1,3 +1,4 @@
+// config/middlewares.js
 module.exports = [
   // Security middleware
   {
@@ -63,6 +64,8 @@ module.exports = [
     },
   },
 
+  // Custom global middleware — now only runs on /api routes
+
   // Error handling middleware
   'strapi::errors',
 
@@ -70,12 +73,11 @@ module.exports = [
   {
     name: 'strapi::cors',
     config: {
-      enabled: true,
       origin: [
         'http://localhost:3000',
         'http://172.20.10.4:3000',
         'https://musicbizqr.com',
-        'https://www.musicbizqr.com'
+        'https://www.musicbizqr.com',
       ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
@@ -83,17 +85,20 @@ module.exports = [
     },
   },
 
-  // Powered By header
+  // Powered-By header
   'strapi::poweredBy',
 
-  // Query middleware
+  // Query parser
   'strapi::query',
 
-  // Body middleware WITH UPDATED LIMITS
+  // Body parser with Stripe webhook raw-body support
   {
     name: 'strapi::body',
     config: {
-      formLimit: '50mb',  // Adjust the size as needed
+      patchKoa: true,         // expose raw body buffer
+      includeUnparsed: true,  // keep unparsedBody for signature check
+      multipart: true,
+      formLimit: '50mb',
       jsonLimit: '50mb',
       textLimit: '50mb',
     },
@@ -105,6 +110,6 @@ module.exports = [
   // Favicon middleware
   'strapi::favicon',
 
-  // Public middleware
+  // Public files
   'strapi::public',
 ];
