@@ -49,9 +49,14 @@ module.exports = {
       handler: "stripe.confirmPayment",
     },
     {
-      method: "POST",
-      path: "/stripe/webhook",
-      handler: "stripe.webhook",
+      method: 'POST',
+      path: '/stripe/webhook',
+      handler: 'stripe.webhook',
+      config: {
+        auth: false,
+        // Important: allow access to rawBody for signature verification
+        rawBody: true,
+      }
     },
     {
       method: "GET",

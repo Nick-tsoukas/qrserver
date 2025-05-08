@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
-const Stripe = require("stripe");
-const crypto = require("crypto");
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+const Stripe = require('stripe');
+const crypto = require('crypto');
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 module.exports = {
+  // 1) Check subscription status
   async subscriptionStatus(ctx) {
     const user = ctx.state.user;
     console.log("🔍 Checking subscription status for user:", user?.email);
@@ -18,16 +18,15 @@ module.exports = {
     try {
       const subscriptions = await stripe.subscriptions.list({
         customer: user.customerId,
-        status: "all",
+        status: 'all',
         limit: 1,
       });
-
       const subscription = subscriptions.data[0];
       console.log("✅ Stripe subscription retrieved:", subscription?.id);
 
       return ctx.send({
-        status: subscription ? subscription.status : "inactive",
-        plan: subscription ? subscription.items.data[0].plan.nickname : null,
+        status: subscription ? subscription.status : 'inactive',
+        plan:   subscription ? subscription.items.data[0].plan.nickname : null,
         trialEndsAt: subscription ? subscription.trial_end : null,
       });
     } catch (error) {
@@ -36,6 +35,7 @@ module.exports = {
     }
   },
 
+  // 2) Retrieve billing info
   async getBillingInfo(ctx) {
     const user = ctx.state.user;
     console.log("🔍 Retrieving billing info for:", user?.email);
@@ -49,10 +49,9 @@ module.exports = {
       const customer = await stripe.customers.retrieve(user.customerId);
       const subscriptions = await stripe.subscriptions.list({
         customer: user.customerId,
-        status: "all",
+        status: 'all',
         limit: 1,
       });
-
       const subscription = subscriptions.data[0];
       console.log("✅ Billing info retrieved for:", customer.id);
 
@@ -67,6 +66,7 @@ module.exports = {
     }
   },
 
+  // 3) Create a Stripe Billing Portal session
   async createBillingPortalSession(ctx) {
     const user = ctx.state.user;
     console.log("🌀 Creating billing portal for:", user?.email);
@@ -78,10 +78,9 @@ module.exports = {
 
     try {
       const session = await stripe.billingPortal.sessions.create({
-        customer: user.customerId,
-        return_url: process.env.BILLING_RETURN_URL || "https://musicbizqr.com/account",
+        customer:   user.customerId,
+        return_url: process.env.BILLING_RETURN_URL || 'https://musicbizqr.com/account',
       });
-
       console.log("✅ Billing portal session created:", session.id);
       return ctx.send({ url: session.url });
     } catch (error) {
@@ -90,16 +89,14 @@ module.exports = {
     }
   },
 
+  // 4) Create a Stripe Customer
   async createCustomer(ctx) {
     try {
       const { email, name } = ctx.request.body;
-
       if (!email || !name) {
         return ctx.badRequest("Missing email or name.");
       }
-
       const customer = await stripe.customers.create({ email, name });
-
       console.log("✅ Stripe customer created:", customer.id);
       return ctx.send({ customerId: customer.id });
     } catch (error) {
@@ -108,21 +105,20 @@ module.exports = {
     }
   },
 
+  // 5) Create a Checkout Session (for card setup)
   async createCheckoutSession(ctx) {
     try {
       const { customerId } = ctx.request.body;
       if (!customerId) {
         return ctx.badRequest("Missing customerId.");
       }
-
       const session = await stripe.checkout.sessions.create({
-        customer: customerId,
-        payment_method_types: ["card"],
-        mode: "setup",
-        success_url: "https://musicbizqr.com/signupSuccess?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url: "https://musicbizqr.com/signupCancelled",
+        customer:             customerId,
+        payment_method_types: ['card'],
+        mode:                 'setup',
+        success_url:          'https://musicbizqr.com/signupSuccess?session_id={CHECKOUT_SESSION_ID}',
+        cancel_url:           'https://musicbizqr.com/signupCancelled',
       });
-
       return ctx.send({ url: session.url });
     } catch (error) {
       console.error("❌ Error creating checkout session:", error);
@@ -130,142 +126,158 @@ module.exports = {
     }
   },
 
+  // 6) Confirm payment, create Stripe subscription & Strapi user
   async confirmPayment(ctx) {
     try {
       const { session_id, email, password, name } = ctx.request.body;
-
       if (!session_id || !email || !password || !name) {
         return ctx.badRequest("Missing required fields.");
       }
 
+      // Retrieve the session and customer
       const session = await stripe.checkout.sessions.retrieve(session_id);
-      if (!session || !session.customer) {
+      if (!session?.customer) {
         return ctx.badRequest("Invalid session or no customer found.");
       }
       const customerId = session.customer;
 
-      const paymentMethods = await stripe.paymentMethods.list({
-        customer: customerId,
-        type: "card",
-      });
-
+      // Ensure they have a payment method
+      const paymentMethods = await stripe.paymentMethods.list({ customer: customerId, type: 'card' });
       if (!paymentMethods.data.length) {
         return ctx.badRequest("No payment method found for this customer.");
       }
 
+      // Create a subscription with a 30-day trial
       const subscription = await stripe.subscriptions.create({
-        customer: customerId,
-        items: [{ price: "price_1QRHWpC26iqgLxbxvIw2311F" }],
-        trial_period_days: 30,
+        customer:           customerId,
+        items:              [{ price: 'price_1QRHWpC26iqgLxbxvIw2311F' }],
+        trial_period_days:  30,
       });
 
-      const authRole = await strapi.db.query("plugin::users-permissions.role").findOne({
-        where: { type: "authenticated" },
-      });
+      // Create the Strapi user
+      const authRole = await strapi.db
+        .query("plugin::users-permissions.role")
+        .findOne({ where: { type: 'authenticated' } });
       if (!authRole) return ctx.badRequest("Authenticated role not found.");
 
-      const confirmationToken = crypto.randomBytes(20).toString("hex");
-
+      const confirmationToken = crypto.randomBytes(20).toString('hex');
       const newUser = await strapi
         .plugin("users-permissions")
         .service("user")
         .add({
           email,
           password,
-          username: email,
-          provider: "local",
-          customerId: customerId,
-          subscriptionId: subscription.id,
-          subscriptionStatus: "trialing",
-          trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          confirmed: false,
+          username:           email,
+          provider:           'local',
+          customerId,
+          subscriptionId:     subscription.id,
+          subscriptionStatus: 'trialing',
+          trialEndsAt:        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          confirmed:          false,
           confirmationToken,
-          role: authRole.id,
+          role:               authRole.id,
         });
 
+      // Send confirmation email
       await strapi.plugin("email").service("email").send({
-        to: email,
-        from: "noreply@musicbizqr.com",
+        to:      email,
+        from:    "noreply@musicbizqr.com",
         subject: "Confirm your email",
-        text: `Hi ${name},\n\nPlease confirm your email:\n\nhttps://qrserver-production.up.railway.app/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
+        text:    `Hi ${name},\n\nPlease confirm your email:\n\nhttps://your-domain.com/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
       });
 
       return ctx.send({
         message: "Confirmation email sent. Please check your inbox.",
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-        },
+        user:    { id: newUser.id, email: newUser.email },
       });
     } catch (error) {
       console.error("🔥 Error in confirmPayment:", error);
-      ctx.send({ message: "Payment confirmation failed.", error: error?.message || "Unknown error" });
+      ctx.send({ message: "Payment confirmation failed.", error: error.message || "Unknown error" });
     }
   },
 
+  // 7) Stripe webhook handler
   async webhook(ctx) {
+    const signature = ctx.request.headers['stripe-signature'];
     let event;
+
+    // Verify webhook signature
     try {
-      const sig = ctx.request.headers["stripe-signature"];
       event = stripe.webhooks.constructEvent(
         ctx.request.rawBody,
-        sig,
+        signature,
         process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
-      console.error("Stripe Webhook Error:", err.message);
+      strapi.log.error('Stripe Webhook signature verification failed:', err.message);
       return ctx.badRequest(`Webhook Error: ${err.message}`);
     }
 
-    switch (event.type) {
-      case "invoice.payment_succeeded": {
-        const invoice = event.data.object;
-        const subscriptionId = invoice.subscription;
-        try {
-          await strapi.db.query("plugin::users-permissions.user").update({
-            where: { subscriptionId },
-            data: { subscriptionStatus: "active" },
-          });
-        } catch (err) {
-          console.error("Failed to update user status:", err);
-        }
-        break;
+    // Helper to update the user record
+    const updateUser = async (subscriptionId, data) => {
+      try {
+        await strapi.db
+          .query('plugin::users-permissions.user')
+          .update({ where: { subscriptionId }, data });
+      } catch (err) {
+        strapi.log.error(`Failed to update user (${subscriptionId}):`, err);
       }
-      case "invoice.payment_failed": {
-        const invoice = event.data.object;
-        const subscriptionId = invoice.subscription;
-        try {
-          await strapi.db.query("plugin::users-permissions.user").update({
-            where: { subscriptionId },
-            data: { subscriptionStatus: "past_due" },
+    };
+
+    // Handle the event
+    try {
+      switch (event.type) {
+        case 'customer.subscription.created': {
+          const sub = event.data.object;
+          await updateUser(sub.id, {
+            subscriptionStatus: sub.status,
+            trialEnd:          new Date(sub.trial_end * 1000),
+            periodEnd:         new Date(sub.current_period_end * 1000),
           });
-        } catch (err) {
-          console.error("Failed to update user status:", err);
+          break;
         }
-        break;
-      }
-      case "customer.subscription.updated": {
-        const subscription = event.data.object;
-        if (subscription.status === "canceled") {
-          try {
-            await strapi.db.query("plugin::users-permissions.user").update({
-              where: { subscriptionId: subscription.id },
-              data: { subscriptionStatus: "canceled" },
-            });
-          } catch (err) {
-            console.error("Failed to update user status:", err);
+        case 'invoice.payment_succeeded': {
+          const invoice = event.data.object;
+          await updateUser(invoice.subscription, {
+            subscriptionStatus: 'active',
+            periodEnd:          new Date(invoice.period_end * 1000),
+          });
+          break;
+        }
+        case 'invoice.payment_failed': {
+          const invoice = event.data.object;
+          await updateUser(invoice.subscription, { subscriptionStatus: 'past_due' });
+          break;
+        }
+        case 'customer.subscription.trial_will_end': {
+          const sub = event.data.object;
+          strapi.log.info(`Subscription ${sub.id} trial will end on ${new Date(sub.trial_end * 1000)}`);
+          break;
+        }
+        case 'customer.subscription.updated': {
+          const sub = event.data.object;
+          if (['canceled', 'unpaid', 'incomplete_expired'].includes(sub.status)) {
+            await updateUser(sub.id, { subscriptionStatus: sub.status });
           }
+          break;
         }
-        break;
+        case 'customer.subscription.deleted': {
+          const sub = event.data.object;
+          await updateUser(sub.id, { subscriptionStatus: 'canceled' });
+          break;
+        }
+        default:
+          strapi.log.debug(`Unhandled Stripe event type: ${event.type}`);
       }
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
-        break;
+    } catch (err) {
+      strapi.log.error(`Error handling Stripe event ${event.type}:`, err);
     }
 
-    return ctx.send({ received: true });
+    // Acknowledge receipt
+    ctx.send({ received: true });
   },
 
+  // 8) A simple test route
   async testRoute(ctx) {
     return ctx.send({ message: "This is a test route" });
   },
