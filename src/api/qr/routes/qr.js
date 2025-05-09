@@ -4,15 +4,14 @@
 module.exports = {
   type: 'content-api',
   routes: [
+    // ─ Public READ (no auth, no policies)
     {
       method: 'GET',
       path: '/qrs',
       handler: 'qr.find',
       config: {
-        policies: [
-          'plugin::users-permissions.isAuthenticated',  // ← fixed
-          'global::subscription-active',
-        ],
+        auth: false,
+        policies: [],    // ← bypass global policies
       },
     },
     {
@@ -20,18 +19,18 @@ module.exports = {
       path: '/qrs/:id',
       handler: 'qr.findOne',
       config: {
-        policies: [
-          'plugin::users-permissions.isAuthenticated',
-          'global::subscription-active',
-          'api::qr.owns-qr',
-        ],
+        auth: false,
+        policies: [],
       },
     },
+
+    // ─ Protected CREATE
     {
       method: 'POST',
       path: '/qrs',
       handler: 'qr.create',
       config: {
+        auth: true,
         policies: [
           'plugin::users-permissions.isAuthenticated',
           'global::subscription-active',
@@ -39,11 +38,14 @@ module.exports = {
         ],
       },
     },
+
+    // ─ Protected UPDATE
     {
       method: 'PUT',
       path: '/qrs/:id',
       handler: 'qr.update',
       config: {
+        auth: true,
         policies: [
           'plugin::users-permissions.isAuthenticated',
           'global::subscription-active',
@@ -51,11 +53,14 @@ module.exports = {
         ],
       },
     },
+
+    // ─ Protected DELETE
     {
       method: 'DELETE',
       path: '/qrs/:id',
       handler: 'qr.delete',
       config: {
+        auth: true,
         policies: [
           'plugin::users-permissions.isAuthenticated',
           'global::subscription-active',
