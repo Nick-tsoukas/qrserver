@@ -183,7 +183,7 @@ module.exports = {
         to:      email,
         from:    "noreply@musicbizqr.com",
         subject: "Confirm your email",
-        text:    `Hi ${name},\n\nPlease confirm your email:\n\nhttps://your-domain.com/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
+        text:    `Hi ${name},\n\nPlease confirm your email:\n\nhttps://qrserver-production.up.railway.app/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
       });
 
       return ctx.send({
