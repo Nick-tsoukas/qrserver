@@ -4,7 +4,6 @@ module.exports = ({ env }) => ({
   jwt: {
     secret: env('JWT_SECRET'),
   },
-
   //------------------------------------------------
   // 1) UPLOAD PLUGIN CONFIG (AWS S3)
   //------------------------------------------------
@@ -31,6 +30,7 @@ module.exports = ({ env }) => ({
         responseChecksumValidation: function () {
           return false;
         },
+
       },
       actionOptions: {
         upload: {
@@ -51,6 +51,7 @@ module.exports = ({ env }) => ({
     },
   },
 
+
   //------------------------------------------------
   // 2) EMAIL PLUGIN CONFIG (RESEND-CUSTOM)
   //------------------------------------------------
@@ -68,39 +69,12 @@ module.exports = ({ env }) => ({
   },
 
   //------------------------------------------------
-  // 3) USERS & PERMISSIONS CONFIG
+  // 3) USERS & PERMISSIONS CONFIG (Optional)
   //------------------------------------------------
   'users-permissions': {
     config: {
-      // Enable email confirmation
       emailConfirmation: true,
-      // Where to redirect after successful confirmation
-      emailConfirmationRedirection: 'https://musicbizqr.com/dashboard',
-      // Override the confirmation email template
-      email: {
-        email_confirmation: {
-          subject: 'Confirm Your Email Address',
-          text: (data) => `
-Hello ${data.user.username || data.user.email},
-
-Please confirm your email by clicking the link below:
-https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${data.confirmationToken}
-
-Thank you!
-          `,
-          html: (data) => `
-<p>Hello ${data.user.username || data.user.email},</p>
-<p>Please confirm your email by clicking the link below:</p>
-<p>
-  <a href="https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${data.confirmationToken}">
-    Confirm Email
-  </a>
-</p>
-<p>Thank you!</p>
-          `,
-        },
-      },
+      emailConfirmationRedirection: 'https://my-frontend.com/after-confirmation',
     },
   },
-
 });
