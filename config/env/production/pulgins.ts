@@ -74,7 +74,7 @@ module.exports = ({ env }) => ({
   'users-permissions': {
     config: {
       emailConfirmation: true,
-      emailConfirmationRedirection: 'https://my-frontend.com/after-confirmation',
+      emailConfirmationRedirection: 'https://musicbizqr.com/dashboard',
     },
   },
 });

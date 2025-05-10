@@ -120,7 +120,8 @@
         "trialing",
         "past_due",
         "canceled",
-        "unpaid"
+        "unpaid",
+        "free"
       ]
     },
     "subscriptionId": {

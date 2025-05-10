@@ -7,7 +7,7 @@ module.exports = ({ env }) => ({
   Hello ${data.user.username || data.user.email},
   
   Please confirm your email address by clicking the link below:
-  ${env('FRONTEND_URL')}/confirm?token=${data.confirmationToken}
+  https://qrserver-production.up.railway.app/api/auth/confirm?token=${data.confirmationToken}
   
   Thank you!
       `,
@@ -15,7 +15,7 @@ module.exports = ({ env }) => ({
       html: (data) => `
         <p>Hello ${data.user.username || data.user.email},</p>
         <p>Please confirm your email address by clicking the link below:</p>
-        <p><a href="${env('FRONTEND_URL')}/confirm?token=${data.confirmationToken}">Confirm Email</a></p>
+        <p><a href="https://qrserver-production.up.railway.app/api/auth//confirm?token=${data.confirmationToken}">Confirm Email</a></p>
         <p>Thank you!</p>
       `,
     },
