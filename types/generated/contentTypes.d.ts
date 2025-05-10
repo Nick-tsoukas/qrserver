@@ -764,7 +764,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::video.video'
     >;
     subscriptionStatus: Attribute.Enumeration<
-      ['active', 'trialing', 'past_due', 'canceled', 'unpaid']
+      ['active', 'trialing', 'past_due', 'canceled', 'unpaid', 'free']
     >;
     subscriptionId: Attribute.String;
     customerId: Attribute.String;

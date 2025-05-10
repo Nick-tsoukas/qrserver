@@ -1,11 +1,11 @@
-// config/plugins.js
+// config/env/production/plugins.ts
 module.exports = ({ env }) => ({
-
   jwt: {
     secret: env('JWT_SECRET'),
   },
+
   //------------------------------------------------
-  // 1) UPLOAD PLUGIN CONFIG (AWS-S3)
+  // 1) UPLOAD PLUGIN CONFIG (AWS S3)
   //------------------------------------------------
   upload: {
     config: {
@@ -24,35 +24,11 @@ module.exports = ({ env }) => ({
           Bucket: env('AWS_BUCKET'),
         },
         computeChecksums: false,
-        requestChecksumCalculation: function () {
-          return false;
-        },
-        responseChecksumValidation: function () {
-          return false;
-        },
+        requestChecksumCalculation: () => false,
+        responseChecksumValidation: () => false,
       },
       actionOptions: {
-        upload: {
-          async beforeUpload(file) {
-            console.log('Uploading file to AWS S3...');
-            console.log('File details:', JSON.stringify(file, null, 2));
-            console.log('AWS Region:', env('AWS_REGION'));
-            console.log('Bucket Name:', env('AWS_BUCKET'));
-
-            if (env('NODE_ENV') !== 'production') {
-              console.log('AWS Access Key ID:', env('AWS_ACCESS_KEY_ID'));
-              console.log('AWS Secret Access Key:', env('AWS_ACCESS_SECRET'));
-            }
-          },
-          async afterUpload(file, { data }) {
-            console.log('S3 Upload Response:', data);
-            console.log('Uploaded file details:', JSON.stringify(file, null, 2));
-          },
-          async onError(error) {
-            console.error('Upload failed:', error.message);
-            console.error('Full error stack:', error);
-          },
-        },
+        upload: { async beforeUpload(file) {/*...*/}, async afterUpload(file, { data }) {/*...*/}, async onError(err) { console.error('Upload error:', err); } },
         uploadStream: {},
         delete: {},
       },
@@ -65,23 +41,40 @@ module.exports = ({ env }) => ({
   email: {
     config: {
       provider: 'strapi-provider-email-resend',
-      providerOptions: {
-        apiKey: env('RESEND_API_KEY'),
-      },
-      settings: {
-        defaultFrom: env('EMAIL_DEFAULT_FROM'),
-        defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO'),
-      },
+      providerOptions: { apiKey: env('RESEND_API_KEY') },
+      settings: { defaultFrom: env('EMAIL_DEFAULT_FROM'), defaultReplyTo: env('EMAIL_DEFAULT_REPLY_TO') },
     },
   },
 
   //------------------------------------------------
-  // 3) USERS & PERMISSIONS CONFIG (Optional)
+  // 3) USERS & PERMISSIONS CONFIG
   //------------------------------------------------
   'users-permissions': {
     config: {
-      emailConfirmation: true,
+      // Disable Strapi's default confirmation email behavior if using custom logic
+      emailConfirmation: false,
+      // Redirect after confirmation (if default handler is still used)
       emailConfirmationRedirection: 'https://my-frontend.com/after-confirmation',
+      // **Custom email template override**
+      email: {
+        email_confirmation: {
+          subject: 'Please Confirm Your Email',
+          text: data => `
+Hello ${data.user.username || data.user.email},
+
+You’re almost set! Confirm your email by clicking the link below:
+https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${data.confirmationToken}
+
+Thank you for joining!
+          `,
+          html: data => `
+<p>Hello ${data.user.username || data.user.email},</p>
+<p>You’re almost set! Confirm your email by clicking the link below:</p>
+<p><a href="https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${data.confirmationToken}">Confirm Email</a></p>
+<p>Thank you for joining!</p>
+          `,
+        },
+      },
     },
   },
 });

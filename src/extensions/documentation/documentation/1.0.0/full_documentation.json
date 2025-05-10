@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-05-08T22:37:55.897Z"
+    "x-generation-date": "2025-05-10T22:55:03.204Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3534,7 +3534,8 @@
                                                     "trialing",
                                                     "past_due",
                                                     "canceled",
-                                                    "unpaid"
+                                                    "unpaid",
+                                                    "free"
                                                   ]
                                                 },
                                                 "subscriptionId": {
@@ -8157,7 +8158,8 @@
                                                                   "trialing",
                                                                   "past_due",
                                                                   "canceled",
-                                                                  "unpaid"
+                                                                  "unpaid",
+                                                                  "free"
                                                                 ]
                                                               },
                                                               "subscriptionId": {
@@ -12960,7 +12962,8 @@
                                                     "trialing",
                                                     "past_due",
                                                     "canceled",
-                                                    "unpaid"
+                                                    "unpaid",
+                                                    "free"
                                                   ]
                                                 },
                                                 "subscriptionId": {
@@ -17386,7 +17389,8 @@
                                                     "trialing",
                                                     "past_due",
                                                     "canceled",
-                                                    "unpaid"
+                                                    "unpaid",
+                                                    "free"
                                                   ]
                                                 },
                                                 "subscriptionId": {
@@ -21648,7 +21652,8 @@
                                                     "trialing",
                                                     "past_due",
                                                     "canceled",
-                                                    "unpaid"
+                                                    "unpaid",
+                                                    "free"
                                                   ]
                                                 },
                                                 "subscriptionId": {
@@ -25560,7 +25565,8 @@
                                                                 "trialing",
                                                                 "past_due",
                                                                 "canceled",
-                                                                "unpaid"
+                                                                "unpaid",
+                                                                "free"
                                                               ]
                                                             },
                                                             "subscriptionId": {
@@ -30668,7 +30674,8 @@
                           "trialing",
                           "past_due",
                           "canceled",
-                          "unpaid"
+                          "unpaid",
+                          "free"
                         ]
                       },
                       "subscriptionId": {
@@ -34742,7 +34749,8 @@
                           "trialing",
                           "past_due",
                           "canceled",
-                          "unpaid"
+                          "unpaid",
+                          "free"
                         ]
                       },
                       "subscriptionId": {
@@ -38191,7 +38199,8 @@
                                                                   "trialing",
                                                                   "past_due",
                                                                   "canceled",
-                                                                  "unpaid"
+                                                                  "unpaid",
+                                                                  "free"
                                                                 ]
                                                               },
                                                               "subscriptionId": {
@@ -43205,7 +43214,8 @@
                           "trialing",
                           "past_due",
                           "canceled",
-                          "unpaid"
+                          "unpaid",
+                          "free"
                         ]
                       },
                       "subscriptionId": {
