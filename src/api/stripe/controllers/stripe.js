@@ -198,13 +198,15 @@ module.exports = {
 
   // 7) Stripe webhook handler
   async webhook(ctx) {
+    // Grab the raw request body for signature verification
+    const rawBody = ctx.request.body[Symbol.for('unparsedBody')];
     const signature = ctx.request.headers['stripe-signature'];
     let event;
-
+  
     // Verify webhook signature
     try {
       event = stripe.webhooks.constructEvent(
-        ctx.request.rawBody,
+        rawBody,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET
       );
@@ -212,7 +214,7 @@ module.exports = {
       strapi.log.error('Stripe Webhook signature verification failed:', err.message);
       return ctx.badRequest(`Webhook Error: ${err.message}`);
     }
-
+  
     // Helper to update the user record
     const updateUser = async (subscriptionId, data) => {
       try {
@@ -223,7 +225,7 @@ module.exports = {
         strapi.log.error(`Failed to update user (${subscriptionId}):`, err);
       }
     };
-
+  
     // Handle the event
     try {
       switch (event.type) {
@@ -231,8 +233,8 @@ module.exports = {
           const sub = event.data.object;
           await updateUser(sub.id, {
             subscriptionStatus: sub.status,
-            trialEnd:          new Date(sub.trial_end * 1000),
-            periodEnd:         new Date(sub.current_period_end * 1000),
+            trialEnd:           new Date(sub.trial_end * 1000),
+            periodEnd:          new Date(sub.current_period_end * 1000),
           });
           break;
         }
@@ -251,7 +253,9 @@ module.exports = {
         }
         case 'customer.subscription.trial_will_end': {
           const sub = event.data.object;
-          strapi.log.info(`Subscription ${sub.id} trial will end on ${new Date(sub.trial_end * 1000)}`);
+          strapi.log.info(
+            `Subscription ${sub.id} trial will end on ${new Date(sub.trial_end * 1000)}`
+          );
           break;
         }
         case 'customer.subscription.updated': {
@@ -272,10 +276,11 @@ module.exports = {
     } catch (err) {
       strapi.log.error(`Error handling Stripe event ${event.type}:`, err);
     }
-
+  
     // Acknowledge receipt
     ctx.send({ received: true });
   },
+  
 
   // 8) A simple test route
   async testRoute(ctx) {

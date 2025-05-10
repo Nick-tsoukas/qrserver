@@ -64,8 +64,6 @@ module.exports = [
     },
   },
 
-  // Custom global middleware — now only runs on /api routes
-
   // Error handling middleware
   'strapi::errors',
 
