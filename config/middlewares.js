@@ -1,5 +1,17 @@
 // config/middlewares.js
 module.exports = [
+    // Body parser with Stripe webhook raw-body support
+    {
+      name: 'strapi::body',
+      config: {
+        patchKoa: true,         // expose raw body buffer
+        includeUnparsed: true,  // keep unparsedBody for signature check
+        multipart: true,
+        formLimit: '50mb',
+        jsonLimit: '50mb',
+        textLimit: '50mb',
+      },
+    },
   // Security middleware
   {
     name: 'strapi::security',
@@ -89,18 +101,7 @@ module.exports = [
   // Query parser
   'strapi::query',
 
-  // Body parser with Stripe webhook raw-body support
-  {
-    name: 'strapi::body',
-    config: {
-      patchKoa: true,         // expose raw body buffer
-      includeUnparsed: true,  // keep unparsedBody for signature check
-      multipart: true,
-      formLimit: '50mb',
-      jsonLimit: '50mb',
-      textLimit: '50mb',
-    },
-  },
+
 
   // Session middleware
   'strapi::session',

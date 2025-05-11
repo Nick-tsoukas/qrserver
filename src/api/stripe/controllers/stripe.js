@@ -201,6 +201,8 @@ module.exports = {
     // Grab the raw request body for signature verification
     const rawBody = ctx.request.body[Symbol.for('unparsedBody')];
     const signature = ctx.request.headers['stripe-signature'];
+    strapi.log.debug('🪵 [WEBHOOK] stripe-signature header:', ctx.request.headers['stripe-signature']);
+    strapi.log.debug('🪵 [WEBHOOK] rawBody starts with:', rawBody?.toString().slice(0, 300));
     let event;
   
     // Verify webhook signature

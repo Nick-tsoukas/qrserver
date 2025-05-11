@@ -54,8 +54,6 @@ module.exports = {
       handler: 'stripe.webhook',
       config: {
         auth: false,
-        // Important: allow access to rawBody for signature verification
-        rawBody: true,
       }
     },
     {
