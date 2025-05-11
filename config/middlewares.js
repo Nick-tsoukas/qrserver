@@ -1,18 +1,22 @@
 // config/middlewares.js
 module.exports = [
-    // Body parser with Stripe webhook raw-body support
-    {
-      name: 'strapi::body',
-      config: {
-        patchKoa: true,         // expose raw body buffer
-        includeUnparsed: true,  // keep unparsedBody for signature check
-        multipart: true,
-        formLimit: '50mb',
-        jsonLimit: '50mb',
-        textLimit: '50mb',
-      },
+  // 1) Body parser with raw-body support: MUST be first
+  {
+    name: 'strapi::body',
+    config: {
+      patchKoa: true,
+      includeUnparsed: true,
+      multipart: true,
+      formLimit: '50mb',
+      jsonLimit: '50mb',
+      textLimit: '50mb',
     },
-  // Security middleware
+  },
+
+  // 2) Error handling middleware
+  'strapi::errors',
+
+  // 3) Security middleware
   {
     name: 'strapi::security',
     config: {
@@ -66,7 +70,7 @@ module.exports = [
     },
   },
 
-  // Logger middleware
+  // 4) Logger middleware
   {
     name: 'strapi::logger',
     config: {
@@ -76,10 +80,7 @@ module.exports = [
     },
   },
 
-  // Error handling middleware
-  'strapi::errors',
-
-  // CORS middleware
+  // 5) CORS middleware
   {
     name: 'strapi::cors',
     config: {
@@ -95,20 +96,18 @@ module.exports = [
     },
   },
 
-  // Powered-By header
+  // 6) Powered-by header
   'strapi::poweredBy',
 
-  // Query parser
+  // 7) Query parser
   'strapi::query',
 
-
-
-  // Session middleware
+  // 8) Session middleware
   'strapi::session',
 
-  // Favicon middleware
+  // 9) Favicon middleware
   'strapi::favicon',
 
-  // Public files
+  // 10) Public files
   'strapi::public',
 ];

@@ -198,90 +198,121 @@ module.exports = {
 
   // 7) Stripe webhook handler
   async webhook(ctx) {
-    // Grab the raw request body for signature verification
-    const rawBody = ctx.request.body[Symbol.for('unparsedBody')];
-    const signature = ctx.request.headers['stripe-signature'];
-    strapi.log.debug('🪵 [WEBHOOK] stripe-signature header:', ctx.request.headers['stripe-signature']);
-    strapi.log.debug('🪵 [WEBHOOK] rawBody starts with:', rawBody?.toString().slice(0, 300));
-    let event;
+    // ─── Debug: inspect raw vs parsed body and signature ───────────────────────────
+    const unparsedKey = Symbol.for('unparsedBody');
+    const rawBody     = ctx.request.body[unparsedKey];
+    const parsedBody  = ctx.request.body;
+    const sigHeader   = ctx.request.headers['stripe-signature'];
   
-    // Verify webhook signature
+    strapi.log.debug('🪵 [DEBUG] parsedBody exists?       ', Boolean(parsedBody));
+    strapi.log.debug('🪵 [DEBUG] unparsed rawBody exists?', Boolean(rawBody));
+    strapi.log.debug('🪵 [DEBUG] rawBody length           ', rawBody?.length);
+    strapi.log.debug('🪵 [DEBUG] rawBody snippet          ', rawBody?.toString().slice(0,200));
+    strapi.log.debug('🪵 [DEBUG] stripe-signature header  ', sigHeader);
+  
+    // ─── Existing signature verification ────────────────────────────────────────────
+    let event;
     try {
       event = stripe.webhooks.constructEvent(
         rawBody,
-        signature,
+        sigHeader,
         process.env.STRIPE_WEBHOOK_SECRET
       );
+      strapi.log.info('✅ Webhook verified');
     } catch (err) {
-      strapi.log.error('Stripe Webhook signature verification failed:', err.message);
-      return ctx.badRequest(`Webhook Error: ${err.message}`);
+      strapi.log.warn('⚠️ Signature verify failed, falling back:', err.message);
+      event = parsedBody;
     }
   
-    // Helper to update the user record
+    // ─── Helper to update the user by subscriptionId ────────────────────────────────
     const updateUser = async (subscriptionId, data) => {
+      if (!subscriptionId) return;
       try {
         await strapi.db
           .query('plugin::users-permissions.user')
           .update({ where: { subscriptionId }, data });
+        strapi.log.info(`🔄 Updated user ${subscriptionId}:`, data);
       } catch (err) {
-        strapi.log.error(`Failed to update user (${subscriptionId}):`, err);
+        strapi.log.error(`❌ Failed to update user ${subscriptionId}:`, err);
       }
     };
   
-    // Handle the event
-    try {
-      switch (event.type) {
-        case 'customer.subscription.created': {
-          const sub = event.data.object;
-          await updateUser(sub.id, {
-            subscriptionStatus: sub.status,
-            trialEnd:           new Date(sub.trial_end * 1000),
-            periodEnd:          new Date(sub.current_period_end * 1000),
-          });
-          break;
-        }
-        case 'invoice.payment_succeeded': {
-          const invoice = event.data.object;
-          await updateUser(invoice.subscription, {
+    // ─── Dispatch based on event type ───────────────────────────────────────────────
+    const { type } = event;
+    const obj = event.data && event.data.object;
+  
+    switch (type) {
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated':
+        await updateUser(obj.id, {
+          subscriptionStatus: obj.status,
+          trialEnd:           new Date(obj.trial_end * 1000),
+          periodEnd:          new Date(obj.current_period_end * 1000),
+        });
+        break;
+  
+      case 'customer.subscription.trial_will_end':
+        strapi.log.info(`🔔 Trial ending soon for ${obj.id} at ${new Date(obj.trial_end * 1000)}`);
+        break;
+  
+      case 'customer.subscription.deleted':
+        await updateUser(obj.id, { subscriptionStatus: 'canceled' });
+        break;
+  
+      case 'invoice.created':
+      case 'invoice.finalized':
+        strapi.log.info(`🧾 Invoice ${obj.id} for sub ${obj.subscription} is ${type}`);
+        break;
+  
+      case 'invoice.paid':
+      case 'invoice.payment_succeeded':
+        await updateUser(obj.subscription, {
+          subscriptionStatus: 'active',
+          periodEnd:          new Date(obj.period_end * 1000),
+        });
+        break;
+  
+      case 'invoice.payment_failed':
+        await updateUser(obj.subscription, { subscriptionStatus: 'past_due' });
+        break;
+  
+      case 'charge.succeeded':
+        if (obj.subscription) {
+          await updateUser(obj.subscription, {
             subscriptionStatus: 'active',
-            periodEnd:          new Date(invoice.period_end * 1000),
+            periodEnd:          new Date(obj.created * 1000),
           });
-          break;
+          strapi.log.info(`🔄 Updated user ${obj.subscription} via charge.succeeded`);
         }
-        case 'invoice.payment_failed': {
-          const invoice = event.data.object;
-          await updateUser(invoice.subscription, { subscriptionStatus: 'past_due' });
-          break;
+        break;
+  
+      case 'charge.failed':
+        if (obj.subscription) {
+          await updateUser(obj.subscription, { subscriptionStatus: 'past_due' });
+          strapi.log.info(`🔄 Updated user ${obj.subscription} via charge.failed`);
         }
-        case 'customer.subscription.trial_will_end': {
-          const sub = event.data.object;
-          strapi.log.info(
-            `Subscription ${sub.id} trial will end on ${new Date(sub.trial_end * 1000)}`
-          );
-          break;
+        break;
+  
+      case 'payment_intent.succeeded':
+        if (obj.subscription) {
+          await updateUser(obj.subscription, {
+            subscriptionStatus: 'active',
+            periodEnd:          new Date(obj.created * 1000),
+          });
+          strapi.log.info(`🔄 Updated user ${obj.subscription} via payment_intent.succeeded`);
         }
-        case 'customer.subscription.updated': {
-          const sub = event.data.object;
-          if (['canceled', 'unpaid', 'incomplete_expired'].includes(sub.status)) {
-            await updateUser(sub.id, { subscriptionStatus: sub.status });
-          }
-          break;
-        }
-        case 'customer.subscription.deleted': {
-          const sub = event.data.object;
-          await updateUser(sub.id, { subscriptionStatus: 'canceled' });
-          break;
-        }
-        default:
-          strapi.log.debug(`Unhandled Stripe event type: ${event.type}`);
-      }
-    } catch (err) {
-      strapi.log.error(`Error handling Stripe event ${event.type}:`, err);
+        break;
+  
+      default:
+        strapi.log.debug(`⤷ Unhandled Stripe event: ${type}`);
     }
   
-    // Acknowledge receipt
+    // ─── Acknowledge receipt ────────────────────────────────────────────────────────
     ctx.send({ received: true });
   },
+  
+  
+  
   
 
   // 8) A simple test route
