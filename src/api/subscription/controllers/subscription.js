@@ -5,12 +5,19 @@ const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 const UNPARSED = Symbol.for('unparsedBody');
 
+// Map of specific event handlers
+const eventHandlers = {
+  'checkout.session.completed': onCheckoutCompleted,
+  'invoice.payment_succeeded':  onInvoicePaid,
+  'customer.subscription.deleted': onSubscriptionCanceled,
+};
+
 module.exports = {
   // GET /api/subscription/status
   async subscriptionStatus(ctx) {
     strapi.log.debug('[Webhook Debug] Entered subscriptionStatus');
     const user = ctx.state.user;
-    strapi.log.debug('[Webhook Debug] Current user state:', user);
+    strapi.log.debug('[Webhook Debug] Current user:', user);
     if (!user || !user.customerId) {
       strapi.log.warn('[Webhook Debug] No user or missing customerId');
       return ctx.badRequest('Stripe customer not found');
@@ -23,7 +30,7 @@ module.exports = {
         limit: 1,
       });
       const sub = subsList.data[0];
-      strapi.log.debug('[Webhook Debug] Retrieved subscription from Stripe:', sub);
+      strapi.log.debug('[Webhook Debug] Retrieved subscription:', sub);
 
       ctx.send({
         status:      sub?.status      || 'inactive',
@@ -40,7 +47,7 @@ module.exports = {
   async createBillingPortalSession(ctx) {
     strapi.log.debug('[Webhook Debug] Entered createBillingPortalSession');
     const user = ctx.state.user;
-    strapi.log.debug('[Webhook Debug] Current user state:', user);
+    strapi.log.debug('[Webhook Debug] Current user:', user);
     if (!user || !user.customerId) {
       strapi.log.warn('[Webhook Debug] No user or missing customerId');
       return ctx.badRequest('Stripe customer not found');
@@ -62,14 +69,13 @@ module.exports = {
 
   // POST /webhooks/stripe
   async webhook(ctx) {
-    console.log('this is the webhook firing off')
     strapi.log.debug('[Webhook Debug] Received webhook request', {
       headers: ctx.request.headers,
       body:    ctx.request.body,
     });
 
-    const sig = ctx.request.headers['stripe-signature'];
-    strapi.log.debug('[Webhook Debug] Stripe signature header:', sig);
+    const signature = ctx.request.headers['stripe-signature'];
+    strapi.log.debug('[Webhook Debug] Stripe signature header:', signature);
 
     const rawBody = ctx.request.body[UNPARSED];
     if (!rawBody) {
@@ -82,7 +88,7 @@ module.exports = {
     try {
       event = stripe.webhooks.constructEvent(
         rawBody,
-        sig,
+        signature,
         process.env.STRIPE_WEBHOOK_SECRET
       );
       strapi.log.debug('[Webhook Debug] Successfully constructed Stripe event:', event);
@@ -92,9 +98,10 @@ module.exports = {
     }
 
     try {
-      await handleEvent(event);
+      const handler = eventHandlers[event.type] || onUnhandledEvent;
+      await handler(event.data.object, event);
     } catch (err) {
-      strapi.log.error('[Webhook Debug] Error handling event:', err);
+      strapi.log.error('[Webhook Debug] Error in handler:', err);
       return ctx.internalServerError('Webhook handling failed');
     }
 
@@ -103,38 +110,13 @@ module.exports = {
   },
 };
 
-// ─── Dispatch incoming events to the right handler ─────────────────────────
-async function handleEvent(event) {
-  strapi.log.debug(`[Webhook Debug] Dispatching event type: ${event.type}`);
-
-  switch (event.type) {
-    case 'checkout.session.completed':
-      strapi.log.debug('[Webhook Debug] Routing to onCheckoutCompleted');
-      await onCheckoutCompleted(event.data.object);
-      break;
-
-    case 'invoice.payment_succeeded':
-      strapi.log.debug('[Webhook Debug] Routing to onInvoicePaid');
-      await onInvoicePaid(event.data.object);
-      break;
-
-    case 'customer.subscription.deleted':
-      strapi.log.debug('[Webhook Debug] Routing to onSubscriptionCanceled');
-      await onSubscriptionCanceled(event.data.object);
-      break;
-
-    default:
-      strapi.log.info(`[Webhook Debug] Unhandled event type: ${event.type}`);
-  }
-}
+// ─── Handlers ────────────────────────────────────────────────────────────────
 
 async function onCheckoutCompleted(session) {
   strapi.log.debug('[Webhook Debug] Handling checkout.session.completed', session);
-
   const customerId     = session.customer;
   const subscriptionId = session.subscription;
   const isTrialing     = !!session.trial_end;
-
   strapi.log.debug(`[Webhook Debug] customerId=${customerId}, subscriptionId=${subscriptionId}, isTrialing=${isTrialing}`);
 
   const [user] = await strapi.entityService.findMany(
@@ -142,7 +124,7 @@ async function onCheckoutCompleted(session) {
     { filters: { customerId } }
   );
   if (!user) {
-    return strapi.log.warn(`[Webhook Debug] No Strapi user found for customer ${customerId}`);
+    return strapi.log.warn(`[Webhook Debug] No Strapi user for Stripe customer ${customerId}`);
   }
 
   try {
@@ -153,9 +135,7 @@ async function onCheckoutCompleted(session) {
         data: {
           subscriptionStatus: isTrialing ? 'trialing' : 'active',
           subscriptionId,
-          trialEndsAt: isTrialing
-            ? new Date(session.trial_end * 1000)
-            : null,
+          trialEndsAt: isTrialing ? new Date(session.trial_end * 1000) : null,
         },
       }
     );
@@ -167,7 +147,6 @@ async function onCheckoutCompleted(session) {
 
 async function onInvoicePaid(invoice) {
   strapi.log.debug('[Webhook Debug] Handling invoice.payment_succeeded', invoice);
-
   const customerId     = invoice.customer;
   const subscriptionId = invoice.subscription;
   strapi.log.debug(`[Webhook Debug] customerId=${customerId}, subscriptionId=${subscriptionId}`);
@@ -177,7 +156,7 @@ async function onInvoicePaid(invoice) {
     { filters: { customerId } }
   );
   if (!user) {
-    return strapi.log.warn(`[Webhook Debug] No Strapi user found for invoice.customer ${customerId}`);
+    return strapi.log.warn(`[Webhook Debug] No Strapi user for Invoice customer ${customerId}`);
   }
 
   try {
@@ -185,14 +164,10 @@ async function onInvoicePaid(invoice) {
       'plugin::users-permissions.user',
       user.id,
       {
-        data: {
-          subscriptionStatus: 'active',
-          subscriptionId,
-          trialEndsAt: null,
-        },
+        data: { subscriptionStatus: 'active', subscriptionId, trialEndsAt: null },
       }
     );
-    strapi.log.info(`[Webhook Debug] User ${user.id} moved from trial to active on invoice.payment_succeeded`);
+    strapi.log.info(`[Webhook Debug] User ${user.id} moved from trial to active`);
   } catch (error) {
     strapi.log.error('[Webhook Debug] Error updating user after invoice paid:', error);
   }
@@ -200,7 +175,6 @@ async function onInvoicePaid(invoice) {
 
 async function onSubscriptionCanceled(subscription) {
   strapi.log.debug('[Webhook Debug] Handling customer.subscription.deleted', subscription);
-
   const subscriptionId = subscription.id;
   strapi.log.debug(`[Webhook Debug] subscriptionId=${subscriptionId}`);
 
@@ -209,7 +183,7 @@ async function onSubscriptionCanceled(subscription) {
     { filters: { subscriptionId } }
   );
   if (!user) {
-    return strapi.log.warn(`[Webhook Debug] No Strapi user found for canceled subscription ${subscriptionId}`);
+    return strapi.log.warn(`[Webhook Debug] No Strapi user for canceled subscription ${subscriptionId}`);
   }
 
   try {
@@ -222,4 +196,8 @@ async function onSubscriptionCanceled(subscription) {
   } catch (error) {
     strapi.log.error('[Webhook Debug] Error updating user on subscription canceled:', error);
   }
+}
+
+async function onUnhandledEvent(data, event) {
+  strapi.log.info(`[Webhook Debug] Unhandled event type: ${event.type}`, data);
 }
