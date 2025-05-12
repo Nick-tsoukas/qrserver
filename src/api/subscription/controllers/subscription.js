@@ -62,6 +62,7 @@ module.exports = {
 
   // POST /webhooks/stripe
   async webhook(ctx) {
+    console.log('this is the webhook firing off')
     strapi.log.debug('[Webhook Debug] Received webhook request', {
       headers: ctx.request.headers,
       body:    ctx.request.body,
