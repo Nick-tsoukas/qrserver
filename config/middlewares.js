@@ -12,6 +12,7 @@ module.exports = [
     config: {
       patchKoa: true,
       includeUnparsed: true,
+      parsedMethods: ['POST', 'PUT', 'PATCH'], // ensure POST bodies come through :contentReference[oaicite:1]{index=1}
       multipart: true,
       formLimit: '50mb',
       jsonLimit: '50mb',

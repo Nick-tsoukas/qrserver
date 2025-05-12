@@ -48,14 +48,14 @@ module.exports = {
       path: "/stripe/confirm-payment",
       handler: "stripe.confirmPayment",
     },
-    {
-      method: 'POST',
-      path: '/stripe/webhook',
-      handler: 'stripe.webhook',
-      config: {
-        auth: false,
-      }
-    },
+    // {
+    //   method: 'POST',
+    //   path: '/stripe/webhook',
+    //   handler: 'stripe.webhook',
+    //   config: {
+    //     auth: false,
+    //   }
+    // },
     {
       method: "GET",
       path: "/stripe/test",
