@@ -48,24 +48,12 @@ module.exports = {
       path: "/stripe/confirm-payment",
       handler: "stripe.confirmPayment",
     },
-    // {
-    //   method: 'POST',
-    //   path: '/stripe/webhook',
-    //   handler: 'stripe.webhook',
-    //   config: {
-    //     auth: false,
-    //   }
-    // },
+
     {
       method: "GET",
       path: "/stripe/test",
       handler: "stripe.testRoute",
     },
-    // (Optional) Webhook route if you want to handle subscription events
-    // {
-    //   method: "POST",
-    //   path: "/stripe/webhook",
-    //   handler: "stripe.webhook",
-    // }
+  
   ],
 };
