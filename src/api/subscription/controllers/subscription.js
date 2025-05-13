@@ -99,8 +99,8 @@ async function onInvoiceFailed(data, event) {
   const customerId = data.customer;
   const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', { filters: { customerId } });
   if (!user) return strapi.log.warn(`No user for customer ${customerId}`);
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, { data: { subscriptionStatus: 'past_due' } });
-  strapi.log.info(`[Webhook Debug] User ${user.id} marked past_due`);
+  await strapi.entityService.update('plugin::users-permissions.user', user.id, { data: { subscriptionStatus: 'pastDue' } });
+  strapi.log.info(`[Webhook Debug] User ${user.id} marked pastDue`);
 }
 
 async function onSubscriptionCanceled(subscription) {

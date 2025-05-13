@@ -118,7 +118,7 @@
       "enum": [
         "active",
         "trialing",
-        "past_due",
+        "pastDue",
         "canceled",
         "unpaid",
         "past_due",
