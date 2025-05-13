@@ -121,6 +121,7 @@
         "past_due",
         "canceled",
         "unpaid",
+        "past_due",
         "free"
       ]
     },
