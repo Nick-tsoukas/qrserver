@@ -19,14 +19,30 @@ module.exports = {
   // GET /api/subscription/status
   async subscriptionStatus(ctx) {
     const user = ctx.state.user;
-    if (!user || !user.customerId) return ctx.badRequest('Stripe customer not found');
+    if (!user || !user.customerId) {
+      return ctx.badRequest('Stripe customer not found');
+    }
+
     try {
-      const subsList = await stripe.subscriptions.list({ customer: user.customerId, status: 'all', limit: 1 });
+      // fetch latest subscription from Stripe
+      const subsList = await stripe.subscriptions.list({
+        customer: user.customerId,
+        status: 'all',
+        limit: 1
+      });
       const sub = subsList.data[0];
+
+      // fetch Strapi user record to get gracePeriodStart
+      const [u] = await strapi.entityService.findMany(
+        'plugin::users-permissions.user',
+        { filters: { id: user.id } }
+      );
+
       ctx.send({
-        status:      sub?.status      || 'inactive',
-        plan:        sub?.items.data[0].plan.nickname || null,
-        trialEndsAt: sub?.trial_end   || null,
+        status:           sub?.status      || 'inactive',
+        plan:             sub?.items.data[0].plan.nickname || null,
+        trialEndsAt:      sub?.trial_end   || null,
+        gracePeriodStart: u.gracePeriodStart ?? null,
       });
     } catch (error) {
       strapi.log.error('[Webhook Debug] subscriptionStatus error:', error);
@@ -37,9 +53,15 @@ module.exports = {
   // POST /api/billing/portal-session
   async createBillingPortalSession(ctx) {
     const user = ctx.state.user;
-    if (!user || !user.customerId) return ctx.badRequest('Stripe customer not found');
+    if (!user || !user.customerId) {
+      return ctx.badRequest('Stripe customer not found');
+    }
+
     try {
-      const session = await stripe.billingPortal.sessions.create({ customer: user.customerId, return_url: process.env.BILLING_RETURN_URL });
+      const session = await stripe.billingPortal.sessions.create({
+        customer:   user.customerId,
+        return_url: process.env.BILLING_RETURN_URL
+      });
       ctx.send({ url: session.url });
     } catch (error) {
       strapi.log.error('[Webhook Debug] createBillingPortalSession error:', error);
@@ -49,13 +71,20 @@ module.exports = {
 
   // POST /webhooks/stripe
   async webhook(ctx) {
-    strapi.log.debug('[Webhook Debug] Received webhook', { headers: ctx.request.headers });
+    strapi.log.debug('[Webhook Debug] Received webhook', {
+      headers: ctx.request.headers
+    });
+
     const signature = ctx.request.headers['stripe-signature'];
     const rawBody   = ctx.request.body[UNPARSED];
     let event;
 
     try {
-      event = stripe.webhooks.constructEvent(rawBody, signature, process.env.STRIPE_WEBHOOK_SECRET);
+      event = stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
       strapi.log.debug('[Webhook Debug] Event type:', event.type);
     } catch (err) {
       strapi.log.error('[Webhook Debug] Signature verification failed:', err.message);
@@ -75,16 +104,17 @@ module.exports = {
 };
 
 // ─── Handlers ────────────────────────────────────────────────────────────────
+
 // ─── onCheckoutCompleted ───────────────────────────────────────────────────
 async function onCheckoutCompleted(session) {
   strapi.log.debug('[Webhook Debug] checkout.session.completed received', {
-    id: session.id,
-    mode: session.mode,
-    customer: session.customer,
+    id:        session.id,
+    mode:      session.mode,
+    customer:  session.customer,
     trial_end: session.trial_end,
   });
 
-  // ◼️ Only handle sessions that actually start a subscription
+  // Only handle if a subscription was created
   if (!session.subscription) {
     strapi.log.info(
       `[Webhook Debug] Skipping checkout.session.completed (no subscription): mode=${session.mode}`
@@ -92,9 +122,10 @@ async function onCheckoutCompleted(session) {
     return;
   }
 
-  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
-    filters: { customerId: session.customer },
-  });
+  const [user] = await strapi.entityService.findMany(
+    'plugin::users-permissions.user',
+    { filters: { customerId: session.customer } }
+  );
   if (!user) {
     strapi.log.warn(`[Webhook Debug] No user found for customer ${session.customer}`);
     return;
@@ -102,18 +133,22 @@ async function onCheckoutCompleted(session) {
 
   const isTrialing = Boolean(session.trial_end);
   strapi.log.debug('[Webhook Debug] Updating subscription state', {
-    userId: user.id,
+    userId:       user.id,
     isTrialing,
     trialEndUnix: session.trial_end,
   });
 
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, {
-    data: {
-      subscriptionStatus: isTrialing ? 'trialing' : 'active',
-      subscriptionId:     session.subscription,
-      trialEndsAt:        isTrialing ? new Date(session.trial_end * 1000) : null,
-    },
-  });
+  await strapi.entityService.update(
+    'plugin::users-permissions.user',
+    user.id,
+    {
+      data: {
+        subscriptionStatus: isTrialing ? 'trialing' : 'active',
+        subscriptionId:     session.subscription,
+        trialEndsAt:        isTrialing ? new Date(session.trial_end * 1000) : null,
+      },
+    }
+  );
 
   strapi.log.info(
     `[Webhook Debug] User ${user.id} marked ${isTrialing ? 'trialing' : 'active'}`
@@ -124,50 +159,49 @@ async function onCheckoutCompleted(session) {
 async function onInvoicePaid(invoice) {
   strapi.log.debug('[Webhook Debug] invoice.payment_succeeded', invoice);
 
-  // ○ Skip the initial trial‐creation invoice (no real charge)
+  // skip the zero‐dollar trial invoice
   if (invoice.billing_reason === 'subscription_create' || invoice.amount_due === 0) {
     strapi.log.info('[Webhook Debug] Skipping initial subscription invoice');
     return;
   }
 
-  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
-    filters: { customerId: invoice.customer },
-  });
+  const [user] = await strapi.entityService.findMany(
+    'plugin::users-permissions.user',
+    { filters: { customerId: invoice.customer } }
+  );
   if (!user) {
     return strapi.log.warn(`[Webhook Debug] No user for customer ${invoice.customer}`);
   }
 
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, {
-    data: {
-      subscriptionStatus: 'active',
-      subscriptionId:     invoice.subscription,
-      trialEndsAt:        null,
-    },
-  });
+  await strapi.entityService.update(
+    'plugin::users-permissions.user',
+    user.id,
+    {
+      data: {
+        subscriptionStatus: 'active',
+        subscriptionId:     invoice.subscription,
+        trialEndsAt:        null,
+      },
+    }
+  );
 
   strapi.log.info(`[Webhook Debug] User ${user.id} marked active on invoice payment`);
 }
 
-
-
-// async function onInvoicePaid(invoice) {
-//   strapi.log.debug('[Webhook Debug] invoice.payment_succeeded', invoice);
-//   const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', { filters: { customerId: invoice.customer } });
-//   if (!user) return strapi.log.warn(`No user for customer ${invoice.customer}`);
-//   await strapi.entityService.update('plugin::users-permissions.user', user.id, { data: { subscriptionStatus: 'active', subscriptionId: invoice.subscription, trialEndsAt: null } });
-//   strapi.log.info(`[Webhook Debug] User ${user.id} marked active`);
-// }
-
+// ─── onInvoiceFailed ─────────────────────────────────────────────────────────
 async function onInvoiceFailed(data, event) {
   strapi.log.debug(`[Webhook Debug] ${event.type}`, data);
+
   const customerId = data.customer;
   const [user] = await strapi.entityService.findMany(
     'plugin::users-permissions.user',
     { filters: { customerId } }
   );
-  if (!user) return strapi.log.warn(`No user for customer ${customerId}`);
+  if (!user) {
+    return strapi.log.warn(`No user for customer ${customerId}`);
+  }
 
-  // If this is the first failure, set gracePeriodStart
+  // mark pastDue and stamp gracePeriodStart if first failure
   const updates = { subscriptionStatus: 'pastDue' };
   if (!user.gracePeriodStart) {
     updates.gracePeriodStart = new Date();
@@ -181,15 +215,26 @@ async function onInvoiceFailed(data, event) {
   strapi.log.info(`[Webhook Debug] User ${user.id} marked pastDue`);
 }
 
-
+// ─── onSubscriptionCanceled ─────────────────────────────────────────────────
 async function onSubscriptionCanceled(subscription) {
   strapi.log.debug('[Webhook Debug] customer.subscription.deleted', subscription);
-  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', { filters: { subscriptionId: subscription.id } });
-  if (!user) return strapi.log.warn(`No user for subscription ${subscription.id}`);
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, { data: { subscriptionStatus: 'canceled' } });
+  const [user] = await strapi.entityService.findMany(
+    'plugin::users-permissions.user',
+    { filters: { subscriptionId: subscription.id } }
+  );
+  if (!user) {
+    return strapi.log.warn(`No user for subscription ${subscription.id}`);
+  }
+
+  await strapi.entityService.update(
+    'plugin::users-permissions.user',
+    user.id,
+    { data: { subscriptionStatus: 'canceled' } }
+  );
   strapi.log.info(`[Webhook Debug] User ${user.id} canceled`);
 }
 
+// ─── onUnhandledEvent ────────────────────────────────────────────────────────
 async function onUnhandledEvent(data, event) {
   strapi.log.info(`[Webhook Debug] Unhandled event type: ${event.type}`);
 }
