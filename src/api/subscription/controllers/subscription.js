@@ -150,13 +150,13 @@ async function onInvoicePaid(invoice) {
 
 
 
-async function onInvoicePaid(invoice) {
-  strapi.log.debug('[Webhook Debug] invoice.payment_succeeded', invoice);
-  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', { filters: { customerId: invoice.customer } });
-  if (!user) return strapi.log.warn(`No user for customer ${invoice.customer}`);
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, { data: { subscriptionStatus: 'active', subscriptionId: invoice.subscription, trialEndsAt: null } });
-  strapi.log.info(`[Webhook Debug] User ${user.id} marked active`);
-}
+// async function onInvoicePaid(invoice) {
+//   strapi.log.debug('[Webhook Debug] invoice.payment_succeeded', invoice);
+//   const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', { filters: { customerId: invoice.customer } });
+//   if (!user) return strapi.log.warn(`No user for customer ${invoice.customer}`);
+//   await strapi.entityService.update('plugin::users-permissions.user', user.id, { data: { subscriptionStatus: 'active', subscriptionId: invoice.subscription, trialEndsAt: null } });
+//   strapi.log.info(`[Webhook Debug] User ${user.id} marked active`);
+// }
 
 async function onInvoiceFailed(data, event) {
   strapi.log.debug(`[Webhook Debug] ${event.type}`, data);
