@@ -7,7 +7,8 @@ module.exports = (policyContext, config, { strapi }) => {
     return response.unauthorized('You must be logged in.');
   }
 
-  const { subscriptionStatus, gracePeriodStart } = user;
+  const { subscriptionStatus, gracePeriodStart, cancelAt } = user;
+  const now = Date.now();
 
   // always allow active or trialing
   if (subscriptionStatus === 'active' || subscriptionStatus === 'trialing') {
@@ -19,10 +20,8 @@ module.exports = (policyContext, config, { strapi }) => {
     if (!gracePeriodStart) {
       return response.forbidden('Payment is past due. Please pay to continue.');
     }
-    const now = Date.now();
     const graceStart = new Date(gracePeriodStart).getTime();
     const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
-
     if (now - graceStart <= THREE_DAYS) {
       return true;
     } else {
@@ -32,7 +31,22 @@ module.exports = (policyContext, config, { strapi }) => {
     }
   }
 
-  // all other statuses (canceled, incomplete, etc.) get blocked
+  // allow users who have canceled but are still within their paid period
+  if (subscriptionStatus === 'canceling') {
+    if (!cancelAt) {
+      return response.forbidden('Your subscription is canceling. Please renew to continue.');
+    }
+    const cancelTime = new Date(cancelAt).getTime();
+    if (now <= cancelTime) {
+      return true;
+    } else {
+      return response.forbidden(
+        'Your subscription has ended. Please renew to regain access.'
+      );
+    }
+  }
+
+  // all other statuses (canceled, incomplete, etc.) get blocked immediately
   return response.forbidden(
     'Your subscription is not active. Please subscribe to use this feature.'
   );

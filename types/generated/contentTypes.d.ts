@@ -778,6 +778,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     customerId: Attribute.String;
     trialEndsAt: Attribute.Date;
     gracePeriodStart: Attribute.Date;
+    cancelAt: Attribute.Date;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

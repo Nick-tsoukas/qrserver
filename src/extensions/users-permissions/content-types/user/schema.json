@@ -135,8 +135,11 @@
       "type": "date"
     },
     "gracePeriodStart": {
-       "type": "date",
-       "required": false
-       }
+      "type": "date",
+      "required": false
+    },
+    "cancelAt": {
+      "type": "date"
+    }
   }
 }
