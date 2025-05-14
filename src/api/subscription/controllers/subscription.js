@@ -76,15 +76,47 @@ module.exports = {
 
 // ─── Handlers ────────────────────────────────────────────────────────────────
 async function onCheckoutCompleted(session) {
-  strapi.log.debug('[Webhook Debug] checkout.session.completed', session);
-  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', { filters: { customerId: session.customer } });
-  if (!user) return strapi.log.warn(`No user for customer ${session.customer}`);
-  const isTrialing = !!session.trial_end;
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, {
-    data: { subscriptionStatus: isTrialing ? 'trialing' : 'active', subscriptionId: session.subscription, trialEndsAt: isTrialing ? new Date(session.trial_end * 1000) : null }
+  strapi.log.debug('[Webhook Debug] checkout.session.completed received', {
+    id: session.id,
+    mode: session.mode,
+    customer: session.customer,
+    trial_end: session.trial_end,
   });
-  strapi.log.info(`[Webhook Debug] User ${user.id} subscription started`);
+
+  // Only handle subscription checkouts (skip setup sessions)
+  if (session.mode && session.mode !== 'subscription') {
+    strapi.log.info(`[Webhook Debug] Skipping checkout.session.completed for mode=${session.mode}`);
+    return;
+  }
+
+  // Find the user by Stripe customer ID
+  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
+    filters: { customerId: session.customer },
+  });
+  if (!user) {
+    strapi.log.warn(`[Webhook Debug] No Strapi user found for customer ${session.customer}`);
+    return;
+  }
+
+  const isTrialing = Boolean(session.trial_end);
+  strapi.log.debug('[Webhook Debug] About to update user subscription state', {
+    userId: user.id,
+    isTrialing,
+    trialEndUnix: session.trial_end,
+  });
+
+  // Update subscriptionStatus & trialEndsAt
+  await strapi.entityService.update('plugin::users-permissions.user', user.id, {
+    data: {
+      subscriptionStatus: isTrialing ? 'trialing' : 'active',
+      subscriptionId:     session.subscription,
+      trialEndsAt:        isTrialing ? new Date(session.trial_end * 1000) : null,
+    },
+  });
+
+  strapi.log.info(`[Webhook Debug] User ${user.id} marked ${isTrialing ? 'trialing' : 'active'}`);
 }
+
 
 async function onInvoicePaid(invoice) {
   strapi.log.debug('[Webhook Debug] invoice.payment_succeeded', invoice);
