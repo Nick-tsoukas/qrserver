@@ -7,11 +7,5 @@ module.exports = {
       handler: 'api::subscription.subscription.webhook',  
       config: { auth: false, prefix: '' },
     },
-    {
-      method: 'POST',
-      path: '/stripe/confirm-payment',
-      handler: 'api::subscription.subscription.confirmPayment',
-      config: { auth: false },
-    },
   ],
 };
