@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-05-12T00:13:26.648Z"
+    "x-generation-date": "2025-05-14T23:29:23.311Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -3532,9 +3532,10 @@
                                                   "enum": [
                                                     "active",
                                                     "trialing",
-                                                    "past_due",
+                                                    "pastDue",
                                                     "canceled",
                                                     "unpaid",
+                                                    "past_due",
                                                     "free"
                                                   ]
                                                 },
@@ -3545,6 +3546,10 @@
                                                   "type": "string"
                                                 },
                                                 "trialEndsAt": {
+                                                  "type": "string",
+                                                  "format": "date"
+                                                },
+                                                "gracePeriodStart": {
                                                   "type": "string",
                                                   "format": "date"
                                                 },
@@ -8156,9 +8161,10 @@
                                                                 "enum": [
                                                                   "active",
                                                                   "trialing",
-                                                                  "past_due",
+                                                                  "pastDue",
                                                                   "canceled",
                                                                   "unpaid",
+                                                                  "past_due",
                                                                   "free"
                                                                 ]
                                                               },
@@ -8169,6 +8175,10 @@
                                                                 "type": "string"
                                                               },
                                                               "trialEndsAt": {
+                                                                "type": "string",
+                                                                "format": "date"
+                                                              },
+                                                              "gracePeriodStart": {
                                                                 "type": "string",
                                                                 "format": "date"
                                                               },
@@ -12960,9 +12970,10 @@
                                                   "enum": [
                                                     "active",
                                                     "trialing",
-                                                    "past_due",
+                                                    "pastDue",
                                                     "canceled",
                                                     "unpaid",
+                                                    "past_due",
                                                     "free"
                                                   ]
                                                 },
@@ -12973,6 +12984,10 @@
                                                   "type": "string"
                                                 },
                                                 "trialEndsAt": {
+                                                  "type": "string",
+                                                  "format": "date"
+                                                },
+                                                "gracePeriodStart": {
                                                   "type": "string",
                                                   "format": "date"
                                                 },
@@ -17387,9 +17402,10 @@
                                                   "enum": [
                                                     "active",
                                                     "trialing",
-                                                    "past_due",
+                                                    "pastDue",
                                                     "canceled",
                                                     "unpaid",
+                                                    "past_due",
                                                     "free"
                                                   ]
                                                 },
@@ -17400,6 +17416,10 @@
                                                   "type": "string"
                                                 },
                                                 "trialEndsAt": {
+                                                  "type": "string",
+                                                  "format": "date"
+                                                },
+                                                "gracePeriodStart": {
                                                   "type": "string",
                                                   "format": "date"
                                                 },
@@ -21650,9 +21670,10 @@
                                                   "enum": [
                                                     "active",
                                                     "trialing",
-                                                    "past_due",
+                                                    "pastDue",
                                                     "canceled",
                                                     "unpaid",
+                                                    "past_due",
                                                     "free"
                                                   ]
                                                 },
@@ -21663,6 +21684,10 @@
                                                   "type": "string"
                                                 },
                                                 "trialEndsAt": {
+                                                  "type": "string",
+                                                  "format": "date"
+                                                },
+                                                "gracePeriodStart": {
                                                   "type": "string",
                                                   "format": "date"
                                                 },
@@ -25563,9 +25588,10 @@
                                                               "enum": [
                                                                 "active",
                                                                 "trialing",
-                                                                "past_due",
+                                                                "pastDue",
                                                                 "canceled",
                                                                 "unpaid",
+                                                                "past_due",
                                                                 "free"
                                                               ]
                                                             },
@@ -25576,6 +25602,10 @@
                                                               "type": "string"
                                                             },
                                                             "trialEndsAt": {
+                                                              "type": "string",
+                                                              "format": "date"
+                                                            },
+                                                            "gracePeriodStart": {
                                                               "type": "string",
                                                               "format": "date"
                                                             },
@@ -30672,9 +30702,10 @@
                         "enum": [
                           "active",
                           "trialing",
-                          "past_due",
+                          "pastDue",
                           "canceled",
                           "unpaid",
+                          "past_due",
                           "free"
                         ]
                       },
@@ -30685,6 +30716,10 @@
                         "type": "string"
                       },
                       "trialEndsAt": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "gracePeriodStart": {
                         "type": "string",
                         "format": "date"
                       },
@@ -34747,9 +34782,10 @@
                         "enum": [
                           "active",
                           "trialing",
-                          "past_due",
+                          "pastDue",
                           "canceled",
                           "unpaid",
+                          "past_due",
                           "free"
                         ]
                       },
@@ -34760,6 +34796,10 @@
                         "type": "string"
                       },
                       "trialEndsAt": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "gracePeriodStart": {
                         "type": "string",
                         "format": "date"
                       },
@@ -38197,9 +38237,10 @@
                                                                 "enum": [
                                                                   "active",
                                                                   "trialing",
-                                                                  "past_due",
+                                                                  "pastDue",
                                                                   "canceled",
                                                                   "unpaid",
+                                                                  "past_due",
                                                                   "free"
                                                                 ]
                                                               },
@@ -38210,6 +38251,10 @@
                                                                 "type": "string"
                                                               },
                                                               "trialEndsAt": {
+                                                                "type": "string",
+                                                                "format": "date"
+                                                              },
+                                                              "gracePeriodStart": {
                                                                 "type": "string",
                                                                 "format": "date"
                                                               },
@@ -43212,9 +43257,10 @@
                         "enum": [
                           "active",
                           "trialing",
-                          "past_due",
+                          "pastDue",
                           "canceled",
                           "unpaid",
+                          "past_due",
                           "free"
                         ]
                       },
@@ -43225,6 +43271,10 @@
                         "type": "string"
                       },
                       "trialEndsAt": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "gracePeriodStart": {
                         "type": "string",
                         "format": "date"
                       },

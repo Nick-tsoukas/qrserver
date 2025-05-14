@@ -17,9 +17,7 @@ module.exports = {
       path: '/stripe/subscription-status',
       handler: 'stripe.subscriptionStatus',
       config: {
-        auth: {
-          scope: [],
-        },
+        auth: false,
       },
     },
     {

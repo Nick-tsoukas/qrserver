@@ -9,110 +9,137 @@ const UNPARSED = Symbol.for('unparsedBody');
 module.exports = {
   // 1) Check subscription status
   async subscriptionStatus(ctx) {
-    strapi.log.debug('[confirmPayment] subscriptionStatus entry', { user: ctx.state.user });
+    strapi.log.debug('[subscriptionStatus] entry', { user: ctx.state.user });
     const user = ctx.state.user;
     if (!user || !user.customerId) {
-      strapi.log.warn('[confirmPayment] No Stripe customer on user', { user });
+      strapi.log.warn('[subscriptionStatus] No Stripe customer on user', { user });
       return ctx.badRequest('Stripe customer not found');
     }
     try {
-      const subscriptions = await stripe.subscriptions.list({ customer: user.customerId, status: 'all', limit: 1 });
+      // fetch Strapi user to get gracePeriodStart
+      const [u] = await strapi.entityService.findMany(
+        'plugin::users-permissions.user',
+        { filters: { id: user.id } }
+      );
+
+      // fetch subscription from Stripe
+      const subscriptions = await stripe.subscriptions.list({
+        customer: user.customerId,
+        status:   'all',
+        limit:    1,
+      });
       const subscription = subscriptions.data[0];
-      strapi.log.debug('[confirmPayment] Retrieved subscription', { subscription });
+
+      strapi.log.debug('[subscriptionStatus] Retrieved subscription', { subscription });
+
       return ctx.send({
-        status: subscription ? subscription.status : 'inactive',
-        plan: subscription ? subscription.items.data[0].plan.nickname : null,
-        trialEndsAt: subscription ? subscription.trial_end : null,
+        status:           subscription ? subscription.status : 'inactive',
+        plan:             subscription ? subscription.items.data[0].plan.nickname : null,
+        trialEndsAt:      subscription ? subscription.trial_end : null,
+        gracePeriodStart: u.gracePeriodStart || null,
       });
     } catch (error) {
-      strapi.log.error('[confirmPayment] subscriptionStatus error', error);
+      strapi.log.error('[subscriptionStatus] error', error);
       return ctx.throw(500, 'Error retrieving subscription status');
     }
   },
 
   // 2) Retrieve billing info
   async getBillingInfo(ctx) {
-    strapi.log.debug('[confirmPayment] getBillingInfo entry', { user: ctx.state.user });
+    strapi.log.debug('[getBillingInfo] entry', { user: ctx.state.user });
     const user = ctx.state.user;
     if (!user || !user.customerId) {
-      strapi.log.warn('[confirmPayment] No Stripe customer on user for billing info', { user });
+      strapi.log.warn('[getBillingInfo] No Stripe customer on user', { user });
       return ctx.badRequest('Stripe customer not found');
     }
     try {
       const customer = await stripe.customers.retrieve(user.customerId);
-      const subscriptions = await stripe.subscriptions.list({ customer: user.customerId, status: 'all', limit: 1 });
+      const subscriptions = await stripe.subscriptions.list({
+        customer: user.customerId,
+        status:   'all',
+        limit:    1,
+      });
       const subscription = subscriptions.data[0];
-      strapi.log.debug('[confirmPayment] Retrieved billing info', { customer, subscription, trialEndsAt: user.trialEndsAt });
+
+      strapi.log.debug('[getBillingInfo] Retrieved billing info', {
+        customer,
+        subscription,
+        trialEndsAt: user.trialEndsAt,
+      });
+
       return ctx.send({ customer, subscription, trialEndsAt: user.trialEndsAt });
     } catch (error) {
-      strapi.log.error('[confirmPayment] getBillingInfo error', error);
+      strapi.log.error('[getBillingInfo] error', error);
       return ctx.throw(500, 'Error retrieving billing information');
     }
   },
 
   // 3) Create a Stripe Billing Portal session
   async createBillingPortalSession(ctx) {
-    strapi.log.debug('[confirmPayment] createBillingPortalSession entry', { user: ctx.state.user });
+    strapi.log.debug('[createBillingPortalSession] entry', { user: ctx.state.user });
     const user = ctx.state.user;
     if (!user || !user.customerId) {
-      strapi.log.warn('[confirmPayment] No Stripe customer on user for billing portal', { user });
+      strapi.log.warn('[createBillingPortalSession] No Stripe customer on user', { user });
       return ctx.badRequest('Stripe customer not found');
     }
     try {
-      const session = await stripe.billingPortal.sessions.create({ customer: user.customerId, return_url: process.env.BILLING_RETURN_URL });
-      strapi.log.debug('[confirmPayment] Created billing portal session', { session });
+      const session = await stripe.billingPortal.sessions.create({
+        customer:   user.customerId,
+        return_url: process.env.BILLING_RETURN_URL,
+      });
+      strapi.log.debug('[createBillingPortalSession] Created billing portal session', { session });
       return ctx.send({ url: session.url });
     } catch (error) {
-      strapi.log.error('[confirmPayment] createBillingPortalSession error', error);
+      strapi.log.error('[createBillingPortalSession] error', error);
       return ctx.throw(500, 'Error creating billing portal session');
     }
   },
 
   // 4) Create a Stripe Customer
   async createCustomer(ctx) {
-    strapi.log.debug('[confirmPayment] createCustomer entry', { body: ctx.request.body });
+    strapi.log.debug('[createCustomer] entry', { body: ctx.request.body });
     try {
       const { email, name } = ctx.request.body;
       if (!email || !name) {
-        strapi.log.warn('[confirmPayment] Missing email or name', { email, name });
+        strapi.log.warn('[createCustomer] Missing email or name', { email, name });
         return ctx.badRequest('Missing email or name.');
       }
       const customer = await stripe.customers.create({ email, name });
-      strapi.log.debug('[confirmPayment] Stripe customer created', { customer });
+      strapi.log.debug('[createCustomer] Stripe customer created', { customer });
       return ctx.send({ customerId: customer.id });
     } catch (error) {
-      strapi.log.error('[confirmPayment] createCustomer error', error);
+      strapi.log.error('[createCustomer] error', error);
       return ctx.throw(500, 'Failed to create Stripe customer');
     }
   },
 
   // 5) Create a Checkout Session (for card setup)
   async createCheckoutSession(ctx) {
-    strapi.log.debug('[confirmPayment] createCheckoutSession entry', { body: ctx.request.body });
+    strapi.log.debug('[createCheckoutSession] entry', { body: ctx.request.body });
     try {
       const { customerId } = ctx.request.body;
       if (!customerId) {
-        strapi.log.warn('[confirmPayment] Missing customerId');
+        strapi.log.warn('[createCheckoutSession] Missing customerId');
         return ctx.badRequest('Missing customerId.');
       }
       const session = await stripe.checkout.sessions.create({
-        customer: customerId,
+        customer:             customerId,
         payment_method_types: ['card'],
-        mode: 'setup',
-        success_url: 'https://musicbizqr.com/signupSuccess?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'https://musicbizqr.com/signupCancelled',
+        mode:                 'setup',
+        success_url:          'https://musicbizqr.com/signupSuccess?session_id={CHECKOUT_SESSION_ID}',
+        cancel_url:           'https://musicbizqr.com/signupCancelled',
       });
-      strapi.log.debug('[confirmPayment] Checkout session created', { session });
+      strapi.log.debug('[createCheckoutSession] Checkout session created', { session });
       return ctx.send({ url: session.url });
     } catch (error) {
-      strapi.log.error('[confirmPayment] createCheckoutSession error', error);
+      strapi.log.error('[createCheckoutSession] error', error);
       return ctx.throw(500, 'Failed to create checkout session');
     }
   },
 
   // 6) Confirm payment, create Stripe subscription & Strapi user
   async confirmPayment(ctx) {
-    strapi.log.debug('[confirmPayment] Entry', { body: ctx.request.body });
+    strapi.log.debug('[confirmPayment] entry', { body: ctx.request.body });
     try {
       const { session_id, email, password, name } = ctx.request.body;
       if (!session_id || !email || !password || !name) {
@@ -129,7 +156,6 @@ module.exports = {
         return ctx.badRequest('Invalid session or no customer found.');
       }
       const customerId = session.customer;
-      strapi.log.debug('[confirmPayment] Stripe customerId', { customerId });
 
       // 2️⃣ Ensure they have a card on file
       strapi.log.debug('[confirmPayment] Listing payment methods', { customerId });
@@ -142,53 +168,74 @@ module.exports = {
 
       // 3️⃣ Create the Stripe subscription (30-day trial)
       strapi.log.debug('[confirmPayment] Creating Stripe subscription', { customerId });
-      const subscription = await stripe.subscriptions.create({ customer: customerId, items: [{ price: 'price_1QRHWpC26iqgLxbxvIw2311F' }], trial_period_days: 30 });
+      const subscription = await stripe.subscriptions.create({
+        customer:           customerId,
+        items:              [{ price: 'price_1QRHWpC26iqgLxbxvIw2311F' }],
+        trial_period_days:  30,
+      });
       strapi.log.debug('[confirmPayment] Subscription created', { subscription });
 
       // 4️⃣ Create the Strapi user (core fields only)
       strapi.log.debug('[confirmPayment] Fetching authenticated role');
-      const authRole = await strapi.db.query('plugin::users-permissions.role').findOne({ where: { type: 'authenticated' } });
+      const authRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+        where: { type: 'authenticated' },
+      });
       if (!authRole) {
         strapi.log.error('[confirmPayment] Authenticated role not found');
         return ctx.badRequest('Authenticated role not found.');
       }
-      strapi.log.debug('[confirmPayment] Auth role', { role: authRole.id });
-
       const confirmationToken = crypto.randomBytes(20).toString('hex');
       strapi.log.debug('[confirmPayment] Creating Strapi user', { email });
       const newUser = await strapi.plugin('users-permissions').service('user').add({
         email,
         password,
-        username: email,
-        provider: 'local',
-        confirmed: false,
+        username:          email,
+        provider:          'local',
+        confirmed:         false,
         confirmationToken,
-        role: authRole.id,
+        role:              authRole.id,
       });
       strapi.log.debug('[confirmPayment] Strapi user created', { userId: newUser.id });
 
-      // 5️⃣ Immediately update user with Stripe fields
+      // 5️⃣ Update user with Stripe fields
       const trialEndsAt = new Date(subscription.trial_end * 1000);
-      strapi.log.debug('[confirmPayment] Updating user with Stripe data', { userId: newUser.id, customerId, subscriptionId: subscription.id, subscriptionStatus: 'trialing', trialEndsAt });
-      await strapi.entityService.update('plugin::users-permissions.user', newUser.id, {
-        data: { customerId, subscriptionId: subscription.id, subscriptionStatus: 'trialing', trialEndsAt }
+      strapi.log.debug('[confirmPayment] Updating user with Stripe data', {
+        userId:             newUser.id,
+        customerId,
+        subscriptionId:     subscription.id,
+        subscriptionStatus: 'trialing',
+        trialEndsAt,
       });
+      await strapi.entityService.update(
+        'plugin::users-permissions.user',
+        newUser.id,
+        {
+          data: {
+            customerId,
+            subscriptionId:     subscription.id,
+            subscriptionStatus: 'trialing',
+            trialEndsAt,
+          },
+        }
+      );
       strapi.log.info('[confirmPayment] User updated with Stripe data', { userId: newUser.id });
 
       // 6️⃣ Send confirmation email
       strapi.log.debug('[confirmPayment] Sending confirmation email', { to: email });
       await strapi.plugin('email').service('email').send({
-        to: email,
-        from: 'noreply@musicbizqr.com',
+        to:      email,
+        from:    'noreply@musicbizqr.com',
         subject: 'Confirm your email',
-        text: `Hi ${name},\n\nPlease confirm your email by clicking: https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`
+        text:    `Hi ${name},\n\nPlease confirm your email by clicking: https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${confirmationToken}\n\nThank you!`,
       });
       strapi.log.info('[confirmPayment] Confirmation email sent', { to: email });
 
       // 7️⃣ Return success
       strapi.log.debug('[confirmPayment] Responding to client', { userId: newUser.id });
-      return ctx.send({ message: 'Confirmation email sent. Please check your inbox.', user: { id: newUser.id, email: newUser.email } });
-
+      return ctx.send({
+        message: 'Confirmation email sent. Please check your inbox.',
+        user:    { id: newUser.id, email: newUser.email },
+      });
     } catch (error) {
       strapi.log.error('[confirmPayment] Error in confirmPayment', error);
       return ctx.internalServerError('Payment confirmation failed.');
@@ -198,5 +245,5 @@ module.exports = {
   // 8) A simple test route
   async testRoute(ctx) {
     return ctx.send({ message: 'This is a test route' });
-  }
+  },
 };

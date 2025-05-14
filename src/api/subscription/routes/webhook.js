@@ -7,5 +7,6 @@ module.exports = {
       handler: 'api::subscription.subscription.webhook',  
       config: { auth: false, prefix: '' },
     },
+
   ],
 };
