@@ -133,6 +133,10 @@
     },
     "trialEndsAt": {
       "type": "date"
-    }
+    },
+    "gracePeriodStart": {
+       "type": "date",
+       "required": false
+       }
   }
 }

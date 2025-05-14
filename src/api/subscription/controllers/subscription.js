@@ -161,11 +161,26 @@ async function onInvoicePaid(invoice) {
 async function onInvoiceFailed(data, event) {
   strapi.log.debug(`[Webhook Debug] ${event.type}`, data);
   const customerId = data.customer;
-  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', { filters: { customerId } });
+  const [user] = await strapi.entityService.findMany(
+    'plugin::users-permissions.user',
+    { filters: { customerId } }
+  );
   if (!user) return strapi.log.warn(`No user for customer ${customerId}`);
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, { data: { subscriptionStatus: 'pastDue' } });
+
+  // If this is the first failure, set gracePeriodStart
+  const updates = { subscriptionStatus: 'pastDue' };
+  if (!user.gracePeriodStart) {
+    updates.gracePeriodStart = new Date();
+  }
+
+  await strapi.entityService.update(
+    'plugin::users-permissions.user',
+    user.id,
+    { data: updates }
+  );
   strapi.log.info(`[Webhook Debug] User ${user.id} marked pastDue`);
 }
+
 
 async function onSubscriptionCanceled(subscription) {
   strapi.log.debug('[Webhook Debug] customer.subscription.deleted', subscription);
