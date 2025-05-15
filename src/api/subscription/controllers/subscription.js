@@ -14,7 +14,7 @@ module.exports = {
     const user = await strapi.entityService.findOne(
       'plugin::users-permissions.user',
       jwtUser.id,
-      { fields: ['customerId','subscriptionStatus','trialEndsAt','gracePeriodStart'] }
+      { fields: ['customerId','subscriptionStatus','trialEndsAt','gracePeriodStart','cancelAt'] }
     );
     if (!user?.customerId) return ctx.badRequest('Stripe customer not found');
 
@@ -30,6 +30,7 @@ module.exports = {
         plan:             sub?.items[0]?.plan?.nickname || null,
         trialEndsAt:      sub?.trial_end   || null,
         gracePeriodStart: user.gracePeriodStart || null,
+        cancelAt:         user.cancelAt || null,
       });
     } catch (err) {
       strapi.log.error('[subscriptionStatus] Stripe error', err);
@@ -50,9 +51,9 @@ module.exports = {
         jwtUser.id,
         { fields: ['customerId'] }
       );
-      strapi.log.debug('[createBillingPortalSession] loaded Strapi user', user);
+      strapi.log.debug('[createBillingPortalSession] loaded user', user);
     } catch (e) {
-      strapi.log.error('[createBillingPortalSession] DB fetch error', e);
+      strapi.log.error('[createBillingPortalSession] fetch error', e);
       return ctx.internalServerError('Error loading user data');
     }
 
@@ -62,7 +63,7 @@ module.exports = {
     }
 
     try {
-      strapi.log.debug('[createBillingPortalSession] calling Stripe.billingPortal', { customer: user.customerId });
+      strapi.log.debug('[createBillingPortalSession] creating session for', user.customerId);
       const session = await stripe.billingPortal.sessions.create({
         customer:   user.customerId,
         return_url: process.env.BILLING_RETURN_URL,
@@ -70,7 +71,7 @@ module.exports = {
       strapi.log.debug('[createBillingPortalSession] session created', session);
       ctx.send({ url: session.url });
     } catch (err) {
-      strapi.log.error('[createBillingPortalSession] Stripe API error', err);
+      strapi.log.error('[createBillingPortalSession] Stripe error', err);
       ctx.throw(500,'Error creating billing portal session');
     }
   },
@@ -84,13 +85,12 @@ module.exports = {
 
     try {
       event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
-      strapi.log.debug('[Webhook] stripe event.type', event.type);
+      strapi.log.debug('[Webhook] event.type', event.type);
     } catch (e) {
       strapi.log.error('[Webhook] Signature verification failed', e.message);
       return ctx.badRequest(`Webhook Error: ${e.message}`);
     }
 
-    // map events to handlers, including subscription.updated
     const handler = {
       'checkout.session.completed':    onCheckoutCompleted,
       'invoice.payment_succeeded':     onInvoicePaid,
@@ -128,6 +128,8 @@ async function onCheckoutCompleted(session) {
       subscriptionStatus: isTrial ? 'trialing' : 'active',
       subscriptionId:     session.subscription,
       trialEndsAt:        isTrial ? new Date(session.trial_end * 1000) : null,
+      gracePeriodStart:   null,
+      cancelAt:           null
     }
   });
   strapi.log.info('[Webhook] User marked', { userId: user.id, status: isTrial ? 'trialing' : 'active' });
@@ -143,13 +145,19 @@ async function onInvoicePaid(invoice) {
   if (!user) return;
 
   await strapi.entityService.update('plugin::users-permissions.user', user.id, {
-    data: { subscriptionStatus: 'active', subscriptionId: invoice.subscription, trialEndsAt: null }
+    data: {
+      subscriptionStatus:  'active',
+      subscriptionId:      invoice.subscription,
+      trialEndsAt:         null,
+      gracePeriodStart:    null,
+      cancelAt:            null
+    }
   });
   strapi.log.info('[Webhook] User marked active', { userId: user.id });
 }
 
 async function onInvoiceFailed(data) {
-  strapi.log.debug('[Webhook] invoice/payment_failed', data.id);
+  strapi.log.debug('[Webhook] invoice.payment_failed', data.id);
   const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
     filters: { customerId: data.customer }
   });
@@ -164,9 +172,10 @@ async function onInvoiceFailed(data) {
 
 async function onSubscriptionUpdated(subscription) {
   strapi.log.debug('[Webhook] customer.subscription.updated', {
-    id:          subscription.id,
-    status:      subscription.status,
-    cancel_at_period_end: subscription.cancel_at_period_end
+    id:                   subscription.id,
+    status:               subscription.status,
+    cancel_at_period_end: subscription.cancel_at_period_end,
+    cancel_at:            subscription.cancel_at
   });
 
   const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
@@ -177,14 +186,17 @@ async function onSubscriptionUpdated(subscription) {
     return;
   }
 
-  // update Strapi user’s status to match Stripe
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, {
-    data: { subscriptionStatus: subscription.status }
-  });
-  strapi.log.info('[Webhook] User subscriptionStatus updated', {
-    userId: user.id,
-    newStatus: subscription.status
-  });
+  const data = { subscriptionStatus: subscription.status };
+  if (subscription.cancel_at_period_end && subscription.cancel_at) {
+    data.cancelAt = new Date(subscription.cancel_at * 1000);
+  }
+  if (subscription.status === 'active') {
+    data.gracePeriodStart = null;
+    data.cancelAt = null;
+  }
+
+  await strapi.entityService.update('plugin::users-permissions.user', user.id, { data });
+  strapi.log.info('[Webhook] User subscriptionStatus updated', { userId: user.id, newStatus: subscription.status });
 }
 
 async function onSubscriptionCanceled(subscription) {
@@ -195,7 +207,7 @@ async function onSubscriptionCanceled(subscription) {
   if (!user) return;
 
   await strapi.entityService.update('plugin::users-permissions.user', user.id, {
-    data: { subscriptionStatus: 'canceled' }
+    data: { subscriptionStatus: 'canceled', gracePeriodStart: null, cancelAt: null }
   });
   strapi.log.info('[Webhook] User marked canceled', { userId: user.id });
 }
