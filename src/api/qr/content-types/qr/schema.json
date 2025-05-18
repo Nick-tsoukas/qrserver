@@ -92,6 +92,15 @@
         "test"
       ],
       "default": "video"
+    },
+    "videoId": {
+      "type": "string"
+    },
+    "songUrl": {
+      "type": "string"
+    },
+    "eventPosterUrl": {
+      "type": "string"
     }
   }
 }

@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-05-18T17:07:15.860Z"
+    "x-generation-date": "2025-05-18T19:14:25.654Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2637,6 +2637,15 @@
                                                                   "event",
                                                                   "test"
                                                                 ]
+                                                              },
+                                                              "videoId": {
+                                                                "type": "string"
+                                                              },
+                                                              "songUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "eventPosterUrl": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -7282,6 +7291,15 @@
                                                                                 "event",
                                                                                 "test"
                                                                               ]
+                                                                            },
+                                                                            "videoId": {
+                                                                              "type": "string"
+                                                                            },
+                                                                            "songUrl": {
+                                                                              "type": "string"
+                                                                            },
+                                                                            "eventPosterUrl": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -12108,6 +12126,15 @@
                                                                   "test"
                                                                 ]
                                                               },
+                                                              "videoId": {
+                                                                "type": "string"
+                                                              },
+                                                              "songUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "eventPosterUrl": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -16556,6 +16583,15 @@
                                                                   "test"
                                                                 ]
                                                               },
+                                                              "videoId": {
+                                                                "type": "string"
+                                                              },
+                                                              "songUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "eventPosterUrl": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -18404,6 +18440,15 @@
                   "event",
                   "test"
                 ]
+              },
+              "videoId": {
+                "type": "string"
+              },
+              "songUrl": {
+                "type": "string"
+              },
+              "eventPosterUrl": {
+                "type": "string"
               }
             }
           }
@@ -20852,6 +20897,15 @@
                                                                   "test"
                                                                 ]
                                                               },
+                                                              "videoId": {
+                                                                "type": "string"
+                                                              },
+                                                              "songUrl": {
+                                                                "type": "string"
+                                                              },
+                                                              "eventPosterUrl": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -22613,6 +22667,15 @@
               "event",
               "test"
             ]
+          },
+          "videoId": {
+            "type": "string"
+          },
+          "songUrl": {
+            "type": "string"
+          },
+          "eventPosterUrl": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",
@@ -26621,6 +26684,15 @@
                           "test"
                         ]
                       },
+                      "videoId": {
+                        "type": "string"
+                      },
+                      "songUrl": {
+                        "type": "string"
+                      },
+                      "eventPosterUrl": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -30176,6 +30248,15 @@
                                         "event",
                                         "test"
                                       ]
+                                    },
+                                    "videoId": {
+                                      "type": "string"
+                                    },
+                                    "songUrl": {
+                                      "type": "string"
+                                    },
+                                    "eventPosterUrl": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -34273,6 +34354,15 @@
                                         "test"
                                       ]
                                     },
+                                    "videoId": {
+                                      "type": "string"
+                                    },
+                                    "songUrl": {
+                                      "type": "string"
+                                    },
+                                    "eventPosterUrl": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -37494,6 +37584,15 @@
                                                                                 "event",
                                                                                 "test"
                                                                               ]
+                                                                            },
+                                                                            "videoId": {
+                                                                              "type": "string"
+                                                                            },
+                                                                            "songUrl": {
+                                                                              "type": "string"
+                                                                            },
+                                                                            "eventPosterUrl": {
+                                                                              "type": "string"
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -42779,6 +42878,15 @@
                                         "event",
                                         "test"
                                       ]
+                                    },
+                                    "videoId": {
+                                      "type": "string"
+                                    },
+                                    "songUrl": {
+                                      "type": "string"
+                                    },
+                                    "eventPosterUrl": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",

@@ -1129,6 +1129,9 @@ export interface ApiQrQr extends Schema.CollectionType {
     arEnabled: Attribute.Boolean & Attribute.DefaultTo<false>;
     template: Attribute.Enumeration<['video', 'song', 'event', 'test']> &
       Attribute.DefaultTo<'video'>;
+    videoId: Attribute.String;
+    songUrl: Attribute.String;
+    eventPosterUrl: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
