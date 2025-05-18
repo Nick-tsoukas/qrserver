@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-05-16T23:22:33.368Z"
+    "x-generation-date": "2025-05-18T17:07:15.860Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2625,6 +2625,18 @@
                                                               },
                                                               "slugId": {
                                                                 "type": "string"
+                                                              },
+                                                              "arEnabled": {
+                                                                "type": "boolean"
+                                                              },
+                                                              "template": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "video",
+                                                                  "song",
+                                                                  "event",
+                                                                  "test"
+                                                                ]
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -7258,6 +7270,18 @@
                                                                             },
                                                                             "slugId": {
                                                                               "type": "string"
+                                                                            },
+                                                                            "arEnabled": {
+                                                                              "type": "boolean"
+                                                                            },
+                                                                            "template": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "video",
+                                                                                "song",
+                                                                                "event",
+                                                                                "test"
+                                                                              ]
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -12072,6 +12096,18 @@
                                                               "slugId": {
                                                                 "type": "string"
                                                               },
+                                                              "arEnabled": {
+                                                                "type": "boolean"
+                                                              },
+                                                              "template": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "video",
+                                                                  "song",
+                                                                  "event",
+                                                                  "test"
+                                                                ]
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -16508,6 +16544,18 @@
                                                               "slugId": {
                                                                 "type": "string"
                                                               },
+                                                              "arEnabled": {
+                                                                "type": "boolean"
+                                                              },
+                                                              "template": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "video",
+                                                                  "song",
+                                                                  "event",
+                                                                  "test"
+                                                                ]
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -18344,6 +18392,18 @@
               },
               "slugId": {
                 "type": "string"
+              },
+              "arEnabled": {
+                "type": "boolean"
+              },
+              "template": {
+                "type": "string",
+                "enum": [
+                  "video",
+                  "song",
+                  "event",
+                  "test"
+                ]
               }
             }
           }
@@ -20780,6 +20840,18 @@
                                                               "slugId": {
                                                                 "type": "string"
                                                               },
+                                                              "arEnabled": {
+                                                                "type": "boolean"
+                                                              },
+                                                              "template": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "video",
+                                                                  "song",
+                                                                  "event",
+                                                                  "test"
+                                                                ]
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -22529,6 +22601,18 @@
           },
           "slugId": {
             "type": "string"
+          },
+          "arEnabled": {
+            "type": "boolean"
+          },
+          "template": {
+            "type": "string",
+            "enum": [
+              "video",
+              "song",
+              "event",
+              "test"
+            ]
           },
           "createdAt": {
             "type": "string",
@@ -26525,6 +26609,18 @@
                       "slugId": {
                         "type": "string"
                       },
+                      "arEnabled": {
+                        "type": "boolean"
+                      },
+                      "template": {
+                        "type": "string",
+                        "enum": [
+                          "video",
+                          "song",
+                          "event",
+                          "test"
+                        ]
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -30068,6 +30164,18 @@
                                     },
                                     "slugId": {
                                       "type": "string"
+                                    },
+                                    "arEnabled": {
+                                      "type": "boolean"
+                                    },
+                                    "template": {
+                                      "type": "string",
+                                      "enum": [
+                                        "video",
+                                        "song",
+                                        "event",
+                                        "test"
+                                      ]
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -34153,6 +34261,18 @@
                                     "slugId": {
                                       "type": "string"
                                     },
+                                    "arEnabled": {
+                                      "type": "boolean"
+                                    },
+                                    "template": {
+                                      "type": "string",
+                                      "enum": [
+                                        "video",
+                                        "song",
+                                        "event",
+                                        "test"
+                                      ]
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -37362,6 +37482,18 @@
                                                                             },
                                                                             "slugId": {
                                                                               "type": "string"
+                                                                            },
+                                                                            "arEnabled": {
+                                                                              "type": "boolean"
+                                                                            },
+                                                                            "template": {
+                                                                              "type": "string",
+                                                                              "enum": [
+                                                                                "video",
+                                                                                "song",
+                                                                                "event",
+                                                                                "test"
+                                                                              ]
                                                                             },
                                                                             "createdAt": {
                                                                               "type": "string",
@@ -42635,6 +42767,18 @@
                                     },
                                     "slugId": {
                                       "type": "string"
+                                    },
+                                    "arEnabled": {
+                                      "type": "boolean"
+                                    },
+                                    "template": {
+                                      "type": "string",
+                                      "enum": [
+                                        "video",
+                                        "song",
+                                        "event",
+                                        "test"
+                                      ]
                                     },
                                     "createdAt": {
                                       "type": "string",

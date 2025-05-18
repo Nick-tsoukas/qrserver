@@ -78,6 +78,20 @@
     },
     "slugId": {
       "type": "string"
+    },
+    "arEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "template": {
+      "type": "enumeration",
+      "enum": [
+        "video",
+        "song",
+        "event",
+        "test"
+      ],
+      "default": "video"
     }
   }
 }

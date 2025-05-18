@@ -1126,6 +1126,9 @@ export interface ApiQrQr extends Schema.CollectionType {
     tour: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::tour.tour'>;
     scans: Attribute.Relation<'api::qr.qr', 'oneToMany', 'api::scan.scan'>;
     slugId: Attribute.String;
+    arEnabled: Attribute.Boolean & Attribute.DefaultTo<false>;
+    template: Attribute.Enumeration<['video', 'song', 'event', 'test']> &
+      Attribute.DefaultTo<'video'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
