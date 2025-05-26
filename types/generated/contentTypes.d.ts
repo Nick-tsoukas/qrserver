@@ -949,6 +949,11 @@ export interface ApiBandBand extends Schema.CollectionType {
     twitter: Attribute.String;
     whatsapp: Attribute.String;
     tiktok: Attribute.String;
+    media_plays: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::media-play.media-play'
+    >;
     singlesong: Attribute.Component<'singlesong.singlesong'>;
     singlevideo: Attribute.Component<'singlevideo.singlevideo'>;
     spotify: Attribute.String;
@@ -1089,6 +1094,43 @@ export interface ApiLinkClickLinkClick extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::link-click.link-click',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiMediaPlayMediaPlay extends Schema.CollectionType {
+  collectionName: 'media_plays';
+  info: {
+    singularName: 'media-play';
+    pluralName: 'media-plays';
+    displayName: 'Media Play';
+    description: 'Tracks each time a user plays the featured song or video';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::media-play.media-play',
+      'manyToOne',
+      'api::band.band'
+    >;
+    mediaType: Attribute.Enumeration<['song', 'video']> & Attribute.Required;
+    title: Attribute.String & Attribute.Required;
+    timestamp: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::media-play.media-play',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::media-play.media-play',
       'oneToOne',
       'admin::user'
     > &
@@ -1362,6 +1404,7 @@ declare module '@strapi/types' {
       'api::event.event': ApiEventEvent;
       'api::funtest.funtest': ApiFuntestFuntest;
       'api::link-click.link-click': ApiLinkClickLinkClick;
+      'api::media-play.media-play': ApiMediaPlayMediaPlay;
       'api::qr.qr': ApiQrQr;
       'api::scan.scan': ApiScanScan;
       'api::socialpage.socialpage': ApiSocialpageSocialpage;
