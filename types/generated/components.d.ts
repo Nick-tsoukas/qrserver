@@ -48,14 +48,15 @@ export interface SinglesongSinglesong extends Schema.Component {
   collectionName: 'components_singlesong_singlesongs';
   info: {
     displayName: 'singlesong';
-    icon: 'earth';
-    description: '';
+    icon: 'music';
+    description: 'A single featured song, either uploaded or embedded';
   };
   attributes: {
-    title: Attribute.String;
-    song: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    embedUrl: Attribute.String;
-    isEmbeded: Attribute.Boolean;
+    title: Attribute.String & Attribute.Required;
+    song: Attribute.Media<'audios'>;
+    isEmbed: Attribute.Boolean & Attribute.DefaultTo<false>;
+    platform: Attribute.Enumeration<['spotify', 'appleMusic']>;
+    trackId: Attribute.String;
   };
 }
 

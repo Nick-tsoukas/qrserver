@@ -1,31 +1,35 @@
+
 {
   "collectionName": "components_singlesong_singlesongs",
   "info": {
     "displayName": "singlesong",
-    "icon": "earth",
-    "description": ""
+    "icon": "music",
+    "description": "A single featured song, either uploaded or embedded"
   },
   "options": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "song": {
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
+      "allowedTypes": ["audios"]
     },
-    "embedUrl": {
-      "type": "string"
+    "isEmbed": {
+      "type": "boolean",
+      "default": false
     },
-    "isEmbeded": {
-      "type": "boolean"
+    "platform": {
+      "type": "enumeration",
+      "enum": ["spotify", "appleMusic"],
+      "required": false
+    },
+    "trackId": {
+      "type": "string",
+      "required": false
     }
   }
 }
