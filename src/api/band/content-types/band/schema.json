@@ -27,9 +27,7 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images"
-      ]
+      "allowedTypes": ["images"]
     },
     "members": {
       "type": "component",
@@ -98,6 +96,12 @@
     },
     "tiktok": {
       "type": "string"
+    },
+    "media_plays": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::media-play.media-play",
+      "mappedBy": "band"
     },
     "singlesong": {
       "displayName": "singlesong",
