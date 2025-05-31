@@ -1,3 +1,6 @@
+this is lifecycle hook i need thedannynovaband in other works the band name without the white space 
+
+
 // src/api/band/content-types/band/lifecycles.js
 
 const slugify = require('slugify'); // Import the slugify package
