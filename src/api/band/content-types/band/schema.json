@@ -143,9 +143,10 @@
       "type": "boolean",
       "default": false
     },
-    "slug": {
-      "type": "uid",
-      "targetField": "name"
-    }
+   "slug": {
+     "type": "string",
+     "required": true,
+     "unique": true
+   }
   }
 }
