@@ -3,16 +3,24 @@ const { default: slugify } = require('slugify');
 
 module.exports = {
   async beforeCreate(event) {
-    event.params.data.publishedAt = new Date();
+    // (you already set publishedAt if needed)
     const { data } = event.params;
     if (data.name) {
-      data.slug = slugify(data.name, { lower: true, strict: true });
+      data.slug = slugify(data.name, {
+        replacement: '', // ← remove spaces/hyphens entirely
+        lower: true,
+        strict: true
+      });
     }
   },
   async beforeUpdate(event) {
     const { data } = event.params;
     if (data.name) {
-      data.slug = slugify(data.name, { lower: true, strict: true });
+      data.slug = slugify(data.name, {
+        replacement: '',
+        lower: true,
+        strict: true
+      });
     }
-  },
+  }
 };
