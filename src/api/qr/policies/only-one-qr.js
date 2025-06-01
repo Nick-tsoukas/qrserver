@@ -2,26 +2,26 @@
 'use strict';
 
 module.exports = async (policyContext, config, { strapi }) => {
-  // return true;
-
   const { state, response } = policyContext;
   const user = state.user;
 
-  // Must be logged in
+  // 1) Must be logged in
   if (!user) {
     return response.unauthorized('You must be logged in to create a QR code.');
   }
 
-  // Check if the user already has a QR
+  // 2) Count how many QR records this user already has
+  //    We only need up to 3, so limit pageSize to 3
   const existing = await strapi.entityService.findMany('api::qr.qr', {
     filters: { users_permissions_user: user.id },
-    limit: 1,
+    pagination: { pageSize: 3 }, // fetch at most 3
   });
 
-  if (existing.length > 0) {
-    return response.forbidden('You can only create one QR code.');
+  // 3) If user already has 3 or more, block creation
+  if (existing.length >= 3) {
+    return response.forbidden('You can only create up to 3 QR codes.');
   }
 
-  // All good
+  // 4) Otherwise allow
   return true;
 };
