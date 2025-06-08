@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-06-08T16:24:06.225Z"
+    "x-generation-date": "2025-06-08T16:32:13.382Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -1985,9 +1985,6 @@
                                                                           "title": {
                                                                             "type": "string"
                                                                           },
-                                                                          "description": {
-                                                                            "type": "string"
-                                                                          },
                                                                           "image": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -2212,6 +2209,7 @@
                                                                           "isApproved": {
                                                                             "type": "boolean"
                                                                           },
+                                                                          "description": {},
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -6404,9 +6402,6 @@
                                                   "title": {
                                                     "type": "string"
                                                   },
-                                                  "description": {
-                                                    "type": "string"
-                                                  },
                                                   "image": {
                                                     "type": "object",
                                                     "properties": {
@@ -8430,6 +8425,7 @@
                                                   "isApproved": {
                                                     "type": "boolean"
                                                   },
+                                                  "description": {},
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -9825,9 +9821,6 @@
               "title": {
                 "type": "string"
               },
-              "description": {
-                "type": "string"
-              },
               "image": {
                 "oneOf": [
                   {
@@ -9911,7 +9904,8 @@
               },
               "isApproved": {
                 "type": "boolean"
-              }
+              },
+              "description": {}
             }
           }
         }
@@ -9966,9 +9960,6 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
-          },
-          "description": {
             "type": "string"
           },
           "image": {
@@ -11718,9 +11709,6 @@
                                                                           "title": {
                                                                             "type": "string"
                                                                           },
-                                                                          "description": {
-                                                                            "type": "string"
-                                                                          },
                                                                           "image": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -11945,6 +11933,7 @@
                                                                           "isApproved": {
                                                                             "type": "boolean"
                                                                           },
+                                                                          "description": {},
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -14183,6 +14172,7 @@
           "isApproved": {
             "type": "boolean"
           },
+          "description": {},
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -16276,9 +16266,6 @@
                                                                           "title": {
                                                                             "type": "string"
                                                                           },
-                                                                          "description": {
-                                                                            "type": "string"
-                                                                          },
                                                                           "image": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -16503,6 +16490,7 @@
                                                                           "isApproved": {
                                                                             "type": "boolean"
                                                                           },
+                                                                          "description": {},
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -20456,9 +20444,6 @@
                                                                           "title": {
                                                                             "type": "string"
                                                                           },
-                                                                          "description": {
-                                                                            "type": "string"
-                                                                          },
                                                                           "image": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -20683,6 +20668,7 @@
                                                                           "isApproved": {
                                                                             "type": "boolean"
                                                                           },
+                                                                          "description": {},
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -24871,9 +24857,6 @@
                                                                           "title": {
                                                                             "type": "string"
                                                                           },
-                                                                          "description": {
-                                                                            "type": "string"
-                                                                          },
                                                                           "image": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -25098,6 +25081,7 @@
                                                                           "isApproved": {
                                                                             "type": "boolean"
                                                                           },
+                                                                          "description": {},
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -29133,9 +29117,6 @@
                                                                           "title": {
                                                                             "type": "string"
                                                                           },
-                                                                          "description": {
-                                                                            "type": "string"
-                                                                          },
                                                                           "image": {
                                                                             "type": "object",
                                                                             "properties": {
@@ -29360,6 +29341,7 @@
                                                                           "isApproved": {
                                                                             "type": "boolean"
                                                                           },
+                                                                          "description": {},
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -33688,9 +33670,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "description": {
-                                                                "type": "string"
-                                                              },
                                                               "image": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -33915,6 +33894,7 @@
                                                               "isApproved": {
                                                                 "type": "boolean"
                                                               },
+                                                              "description": {},
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -37894,9 +37874,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "description": {
-                                                                "type": "string"
-                                                              },
                                                               "image": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -38121,6 +38098,7 @@
                                                               "isApproved": {
                                                                 "type": "boolean"
                                                               },
+                                                              "description": {},
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -40488,9 +40466,6 @@
                       "type": "object",
                       "properties": {
                         "title": {
-                          "type": "string"
-                        },
-                        "description": {
                           "type": "string"
                         },
                         "image": {
@@ -44428,6 +44403,7 @@
                         "isApproved": {
                           "type": "boolean"
                         },
+                        "description": {},
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -46621,9 +46597,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "description": {
-                                                                "type": "string"
-                                                              },
                                                               "image": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -46848,6 +46821,7 @@
                                                               "isApproved": {
                                                                 "type": "boolean"
                                                               },
+                                                              "description": {},
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"

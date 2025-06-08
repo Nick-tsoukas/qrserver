@@ -27,7 +27,9 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "members": {
       "type": "component",
@@ -143,10 +145,10 @@
       "type": "boolean",
       "default": false
     },
-   "slug": {
-     "type": "string",
-     "required": true,
-     "unique": true
-   }
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    }
   }
 }

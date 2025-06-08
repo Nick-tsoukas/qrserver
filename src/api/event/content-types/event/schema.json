@@ -15,9 +15,6 @@
     "title": {
       "type": "string"
     },
-    "description": {
-      "type": "text"
-    },
     "image": {
       "type": "media",
       "multiple": false,
@@ -97,6 +94,9 @@
     "isApproved": {
       "type": "boolean",
       "default": true
+    },
+    "description": {
+      "type": "blocks"
     }
   }
 }

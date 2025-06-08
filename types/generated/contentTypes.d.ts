@@ -992,7 +992,6 @@ export interface ApiEventEvent extends Schema.CollectionType {
   };
   attributes: {
     title: Attribute.String;
-    description: Attribute.Text;
     image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     date: Attribute.Date;
     time: Attribute.Time;
@@ -1016,6 +1015,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
     tiktok: Attribute.String;
     website: Attribute.String;
     isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
+    description: Attribute.Blocks;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
