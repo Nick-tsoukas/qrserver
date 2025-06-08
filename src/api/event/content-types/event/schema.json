@@ -96,7 +96,7 @@
       "default": true
     },
     "description": {
-      "type": "blocks"
+      "type": "json"
     }
   }
 }

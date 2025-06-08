@@ -1015,7 +1015,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
     tiktok: Attribute.String;
     website: Attribute.String;
     isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
-    description: Attribute.Blocks;
+    description: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
