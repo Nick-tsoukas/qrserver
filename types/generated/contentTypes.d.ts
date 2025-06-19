@@ -968,7 +968,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     >;
     reverbnation: Attribute.String;
     isBandNameInLogo: Attribute.Boolean & Attribute.DefaultTo<false>;
-    slug: Attribute.String & Attribute.Required & Attribute.Unique;
+    slug: Attribute.String & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
