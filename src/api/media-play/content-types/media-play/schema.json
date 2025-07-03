@@ -1,35 +1,37 @@
 {
-    "kind": "collectionType",
-    "collectionName": "media_plays",
-    "info": {
-      "singularName": "media-play",
-      "pluralName": "media-plays",
-      "displayName": "Media Play",
-      "description": "Tracks each time a user plays the featured song or video"
+  "kind": "collectionType",
+  "collectionName": "media_plays",
+  "info": {
+    "singularName": "media-play",
+    "pluralName": "media-plays",
+    "displayName": "Media Play",
+    "description": "Tracks each time a user plays the featured song or video"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "inversedBy": "media_plays"
     },
-    "options": {
-      "draftAndPublish": false
+    "mediaType": {
+      "type": "enumeration",
+      "enum": [
+        "song",
+        "video"
+      ],
+      "required": true
     },
-    "attributes": {
-      "band": {
-        "type": "relation",
-        "relation": "manyToOne",
-        "target": "api::band.band",
-        "inversedBy": "media_plays"
-      },
-      "mediaType": {
-        "type": "enumeration",
-        "enum": ["song", "video"],
-        "required": true
-      },
-      "title": {
-        "type": "string",
-        "required": true
-      },
-      "timestamp": {
-        "type": "datetime",
-        "default": null
-      }
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "timestamp": {
+      "type": "datetime",
+      "default": null
     }
   }
-  
+}

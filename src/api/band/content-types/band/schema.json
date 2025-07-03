@@ -21,7 +21,8 @@
     },
     "bio": {
       "type": "text",
-      "required": true
+      "required": true,
+      "maxLength": 247
     },
     "bandImg": {
       "type": "media",

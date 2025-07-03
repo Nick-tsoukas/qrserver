@@ -14,11 +14,11 @@ module.exports = async (policyContext, config, { strapi }) => {
   //    We only need up to 3, so limit pageSize to 3
   const existing = await strapi.entityService.findMany('api::qr.qr', {
     filters: { users_permissions_user: user.id },
-    pagination: { pageSize: 3 }, // fetch at most 3
+    pagination: { pageSize: 1 }, // fetch at most 3
   });
 
   // 3) If user already has 3 or more, block creation
-  if (existing.length >= 3) {
+  if (existing.length >= 1) {
     return response.forbidden('You can only create up to 3 QR codes.');
   }
 
