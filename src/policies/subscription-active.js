@@ -8,10 +8,10 @@ module.exports = (policyContext, config, { strapi }) => {
   }
 
   // 1) Free accounts always allowed
-  if (user.free === true) {
+  if (user.subscriptionStatus === 'free') {
     return true;
   }
-
+  
   const { subscriptionStatus, gracePeriodStart, cancelAt } = user;
   const now = Date.now();
 
