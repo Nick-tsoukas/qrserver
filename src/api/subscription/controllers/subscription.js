@@ -172,6 +172,19 @@ async register(ctx) {
     strapi.log.error('[register] Strapi user creation failed', err);
     return ctx.internalServerError('Failed to create user account.');
   }
+  //  Option B: Or send manually with your provider if you need custom links:
+ await strapi.plugin('email').service('email').send({
+   to:      email,
+   from:    'no-reply@yourdomain.com',
+   subject: 'Please confirm your email',
+   text:    `Hi ${name}, please confirm your email by clicking: https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${newUser.confirmationToken}`,
+ });
+
+  //   // 5️⃣ Send confirmation email (Users-Permissions helper)
+  // await strapi
+  //   .plugin('users-permissions')
+  //   .service('user')
+  //   .sendConfirmationEmail(newUser);
 
   // 4️⃣ Update that user with Stripe data (best-effort)
   try {
@@ -193,17 +206,6 @@ async register(ctx) {
     strapi.log.error('[register] Failed to update user with Stripe data', err);
   }
 
-  // 5️⃣ Send confirmation email (best-effort)
-  try {
-    await strapi.plugin('email').service('email').send({
-      to:      email,
-      from:    'no-reply@yourdomain.com',
-      subject: 'Please confirm your email',
-      text:    `Hi ${name}, please confirm your email: https://your-app.com/confirm?uid=${newUser.id}`,
-    });
-  } catch (err) {
-    strapi.log.error('[register] Failed to send confirmation email', err);
-  }
 
   // ✅ All done
   return ctx.send({

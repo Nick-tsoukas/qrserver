@@ -1,4 +1,4 @@
-// path: src/api/subscription/controllers/subscription.js
+// path: src/api/subscription/controllers/stripe.js
 'use strict';
 
 const Stripe = require('stripe');
