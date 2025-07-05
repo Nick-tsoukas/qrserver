@@ -18,5 +18,14 @@ module.exports = {
         auth: { scope: [] },
       },
     },
+
+    {
+      method: 'POST',
+      path:   '/stripe/register',
+      handler:'subscription.register',
+      config: {
+        auth: false  // allow guests to sign up
+      }
+    },
   ],
 };

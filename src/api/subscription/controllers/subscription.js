@@ -212,6 +212,71 @@ async function onSubscriptionCanceled(subscription) {
   strapi.log.info('[Webhook] User marked canceled', { userId: user.id });
 }
 
+ // POST /api/stripe/register
+ async register(ctx) {
+  strapi.log.debug('[register] entry', { body: ctx.request.body });
+  const { name, email, password } = ctx.request.body;
+  if (!name || !email || !password) {
+    return ctx.badRequest('Missing name, email or password');
+  }
+
+  // 1️⃣ Create the Strapi user
+  const authRole = await strapi
+    .query('plugin::users-permissions.role')
+    .findOne({ where: { type: 'authenticated' } });
+  const newUser = await strapi
+    .plugin('users-permissions')
+    .service('user')
+    .add({
+      username: email,
+      email,
+      password,
+      provider: 'local',
+      confirmed: false,
+      role: authRole.id,
+    });
+  strapi.log.info('[register] Strapi user created', { userId: newUser.id });
+
+  // 2️⃣ Create a Stripe customer
+  const customer = await stripe.customers.create({ email, name });
+  strapi.log.info('[register] Stripe customer created', { customerId: customer.id });
+
+  // 3️⃣ Create a subscription with 30-day trial
+  const subscription = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [{ price: process.env.STRIPE_PRICE_ID }],
+    trial_period_days: Number(process.env.STRIPE_TRIAL_DAYS || 30),
+  });
+  strapi.log.info('[register] Stripe subscription created', { subscriptionId: subscription.id });
+
+  // 4️⃣ Update the Strapi user with Stripe data
+  const trialEndsAt = new Date(subscription.trial_end * 1000);
+  await strapi.entityService.update(
+    'plugin::users-permissions.user',
+    newUser.id,
+    {
+      data: {
+        customerId:         customer.id,
+        subscriptionId:     subscription.id,
+        subscriptionStatus: 'trialing',
+        trialEndsAt,
+      },
+    }
+  );
+  
+  strapi.log.info('[register] User updated with Stripe data', { userId: newUser.id });
+
+  // 5️⃣ Send confirmation email (optional)
+  await strapi.plugin('email').service('email').send({
+    to:      email,
+    from:    'no-reply@yourdomain.com',
+    subject: 'Please confirm your email',
+    text:    `Hi ${name}, please confirm your email by clicking here: https://your-app.com/confirm?uid=${newUser.id}`,
+  });
+
+  return ctx.send({ user: { id: newUser.id, email: newUser.email } });
+},
+
 async function onUnhandledEvent(data, event) {
   strapi.log.info('[Webhook] Unhandled event', event.type);
 }

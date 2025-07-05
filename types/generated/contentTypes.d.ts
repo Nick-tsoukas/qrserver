@@ -773,7 +773,8 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
         'past_due',
         'free'
       ]
-    >;
+    > &
+      Attribute.DefaultTo<'trialing'>;
     subscriptionId: Attribute.String;
     customerId: Attribute.String;
     trialEndsAt: Attribute.Date;
