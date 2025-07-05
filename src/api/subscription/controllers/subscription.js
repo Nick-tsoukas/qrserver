@@ -111,107 +111,106 @@ module.exports = {
     ctx.send({ received: true });
   },
 
-   // POST /api/stripe/register
-   async register(ctx) {
-    const { name, email, password } = ctx.request.body;
-    if (!name || !email || !password) {
-      return ctx.badRequest('Missing name, email or password.');
-    }
+// POST /api/stripe/register
+async register(ctx) {
+  const { name, email, password } = ctx.request.body;
+  if (!name || !email || !password) {
+    return ctx.badRequest('Missing name, email or password.');
+  }
 
-    // ─── DEBUG: Ensure your STRIPE_PRICE_ID is set in env ──────────────
-    const priceId = process.env.STRIPE_PRICE_ID;
-    strapi.log.debug('[register] STRIPE_PRICE_ID =', priceId);
-    if (!priceId) {
-      return ctx.badRequest('Server misconfiguration: price ID is missing.');
-    }
+  // ─── Determine Price ID ─────────────────────────────────────────
+  const priceId = process.env.STRIPE_PRICE_ID || 'price_1QRHWpC26iqgLxbxvIw2311F';
+  strapi.log.debug('[register] using Price ID =', priceId);
 
-    // 1️⃣ Create Stripe Customer
-    let customer;
-    try {
-      customer = await stripe.customers.create({ email, name });
-      strapi.log.info('[register] Stripe customer created', { customerId: customer.id });
-    } catch (err) {
-      strapi.log.error('[register] Stripe customer creation failed', err);
-      return ctx.internalServerError('Failed to create Stripe customer.');
-    }
+  // 1️⃣ Create Stripe Customer
+  let customer;
+  try {
+    customer = await stripe.customers.create({ email, name });
+    strapi.log.info('[register] Stripe customer created', { customerId: customer.id });
+  } catch (err) {
+    strapi.log.error('[register] Stripe customer creation failed', err);
+    return ctx.internalServerError('Failed to create Stripe customer.');
+  }
 
-    // 2️⃣ Create Subscription with 30-day trial
-    let subscription;
-    try {
-      subscription = await stripe.subscriptions.create({
-        customer:           customer.id,
-        items:              [{ price: 'price_1QRHWpC26iqgLxbxvIw2311F' }],
-        trial_period_days:  Number(process.env.STRIPE_TRIAL_DAYS || 30),
-      });
-      strapi.log.info('[register] Stripe subscription created', { subscriptionId: subscription.id });
-    } catch (err) {
-      strapi.log.error('[register] Stripe subscription creation failed', err);
-      return ctx.internalServerError('Failed to create Stripe subscription.');
-    }
-
-    // 3️⃣ Create the Strapi user (only after Stripe succeeded)
-    let newUser;
-    try {
-      const authRole = await strapi
-        .query('plugin::users-permissions.role')
-        .findOne({ where: { type: 'authenticated' } });
-
-      newUser = await strapi
-        .plugin('users-permissions')
-        .service('user')
-        .add({
-          username:          email,
-          email,
-          password,
-          provider:          'local',
-          confirmed:         false,
-          role:              authRole.id,
-        });
-      strapi.log.info('[register] Strapi user created', { userId: newUser.id });
-    } catch (err) {
-      strapi.log.error('[register] Strapi user creation failed', err);
-      // If user creation somehow fails, you may want to cancel the Stripe subscription/customer here.
-      return ctx.internalServerError('Failed to create user account.');
-    }
-
-    // 4️⃣ Update that user with Stripe data
-    try {
-      const trialEndsAt = new Date(subscription.trial_end * 1000);
-      await strapi.entityService.update(
-        'plugin::users-permissions.user',
-        newUser.id,
-        {
-          data: {
-            customerId:         customer.id,
-            subscriptionId:     subscription.id,
-            subscriptionStatus: 'trialing',
-            trialEndsAt,
-          },
-        }
-      );
-      strapi.log.info('[register] User updated with Stripe data', { userId: newUser.id });
-    } catch (err) {
-      strapi.log.error('[register] Failed to update user with Stripe data', err);
-      // not fatal to user creation flow
-    }
-
-    // 5️⃣ Send confirmation email
-    try {
-      await strapi.plugin('email').service('email').send({
-        to:      email,
-        from:    'no-reply@yourdomain.com',
-        subject: 'Please confirm your email',
-        text:    `Hi ${name}, please confirm your email: https://your-app.com/confirm?uid=${newUser.id}`,
-      });
-    } catch (err) {
-      strapi.log.error('[register] Failed to send confirmation email', err);
-    }
-
-    // ✅ All done
-    return ctx.send({
-      user: { id: newUser.id, email: newUser.email }
+  // 2️⃣ Create Subscription with 30-day trial
+  let subscription;
+  try {
+    subscription = await stripe.subscriptions.create({
+      customer:          customer.id,
+      items:             [{ price: priceId }],
+      trial_period_days: Number(process.env.STRIPE_TRIAL_DAYS || 30),
     });
-  },
+    strapi.log.info(
+      '[register] Stripe subscription created',
+      { subscriptionId: subscription.id }
+    );
+  } catch (err) {
+    strapi.log.error('[register] Stripe subscription creation failed', err);
+    return ctx.internalServerError('Failed to create Stripe subscription.');
+  }
+
+  // 3️⃣ Create the Strapi user (only after Stripe succeeded)
+  let newUser;
+  try {
+    const authRole = await strapi
+      .query('plugin::users-permissions.role')
+      .findOne({ where: { type: 'authenticated' } });
+
+    newUser = await strapi
+      .plugin('users-permissions')
+      .service('user')
+      .add({
+        username:  email,
+        email,
+        password,
+        provider:  'local',
+        confirmed: false,
+        role:      authRole.id,
+      });
+    strapi.log.info('[register] Strapi user created', { userId: newUser.id });
+  } catch (err) {
+    strapi.log.error('[register] Strapi user creation failed', err);
+    return ctx.internalServerError('Failed to create user account.');
+  }
+
+  // 4️⃣ Update that user with Stripe data (best-effort)
+  try {
+    const trialEndsAt = new Date(subscription.trial_end * 1000);
+    await strapi.entityService.update(
+      'plugin::users-permissions.user',
+      newUser.id,
+      {
+        data: {
+          customerId:         customer.id,
+          subscriptionId:     subscription.id,
+          subscriptionStatus: 'trialing',
+          trialEndsAt,
+        },
+      }
+    );
+    strapi.log.info('[register] User updated with Stripe data', { userId: newUser.id });
+  } catch (err) {
+    strapi.log.error('[register] Failed to update user with Stripe data', err);
+  }
+
+  // 5️⃣ Send confirmation email (best-effort)
+  try {
+    await strapi.plugin('email').service('email').send({
+      to:      email,
+      from:    'no-reply@yourdomain.com',
+      subject: 'Please confirm your email',
+      text:    `Hi ${name}, please confirm your email: https://your-app.com/confirm?uid=${newUser.id}`,
+    });
+  } catch (err) {
+    strapi.log.error('[register] Failed to send confirmation email', err);
+  }
+
+  // ✅ All done
+  return ctx.send({
+    user: { id: newUser.id, email: newUser.email }
+  });
+},
+
 };
 
 // ─── Handlers ────────────────────────────────────────────────────────────────
