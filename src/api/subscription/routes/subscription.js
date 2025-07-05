@@ -22,7 +22,7 @@ module.exports = {
     {
       method: 'POST',
       path:   '/stripe/register',
-      handler:'subscription.register',
+      handler:'api::subscription.subscription.register',
       config: {
         auth: false  // allow guests to sign up
       }
