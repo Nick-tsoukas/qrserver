@@ -140,7 +140,7 @@ module.exports = {
     try {
       subscription = await stripe.subscriptions.create({
         customer:           customer.id,
-        items:              [{ price: priceId }],
+        items:              [{ price: 'price_1QRHWpC26iqgLxbxvIw2311F' }],
         trial_period_days:  Number(process.env.STRIPE_TRIAL_DAYS || 30),
       });
       strapi.log.info('[register] Stripe subscription created', { subscriptionId: subscription.id });
