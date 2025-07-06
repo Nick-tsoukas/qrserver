@@ -11,33 +11,43 @@ const confirmationToken = crypto.randomBytes(20).toString('hex');
 module.exports = {
   // GET /api/stripe/subscription-status
   async subscriptionStatus(ctx) {
+    strapi.log.debug('[subscriptionStatus] entry', { jwtUser: ctx.state.user });
     const jwtUser = ctx.state.user;
-    if (!jwtUser) return ctx.unauthorized('You must be logged in.');
-
-    const user = await strapi.entityService.findOne(
+    if (!jwtUser) {
+      return ctx.unauthorized('You must be logged in.');
+    }
+  
+    // Fetch the *full* user from the DB so we get customerId, trialEndsAt, etc.
+    const [dbUser] = await strapi.entityService.findMany(
       'plugin::users-permissions.user',
-      jwtUser.id,
-      { fields: ['customerId','subscriptionStatus','trialEndsAt','gracePeriodStart','cancelAt'] }
+      { filters: { id: jwtUser.id } }
     );
-    if (!user?.customerId) return ctx.badRequest('Stripe customer not found');
-
+    if (!dbUser?.customerId) {
+      strapi.log.warn('[subscriptionStatus] No Stripe customer on DB user', { dbUser });
+      return ctx.badRequest('Stripe customer not found');
+    }
+  
     try {
-      const subs = await stripe.subscriptions.list({
-        customer: user.customerId,
+      // Now pass the real customerId to Stripe
+      const subsList = await stripe.subscriptions.list({
+        customer: dbUser.customerId,
         status:   'all',
         limit:    1,
       });
-      const sub = subs.data[0];
-      ctx.send({
-        status:           sub?.status      || 'inactive',
-        plan:             sub?.items[0]?.plan?.nickname || null,
-        trialEndsAt:      sub?.trial_end   || null,
-        gracePeriodStart: user.gracePeriodStart || null,
-        cancelAt:         user.cancelAt || null,
+      const sub = subsList.data[0];
+  
+      strapi.log.debug('[subscriptionStatus] Retrieved subscription', { subscription: sub });
+  
+      return ctx.send({
+        status:      sub?.status        || 'inactive',
+        plan:        sub?.items.data[0]?.plan?.nickname || null,
+        trialEndsAt: sub?.trial_end     || null,
+        // you can also return dbUser.gracePeriodStart here
+        gracePeriodStart: dbUser.gracePeriodStart || null,
       });
     } catch (err) {
       strapi.log.error('[subscriptionStatus] Stripe error', err);
-      ctx.throw(500,'Error retrieving subscription status');
+      return ctx.throw(500, 'Error retrieving subscription status');
     }
   },
 

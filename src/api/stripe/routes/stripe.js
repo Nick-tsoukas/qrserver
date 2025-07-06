@@ -17,9 +17,11 @@ module.exports = {
       path: '/stripe/subscription-status',
       handler: 'stripe.subscriptionStatus',
       config: {
-        auth: false,
-      },
-    },
+        auth: {
+          enabled: true,   // ← must be an object
+        },
+    }
+  },
     {
       method: 'GET',
       path: '/stripe/billing',

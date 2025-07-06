@@ -8,41 +8,48 @@ const UNPARSED = Symbol.for('unparsedBody');
 
 module.exports = {
   // 1) Check subscription status
+  // src/api/stripe/controllers/stripe.js
   async subscriptionStatus(ctx) {
-    strapi.log.debug('[subscriptionStatus] entry', { user: ctx.state.user });
-    const user = ctx.state.user;
-    if (!user || !user.customerId) {
-      strapi.log.warn('[subscriptionStatus] No Stripe customer on user', { user });
+    strapi.log.debug('[subscriptionStatus] entry', { jwtUser: ctx.state.user });
+    const jwtUser = ctx.state.user;
+    if (!jwtUser) {
+      return ctx.unauthorized('You must be logged in.');
+    }
+  
+    // Fetch the *full* user from the DB so we get customerId, trialEndsAt, etc.
+    const [dbUser] = await strapi.entityService.findMany(
+      'plugin::users-permissions.user',
+      { filters: { id: jwtUser.id } }
+    );
+    if (!dbUser?.customerId) {
+      strapi.log.warn('[subscriptionStatus] No Stripe customer on DB user', { dbUser });
       return ctx.badRequest('Stripe customer not found');
     }
+  
     try {
-      // fetch Strapi user to get gracePeriodStart
-      const [u] = await strapi.entityService.findMany(
-        'plugin::users-permissions.user',
-        { filters: { id: user.id } }
-      );
-
-      // fetch subscription from Stripe
-      const subscriptions = await stripe.subscriptions.list({
-        customer: user.customerId,
+      // Now pass the real customerId to Stripe
+      const subsList = await stripe.subscriptions.list({
+        customer: dbUser.customerId,
         status:   'all',
         limit:    1,
       });
-      const subscription = subscriptions.data[0];
-
-      strapi.log.debug('[subscriptionStatus] Retrieved subscription', { subscription });
-
+      const sub = subsList.data[0];
+  
+      strapi.log.debug('[subscriptionStatus] Retrieved subscription', { subscription: sub });
+  
       return ctx.send({
-        status:           subscription ? subscription.status : 'inactive',
-        plan:             subscription ? subscription.items.data[0].plan.nickname : null,
-        trialEndsAt:      subscription ? subscription.trial_end : null,
-        gracePeriodStart: u.gracePeriodStart || null,
+        status:      sub?.status        || 'inactive',
+        plan:        sub?.items.data[0]?.plan?.nickname || null,
+        trialEndsAt: sub?.trial_end     || null,
+        // you can also return dbUser.gracePeriodStart here
+        gracePeriodStart: dbUser.gracePeriodStart || null,
       });
-    } catch (error) {
-      strapi.log.error('[subscriptionStatus] error', error);
+    } catch (err) {
+      strapi.log.error('[subscriptionStatus] Stripe error', err);
       return ctx.throw(500, 'Error retrieving subscription status');
     }
   },
+
 
   // 2) Retrieve billing info
   async getBillingInfo(ctx) {
