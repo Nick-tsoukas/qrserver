@@ -3,7 +3,10 @@
 
 const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+const crypto = require('crypto');
 const UNPARSED = Symbol.for('unparsedBody');
+const confirmationToken = crypto.randomBytes(20).toString('hex');
+
 
 module.exports = {
   // GET /api/stripe/subscription-status
@@ -51,7 +54,7 @@ module.exports = {
         jwtUser.id,
         { fields: ['customerId'] }
       );
-      strapi.log.debug('[createBillingPortalSession] loaded user', user);
+\      strapi.log.debug('[createBillingPortalSession] loaded user', user);
     } catch (e) {
       strapi.log.error('[createBillingPortalSession] fetch error', e);
       return ctx.internalServerError('Error loading user data');
@@ -113,14 +116,16 @@ module.exports = {
 
 // POST /api/stripe/register
 async register(ctx) {
+  strapi.log.debug('[register] entry', { body: ctx.request.body });
   const { name, email, password } = ctx.request.body;
   if (!name || !email || !password) {
+    strapi.log.warn('[register] missing parameters', { name, email, password });
     return ctx.badRequest('Missing name, email or password.');
   }
 
   // ─── Determine Price ID ─────────────────────────────────────────
   const priceId = process.env.STRIPE_PRICE_ID || 'price_1QRHWpC26iqgLxbxvIw2311F';
-  strapi.log.debug('[register] using Price ID =', priceId);
+  strapi.log.debug('[register] using Stripe price ID:', priceId);
 
   // 1️⃣ Create Stripe Customer
   let customer;
@@ -140,55 +145,64 @@ async register(ctx) {
       items:             [{ price: priceId }],
       trial_period_days: Number(process.env.STRIPE_TRIAL_DAYS || 30),
     });
-    strapi.log.info(
-      '[register] Stripe subscription created',
-      { subscriptionId: subscription.id }
-    );
+    strapi.log.info('[register] Stripe subscription created', {
+      subscriptionId: subscription.id,
+      trialEndsAt:    subscription.trial_end,
+    });
   } catch (err) {
     strapi.log.error('[register] Stripe subscription creation failed', err);
     return ctx.internalServerError('Failed to create Stripe subscription.');
   }
 
-  // 3️⃣ Create the Strapi user (only after Stripe succeeded)
+  // 3️⃣ Generate confirmation token & create Strapi user
+  const confirmationToken = crypto.randomBytes(20).toString('hex');
   let newUser;
   try {
     const authRole = await strapi
       .query('plugin::users-permissions.role')
       .findOne({ where: { type: 'authenticated' } });
+    strapi.log.debug('[register] using authenticated role', { roleId: authRole.id });
 
     newUser = await strapi
       .plugin('users-permissions')
       .service('user')
       .add({
-        username:  email,
+        username:          email,
         email,
         password,
-        provider:  'local',
-        confirmed: false,
-        role:      authRole.id,
+        provider:          'local',
+        confirmed:         false,
+        confirmationToken, // store token for confirmation link
+        role:              authRole.id,
       });
     strapi.log.info('[register] Strapi user created', { userId: newUser.id });
   } catch (err) {
     strapi.log.error('[register] Strapi user creation failed', err);
     return ctx.internalServerError('Failed to create user account.');
   }
-  //  Option B: Or send manually with your provider if you need custom links:
- await strapi.plugin('email').service('email').send({
-   to:      email,
-   from:    'no-reply@yourdomain.com',
-   subject: 'Please confirm your email',
-   text:    `Hi ${name}, please confirm your email by clicking: https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${newUser.confirmationToken}`,
- });
 
-  //   // 5️⃣ Send confirmation email (Users-Permissions helper)
-  // await strapi
-  //   .plugin('users-permissions')
-  //   .service('user')
-  //   .sendConfirmationEmail(newUser);
-
-  // 4️⃣ Update that user with Stripe data (best-effort)
+  // 4️⃣ Send confirmation email manually
   try {
-    const trialEndsAt = new Date(subscription.trial_end * 1000);
+    const confirmUrl = `https://qrserver-production.up.railway.app/api/auth/confirm-email?token=${confirmationToken}`;
+    strapi.log.debug('[register] sending confirmation email', { to: email, confirmUrl });
+    await strapi
+      .plugin('email')
+      .service('email')
+      .send({
+        to:      email,
+        from:    process.env.EMAIL_DEFAULT_FROM,
+        subject: 'Please confirm your email',
+        text:    `Hi ${name},\n\nPlease confirm your email by clicking the link below:\n\n${confirmUrl}\n\nThank you!`,
+      });
+    strapi.log.info('[register] confirmation email sent');
+  } catch (err) {
+    strapi.log.error('[register] failed to send confirmation email', err);
+    // continue even if email fails
+  }
+
+  // 5️⃣ Update user record with Stripe metadata (best-effort)
+  try {
+    const trialEndsAtDate = new Date(subscription.trial_end * 1000);
     await strapi.entityService.update(
       'plugin::users-permissions.user',
       newUser.id,
@@ -197,19 +211,20 @@ async register(ctx) {
           customerId:         customer.id,
           subscriptionId:     subscription.id,
           subscriptionStatus: 'trialing',
-          trialEndsAt,
+          trialEndsAt:        trialEndsAtDate,
         },
       }
     );
-    strapi.log.info('[register] User updated with Stripe data', { userId: newUser.id });
+    strapi.log.info('[register] user updated with Stripe data', { userId: newUser.id });
   } catch (err) {
-    strapi.log.error('[register] Failed to update user with Stripe data', err);
+    strapi.log.error('[register] failed to update user with Stripe data', err);
   }
 
-
-  // ✅ All done comment again 
+  // ✅ All done
+  strapi.log.debug('[register] completed successfully');
   return ctx.send({
-    user: { id: newUser.id, email: newUser.email }
+    user:    { id: newUser.id, email: newUser.email },
+    message: 'Registration successful! Please check your email to confirm your account.',
   });
 },
 
