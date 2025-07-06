@@ -207,7 +207,7 @@ async register(ctx) {
   }
 
 
-  // ✅ All done
+  // ✅ All done comment again 
   return ctx.send({
     user: { id: newUser.id, email: newUser.email }
   });
