@@ -54,7 +54,7 @@ module.exports = {
         jwtUser.id,
         { fields: ['customerId'] }
       );
-\      strapi.log.debug('[createBillingPortalSession] loaded user', user);
+      strapi.log.debug('[createBillingPortalSession] loaded user', user);
     } catch (e) {
       strapi.log.error('[createBillingPortalSession] fetch error', e);
       return ctx.internalServerError('Error loading user data');
