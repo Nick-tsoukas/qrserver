@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-07-06T00:24:33.530Z"
+    "x-generation-date": "2025-07-06T12:11:17.429Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -2210,6 +2210,9 @@
                                                                             "type": "boolean"
                                                                           },
                                                                           "description": {},
+                                                                          "slug": {
+                                                                            "type": "string"
+                                                                          },
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -8424,6 +8427,9 @@
                                                     "type": "boolean"
                                                   },
                                                   "description": {},
+                                                  "slug": {
+                                                    "type": "string"
+                                                  },
                                                   "createdAt": {
                                                     "type": "string",
                                                     "format": "date-time"
@@ -9814,6 +9820,9 @@
         ],
         "properties": {
           "data": {
+            "required": [
+              "slug"
+            ],
             "type": "object",
             "properties": {
               "title": {
@@ -9903,7 +9912,10 @@
               "isApproved": {
                 "type": "boolean"
               },
-              "description": {}
+              "description": {},
+              "slug": {
+                "type": "string"
+              }
             }
           }
         }
@@ -9956,6 +9968,9 @@
       },
       "Event": {
         "type": "object",
+        "required": [
+          "slug"
+        ],
         "properties": {
           "title": {
             "type": "string"
@@ -11932,6 +11947,9 @@
                                                                             "type": "boolean"
                                                                           },
                                                                           "description": {},
+                                                                          "slug": {
+                                                                            "type": "string"
+                                                                          },
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -14171,6 +14189,9 @@
             "type": "boolean"
           },
           "description": {},
+          "slug": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -16489,6 +16510,9 @@
                                                                             "type": "boolean"
                                                                           },
                                                                           "description": {},
+                                                                          "slug": {
+                                                                            "type": "string"
+                                                                          },
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -20667,6 +20691,9 @@
                                                                             "type": "boolean"
                                                                           },
                                                                           "description": {},
+                                                                          "slug": {
+                                                                            "type": "string"
+                                                                          },
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -25080,6 +25107,9 @@
                                                                             "type": "boolean"
                                                                           },
                                                                           "description": {},
+                                                                          "slug": {
+                                                                            "type": "string"
+                                                                          },
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -29340,6 +29370,9 @@
                                                                             "type": "boolean"
                                                                           },
                                                                           "description": {},
+                                                                          "slug": {
+                                                                            "type": "string"
+                                                                          },
                                                                           "createdAt": {
                                                                             "type": "string",
                                                                             "format": "date-time"
@@ -33893,6 +33926,9 @@
                                                                 "type": "boolean"
                                                               },
                                                               "description": {},
+                                                              "slug": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -38097,6 +38133,9 @@
                                                                 "type": "boolean"
                                                               },
                                                               "description": {},
+                                                              "slug": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -44402,6 +44441,9 @@
                           "type": "boolean"
                         },
                         "description": {},
+                        "slug": {
+                          "type": "string"
+                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -46820,6 +46862,9 @@
                                                                 "type": "boolean"
                                                               },
                                                               "description": {},
+                                                              "slug": {
+                                                                "type": "string"
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"

@@ -1021,6 +1021,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
     website: Attribute.String;
     isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
     description: Attribute.JSON;
+    slug: Attribute.String & Attribute.Required & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

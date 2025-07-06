@@ -97,6 +97,11 @@
     },
     "description": {
       "type": "json"
+    },
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
     }
   }
 }
