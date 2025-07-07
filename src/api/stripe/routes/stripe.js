@@ -8,9 +8,9 @@ module.exports = {
       handler: 'stripe.createBillingPortalSession',
       config: {
         auth: {
-          scope: [], // ✅ this ensures authentication is required
+          enabled: true,   // ← must be an object
         },
-      },
+    }
     },
     {
       method: 'GET',
