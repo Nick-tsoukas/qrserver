@@ -1,4 +1,4 @@
-// src/api/event/content-types/event/lifecycles.js
+// src/api/event/content-types/event/lifecycles.js extra coment to commit and rebuid 
 const slugify = require('slugify');
 
 module.exports = {
