@@ -55,31 +55,41 @@ module.exports = {
   async getBillingInfo(ctx) {
     strapi.log.debug('[getBillingInfo] entry', { user: ctx.state.user });
     const user = ctx.state.user;
+  
     if (!user || !user.customerId) {
       strapi.log.warn('[getBillingInfo] No Stripe customer on user', { user });
       return ctx.badRequest('Stripe customer not found');
     }
+  
     try {
       const customer = await stripe.customers.retrieve(user.customerId);
       const subscriptions = await stripe.subscriptions.list({
         customer: user.customerId,
-        status:   'all',
-        limit:    1,
+        status: 'all',
+        limit: 1,
       });
+  
       const subscription = subscriptions.data[0];
-
+  
+      // Check if there's at least one attached payment method
+      const hasPaymentMethod =
+        customer.invoice_settings?.default_payment_method != null;
+  
       strapi.log.debug('[getBillingInfo] Retrieved billing info', {
-        customer,
-        subscription,
+        hasPaymentMethod,
         trialEndsAt: user.trialEndsAt,
       });
-
-      return ctx.send({ customer, subscription, trialEndsAt: user.trialEndsAt });
+  
+      return ctx.send({
+        hasPaymentMethod,
+        trialEndsAt: user.trialEndsAt,
+      });
     } catch (error) {
       strapi.log.error('[getBillingInfo] error', error);
       return ctx.throw(500, 'Error retrieving billing information');
     }
   },
+  
 
   // 3) Create a Stripe Billing Portal session
   async createBillingPortalSession(ctx) {
