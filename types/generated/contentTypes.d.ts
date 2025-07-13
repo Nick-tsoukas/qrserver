@@ -1067,6 +1067,11 @@ export interface ApiEventEvent extends Schema.CollectionType {
     isApproved: Attribute.Boolean & Attribute.DefaultTo<true>;
     description: Attribute.JSON;
     slug: Attribute.String & Attribute.Unique;
+    event_page_views: Attribute.Relation<
+      'api::event.event',
+      'oneToMany',
+      'api::event-page-view.event-page-view'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1077,6 +1082,47 @@ export interface ApiEventEvent extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::event.event',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiEventPageViewEventPageView extends Schema.CollectionType {
+  collectionName: 'event_page_views';
+  info: {
+    singularName: 'event-page-view';
+    pluralName: 'event-page-views';
+    displayName: 'Event Page View';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    timestamp: Attribute.DateTime;
+    ipAddress: Attribute.String;
+    userAgent: Attribute.String;
+    referrer: Attribute.String;
+    path: Attribute.String;
+    title: Attribute.String;
+    event: Attribute.Relation<
+      'api::event-page-view.event-page-view',
+      'manyToOne',
+      'api::event.event'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::event-page-view.event-page-view',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::event-page-view.event-page-view',
       'oneToOne',
       'admin::user'
     > &
@@ -1452,6 +1498,7 @@ declare module '@strapi/types' {
       'api::band.band': ApiBandBand;
       'api::band-page-view.band-page-view': ApiBandPageViewBandPageView;
       'api::event.event': ApiEventEvent;
+      'api::event-page-view.event-page-view': ApiEventPageViewEventPageView;
       'api::funtest.funtest': ApiFuntestFuntest;
       'api::link-click.link-click': ApiLinkClickLinkClick;
       'api::media-play.media-play': ApiMediaPlayMediaPlay;

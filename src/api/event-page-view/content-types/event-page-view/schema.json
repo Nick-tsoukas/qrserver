@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "event_page_views",
+  "info": {
+    "singularName": "event-page-view",
+    "pluralName": "event-page-views",
+    "displayName": "Event Page View",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "timestamp": {
+      "type": "datetime"
+    },
+    "ipAddress": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "string"
+    },
+    "referrer": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event",
+      "inversedBy": "event_page_views"
+    }
+  }
+}

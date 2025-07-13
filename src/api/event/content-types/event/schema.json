@@ -101,6 +101,12 @@
     "slug": {
       "type": "string",
       "unique": true
+    },
+    "event_page_views": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::event-page-view.event-page-view",
+      "mappedBy": "event"
     }
   }
 }
