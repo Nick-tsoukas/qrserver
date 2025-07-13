@@ -8,8 +8,9 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
+  "pluginOptions": {},
   "attributes": {
     "name": {
       "type": "string",
@@ -149,6 +150,12 @@
     "slug": {
       "type": "string",
       "unique": true
+    },
+    "band_page_views": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::band-page-view.band-page-view",
+      "mappedBy": "band"
     }
   }
 }

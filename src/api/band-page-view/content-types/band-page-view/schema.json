@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "band_page_views",
+  "info": {
+    "singularName": "band-page-view",
+    "pluralName": "band-page-views",
+    "displayName": "band-page-view",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "inversedBy": "band_page_views"
+    },
+    "timestamp": {
+      "type": "datetime"
+    },
+    "ipAddress": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "string"
+    },
+    "referrer": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    }
+  }
+}

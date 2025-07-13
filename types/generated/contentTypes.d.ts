@@ -910,7 +910,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     name: Attribute.String & Attribute.Required;
@@ -974,12 +974,56 @@ export interface ApiBandBand extends Schema.CollectionType {
     reverbnation: Attribute.String;
     isBandNameInLogo: Attribute.Boolean & Attribute.DefaultTo<false>;
     slug: Attribute.String & Attribute.Unique;
+    band_page_views: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::band-page-view.band-page-view'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
+  collectionName: 'band_page_views';
+  info: {
+    singularName: 'band-page-view';
+    pluralName: 'band-page-views';
+    displayName: 'band-page-view';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::band-page-view.band-page-view',
+      'manyToOne',
+      'api::band.band'
+    >;
+    timestamp: Attribute.DateTime;
+    ipAddress: Attribute.String;
+    userAgent: Attribute.String;
+    referrer: Attribute.String;
+    path: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::band-page-view.band-page-view',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::band-page-view.band-page-view',
+      'oneToOne',
+      'admin::user'
+    > &
       Attribute.Private;
   };
 }
@@ -993,7 +1037,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     title: Attribute.String;
@@ -1024,7 +1068,6 @@ export interface ApiEventEvent extends Schema.CollectionType {
     slug: Attribute.String & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::event.event',
       'oneToOne',
@@ -1153,7 +1196,7 @@ export interface ApiQrQr extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     q_image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
@@ -1182,7 +1225,6 @@ export interface ApiQrQr extends Schema.CollectionType {
     eventPosterUrl: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::qr.qr', 'oneToOne', 'admin::user'> &
@@ -1407,6 +1449,7 @@ declare module '@strapi/types' {
       'plugin::i18n.locale': PluginI18NLocale;
       'api::album.album': ApiAlbumAlbum;
       'api::band.band': ApiBandBand;
+      'api::band-page-view.band-page-view': ApiBandPageViewBandPageView;
       'api::event.event': ApiEventEvent;
       'api::funtest.funtest': ApiFuntestFuntest;
       'api::link-click.link-click': ApiLinkClickLinkClick;
