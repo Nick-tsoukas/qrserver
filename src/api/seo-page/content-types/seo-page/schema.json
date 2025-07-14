@@ -1,0 +1,47 @@
+{
+  "kind": "collectionType",
+  "collectionName": "seo_pages",
+  "info": {
+    "singularName": "seo-page",
+    "pluralName": "seo-pages",
+    "displayName": "seo-page"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "metaTitle": {
+      "type": "string"
+    },
+    "metaDescription": {
+      "type": "string"
+    },
+    "ogImage": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "featured": {
+      "type": "boolean"
+    },
+    "keywords": {
+      "type": "string"
+    }
+  }
+}

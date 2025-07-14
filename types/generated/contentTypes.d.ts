@@ -1303,6 +1303,43 @@ export interface ApiScanScan extends Schema.CollectionType {
   };
 }
 
+export interface ApiSeoPageSeoPage extends Schema.CollectionType {
+  collectionName: 'seo_pages';
+  info: {
+    singularName: 'seo-page';
+    pluralName: 'seo-pages';
+    displayName: 'seo-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    slug: Attribute.UID<'api::seo-page.seo-page', 'title'>;
+    metaTitle: Attribute.String;
+    metaDescription: Attribute.String;
+    ogImage: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    content: Attribute.RichText;
+    featured: Attribute.Boolean;
+    keywords: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::seo-page.seo-page',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::seo-page.seo-page',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiSocialpageSocialpage extends Schema.CollectionType {
   collectionName: 'socialpages';
   info: {
@@ -1504,6 +1541,7 @@ declare module '@strapi/types' {
       'api::media-play.media-play': ApiMediaPlayMediaPlay;
       'api::qr.qr': ApiQrQr;
       'api::scan.scan': ApiScanScan;
+      'api::seo-page.seo-page': ApiSeoPageSeoPage;
       'api::socialpage.socialpage': ApiSocialpageSocialpage;
       'api::stream.stream': ApiStreamStream;
       'api::tour.tour': ApiTourTour;
