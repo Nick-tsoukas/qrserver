@@ -1309,6 +1309,7 @@ export interface ApiSeoPageSeoPage extends Schema.CollectionType {
     singularName: 'seo-page';
     pluralName: 'seo-pages';
     displayName: 'seo-page';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -1322,6 +1323,18 @@ export interface ApiSeoPageSeoPage extends Schema.CollectionType {
     content: Attribute.RichText;
     featured: Attribute.Boolean;
     keywords: Attribute.String;
+    category: Attribute.Enumeration<
+      [
+        'qr-code-strategy',
+        'smart-links',
+        'fan-funnels',
+        'touring-events',
+        'music-marketing',
+        'merch-growth',
+        'analytics',
+        'case-studies'
+      ]
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

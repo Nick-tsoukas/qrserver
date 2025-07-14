@@ -4,7 +4,8 @@
   "info": {
     "singularName": "seo-page",
     "pluralName": "seo-pages",
-    "displayName": "seo-page"
+    "displayName": "seo-page",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -25,14 +26,15 @@
       "type": "string"
     },
     "ogImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
     },
     "content": {
       "type": "richtext"
@@ -42,6 +44,19 @@
     },
     "keywords": {
       "type": "string"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "qr-code-strategy",
+        "smart-links",
+        "fan-funnels",
+        "touring-events",
+        "music-marketing",
+        "merch-growth",
+        "analytics",
+        "case-studies"
+      ]
     }
   }
 }
