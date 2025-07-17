@@ -261,6 +261,8 @@ module.exports = {
 
   // 9) Confirm social signup
 async confirmSocial(ctx) {
+  strapi.log.debug('[confirmSocial] raw body:', ctx.request.body)
+
   const { email, name, uid, provider } = ctx.request.body
   
 
