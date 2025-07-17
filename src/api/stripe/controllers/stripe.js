@@ -187,7 +187,7 @@ module.exports = {
       strapi.log.debug('[confirmPayment] Creating Stripe subscription', { customerId });
       const subscription = await stripe.subscriptions.create({
         customer:           customerId,
-        items:              [{ price: 'price_1QRHWpC26iqgLxbxvIw2311F' }],
+        items:              [{ price: process.env.STRIPE_DEFAULT_PRICE_ID }],
         trial_period_days:  30,
       });
       strapi.log.debug('[confirmPayment] Subscription created', { subscription });
@@ -258,6 +258,54 @@ module.exports = {
       return ctx.internalServerError('Payment confirmation failed.');
     }
   },
+
+  // 9) Confirm social signup
+async confirmSocial(ctx) {
+  const { email, name, uid, provider } = ctx.request.body
+
+  strapi.log.debug('[confirmSocial] entry', { email, name, uid, provider })
+
+  if (!email || !name || !uid || !provider) {
+    return ctx.badRequest('Missing required fields.')
+  }
+
+  // 1️⃣ Check if user already exists
+  const existingUser = await strapi.db.query('plugin::users-permissions.user').findOne({
+    where: { email }
+  })
+
+  if (existingUser) {
+    strapi.log.debug('[confirmSocial] User exists, logging in', { id: existingUser.id })
+    const jwt = strapi.plugins['users-permissions'].services.jwt.issue({ id: existingUser.id })
+    return ctx.send({ jwt })
+  }
+
+  // 2️⃣ Create Stripe customer
+  const customer = await stripe.customers.create({ email, name })
+
+  // 3️⃣ Create user with provider
+  const authRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+    where: { type: 'authenticated' },
+  })
+
+  const newUser = await strapi.plugins['users-permissions'].services.user.add({
+    email,
+    username: email,
+    provider,
+    confirmed: true,
+    role: authRole.id,
+    customerId: customer.id,
+    subscriptionStatus: 'trialing',
+    trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30-day trial
+  })
+
+  const jwt = strapi.plugins['users-permissions'].services.jwt.issue({ id: newUser.id })
+
+  strapi.log.debug('[confirmSocial] User created and JWT issued', { id: newUser.id })
+
+  return ctx.send({ jwt })
+},
+
 
   // 8) A simple test route
   async testRoute(ctx) {

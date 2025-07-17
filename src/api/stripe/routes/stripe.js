@@ -50,6 +50,15 @@ module.exports = {
     },
 
     {
+      method: 'POST',
+      path: '/stripe/confirm-social',
+      handler: 'stripe.confirmSocial',
+      config: {
+        auth: false
+      }
+    },
+
+    {
       method: "GET",
       path: "/stripe/test",
       handler: "stripe.testRoute",
