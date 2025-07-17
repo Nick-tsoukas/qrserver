@@ -262,6 +262,7 @@ module.exports = {
   // 9) Confirm social signup
 async confirmSocial(ctx) {
   const { email, name, uid, provider } = ctx.request.body
+  
 
   strapi.log.debug('[confirmSocial] entry', { email, name, uid, provider })
 
@@ -287,6 +288,11 @@ async confirmSocial(ctx) {
   const authRole = await strapi.db.query('plugin::users-permissions.role').findOne({
     where: { type: 'authenticated' },
   })
+  const subscription = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [{ price: process.env.STRIPE_DEFAULT_PRICE_ID }], // make sure this is set!
+    trial_period_days: 30,
+  })
 
   const newUser = await strapi.plugins['users-permissions'].services.user.add({
     email,
@@ -295,6 +301,7 @@ async confirmSocial(ctx) {
     confirmed: true,
     role: authRole.id,
     customerId: customer.id,
+    subscriptionId: subscription.id,
     subscriptionStatus: 'trialing',
     trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30-day trial
   })
