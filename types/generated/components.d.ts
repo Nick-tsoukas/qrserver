@@ -52,10 +52,24 @@ export interface SinglesongSinglesong extends Schema.Component {
     description: 'A single featured song, either uploaded or embedded';
   };
   attributes: {
-    title: Attribute.String & Attribute.Required;
+    title: Attribute.String;
     song: Attribute.Media<'audios'>;
     isEmbed: Attribute.Boolean & Attribute.DefaultTo<false>;
-    platform: Attribute.Enumeration<['spotify', 'appleMusic']>;
+    platform: Attribute.Enumeration<
+      [
+        'spotify',
+        'appleMusic',
+        'youtube',
+        'deezer',
+        'bandcamp',
+        'mixcloud',
+        'audiomack',
+        'soundcloud'
+      ]
+    >;
+    url: Attribute.String;
+    embedUrl: Attribute.String;
+    embedHtml: Attribute.Text;
     trackId: Attribute.String;
   };
 }

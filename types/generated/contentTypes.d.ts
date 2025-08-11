@@ -1041,7 +1041,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
     draftAndPublish: false;
   };
   attributes: {
-    title: Attribute.String;
+    title: Attribute.String & Attribute.Unique;
     image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     date: Attribute.Date;
     time: Attribute.Time;
