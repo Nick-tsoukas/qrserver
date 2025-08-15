@@ -23,7 +23,7 @@
     "bio": {
       "type": "text",
       "required": true,
-      "maxLength": 247
+      "maxLength": 347
     },
     "bandImg": {
       "type": "media",

@@ -918,7 +918,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     bio: Attribute.Text &
       Attribute.Required &
       Attribute.SetMinMaxLength<{
-        maxLength: 247;
+        maxLength: 347;
       }>;
     bandImg: Attribute.Media<'images'>;
     members: Attribute.Component<'member.members', true>;
