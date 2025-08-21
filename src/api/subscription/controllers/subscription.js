@@ -10,46 +10,80 @@ const confirmationToken = crypto.randomBytes(20).toString('hex');
 
 module.exports = {
   // GET /api/stripe/subscription-status
-  async subscriptionStatus(ctx) {
-    strapi.log.debug('[subscriptionStatus] entry', { jwtUser: ctx.state.user });
-    const jwtUser = ctx.state.user;
-    if (!jwtUser) {
-      return ctx.unauthorized('You must be logged in.');
+// GET /api/stripe/subscription-status
+async subscriptionStatus(ctx) {
+  strapi.log.debug('[subscriptionStatus] entry', { jwtUser: ctx.state.user });
+  const jwtUser = ctx.state.user;
+  if (!jwtUser) return ctx.unauthorized('You must be logged in.');
+
+  // Load DB user (keep as-is; no schema changes)
+  const [dbUser] = await strapi.entityService.findMany(
+    'plugin::users-permissions.user',
+    { filters: { id: jwtUser.id } }
+  );
+  if (!dbUser?.customerId) {
+    strapi.log.warn('[subscriptionStatus] No Stripe customer on DB user', { dbUser });
+    return ctx.badRequest('Stripe customer not found');
+  }
+
+  try {
+    // Get latest sub from Stripe
+    const subsList = await stripe.subscriptions.list({
+      customer: dbUser.customerId,
+      status: 'all',
+      limit: 1,
+    });
+    const sub = subsList.data?.[0] || null;
+    strapi.log.debug('[subscriptionStatus] Retrieved subscription', { subscription: sub?.id, status: sub?.status });
+
+    // Derive live values (non-breaking)
+    const planNickname =
+      sub?.items?.data?.[0]?.price?.nickname ||
+      sub?.items?.data?.[0]?.plan?.nickname || // legacy fallback
+      null;
+
+    // Keep frontend response in Stripe snake_case
+    const liveStatusSnake = sub?.status || 'inactive';
+    const liveTrialEndRaw = sub?.trial_end || null; // seconds
+    const liveTrialEnd = liveTrialEndRaw ? new Date(liveTrialEndRaw * 1000) : null;
+
+    // For DB write-through, map ONLY 'past_due' -> 'pastDue' to avoid breaking existing consumers
+    const mapForUserRow = (s) => (s === 'past_due' ? 'pastDue' : (s || 'inactive'));
+
+    // Prepare what's going to the user row (idempotent update)
+    const nextData = {
+      subscriptionStatus: mapForUserRow(liveStatusSnake),
+      plan: planNickname,
+      trialEndsAt: liveTrialEnd,
+      // leave gracePeriodStart untouched here; webhooks control it
+    };
+
+    // Compute diff vs current dbUser to avoid unnecessary writes
+    const needsUpdate =
+      dbUser.subscriptionStatus !== nextData.subscriptionStatus ||
+      dbUser.plan !== nextData.plan ||
+      String(dbUser.trialEndsAt || '') !== String(nextData.trialEndsAt || '');
+
+    if (needsUpdate) {
+      await strapi.entityService.update('plugin::users-permissions.user', dbUser.id, { data: nextData });
+      strapi.log.debug('[subscriptionStatus] user reconciled', { userId: dbUser.id, next: nextData });
+    } else {
+      strapi.log.debug('[subscriptionStatus] user already up-to-date', { userId: dbUser.id });
     }
-  
-    // Fetch the *full* user from the DB so we get customerId, trialEndsAt, etc.
-    const [dbUser] = await strapi.entityService.findMany(
-      'plugin::users-permissions.user',
-      { filters: { id: jwtUser.id } }
-    );
-    if (!dbUser?.customerId) {
-      strapi.log.warn('[subscriptionStatus] No Stripe customer on DB user', { dbUser });
-      return ctx.badRequest('Stripe customer not found');
-    }
-  
-    try {
-      // Now pass the real customerId to Stripe
-      const subsList = await stripe.subscriptions.list({
-        customer: dbUser.customerId,
-        status:   'all',
-        limit:    1,
-      });
-      const sub = subsList.data[0];
-  
-      strapi.log.debug('[subscriptionStatus] Retrieved subscription', { subscription: sub });
-  
-      return ctx.send({
-        status:      sub?.status        || 'inactive',
-        plan:        sub?.items.data[0]?.plan?.nickname || null,
-        trialEndsAt: sub?.trial_end     || null,
-        // you can also return dbUser.gracePeriodStart here
-        gracePeriodStart: dbUser.gracePeriodStart || null,
-      });
-    } catch (err) {
-      strapi.log.error('[subscriptionStatus] Stripe error', err);
-      return ctx.throw(500, 'Error retrieving subscription status');
-    }
-  },
+
+    // Respond with the live truth (snake_case) for the frontend
+    return ctx.send({
+      status: liveStatusSnake,
+      plan: planNickname,
+      trialEndsAt: liveTrialEndRaw,                 // seconds (keeps your frontend math unchanged)
+      gracePeriodStart: dbUser.gracePeriodStart || null,
+    });
+  } catch (err) {
+    strapi.log.error('[subscriptionStatus] Stripe error', err);
+    return ctx.throw(500, 'Error retrieving subscription status');
+  }
+},
+
 
   // POST /api/stripe/create-billing-portal-session
   async createBillingPortalSession(ctx) {
@@ -306,26 +340,67 @@ async function onSubscriptionUpdated(subscription) {
     cancel_at:            subscription.cancel_at
   });
 
+  // Find user by subscriptionId (leave as-is to avoid breaking changes)
   const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
-    filters: { subscriptionId: subscription.id }
+    filters: { subscriptionId: subscription.id },
+    limit: 1,
+    fields: ['id', 'subscriptionStatus', 'plan', 'trialEndsAt', 'gracePeriodStart', 'cancelAt']
   });
+
   if (!user) {
     strapi.log.warn('[Webhook] No user for subscription', subscription.id);
     return;
   }
 
-  const data = { subscriptionStatus: subscription.status };
+  // Safely derive plan nickname from either price.nickname or legacy plan.nickname
+  const planNickname =
+    subscription.items?.data?.[0]?.price?.nickname ||
+    subscription.items?.data?.[0]?.plan?.nickname ||
+    null;
+
+  // Convert Stripe epoch seconds -> Date for DB fields that are dates
+  const trialEndsAtDate = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
+
+  // Build update payload (non-destructive, minimal)
+  const data = {
+    // Keep snake_case status as-is; you have existing code that reads snake and camel elsewhere
+    subscriptionStatus: subscription.status,
+    plan:               planNickname,
+    trialEndsAt:        trialEndsAtDate,
+  };
+
+  // If set to cancel at period end, persist cancelAt date
   if (subscription.cancel_at_period_end && subscription.cancel_at) {
     data.cancelAt = new Date(subscription.cancel_at * 1000);
   }
+
+  // If subscription is active again, clear grace/cancel flags
   if (subscription.status === 'active') {
     data.gracePeriodStart = null;
     data.cancelAt = null;
   }
 
-  await strapi.entityService.update('plugin::users-permissions.user', user.id, { data });
-  strapi.log.info('[Webhook] User subscriptionStatus updated', { userId: user.id, newStatus: subscription.status });
+  // Idempotent write (avoid noise): only update if something actually changed
+  const changed =
+    user.subscriptionStatus !== data.subscriptionStatus ||
+    user.plan !== data.plan ||
+    String(user.trialEndsAt || '') !== String(data.trialEndsAt || '') ||
+    String(user.gracePeriodStart || '') !== String(data.gracePeriodStart || '') ||
+    String(user.cancelAt || '') !== String(data.cancelAt || '');
+
+  if (changed) {
+    await strapi.entityService.update('plugin::users-permissions.user', user.id, { data });
+    strapi.log.info('[Webhook] User subscription updated', {
+      userId: user.id,
+      newStatus: subscription.status,
+      plan: planNickname,
+      trialEndsAt: trialEndsAtDate?.toISOString() || null
+    });
+  } else {
+    strapi.log.debug('[Webhook] No changes to persist for user', { userId: user.id });
+  }
 }
+
 
 async function onSubscriptionCanceled(subscription) {
   strapi.log.debug('[Webhook] customer.subscription.deleted', subscription.id);
