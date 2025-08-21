@@ -7,6 +7,9 @@ module.exports = ({ env }) => ({
   webhooks: {
     populateRelations: env.bool('WEBHOOKS_POPULATE_RELATIONS', false),
   },
+  cron: {
+    enabled: true, // ✅ enable cron
+  },
   // Enable more detailed logging
   logger: {
     level: 'debug',  // Set the log level to 'debug' for detailed logs
