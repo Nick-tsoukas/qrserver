@@ -1,43 +1,60 @@
-// src/api/band/content-types/band/lifecycles.js
 'use strict';
 
+// If you still want ASCII slugs for some cases, we can keep transliteration as a fallback.
+// But primary path below preserves Unicode (Thai).
 const { slugify: translitSlugify } = require('transliteration');
 
-/**
- * Generate a URL-safe, romanized slug from a name.
- * - Romanizes non-Latin (Thai, etc.)
- * - Lowercase, dash-separated
- * - Truncates to maxLen (default 60)
- * - Provides a fallback if empty
- */
-const makeBaseSlug = (name, maxLen = 60) => {
+const UID = 'api::band.band';
+const MAX_LEN = 60;
+
+// Escape a string for use inside a RegExp
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Unicode-safe sanitizer: keep letters/numbers (any script), - . _ ~
+// Convert whitespace → "-", collapse dashes, trim, truncate.
+const makeUnicodeSlug = (name, maxLen = MAX_LEN) => {
   if (!name || typeof name !== 'string') return null;
+  let s = name
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/gu, '-')                    // spaces → dash
+    .replace(/[^\p{L}\p{N}\-._~]+/gu, '-')    // keep unicode letters/digits and -._~
+    .replace(/-+/g, '-')                      // collapse dashes
+    .replace(/^-|-$/g, '');                   // trim edge dashes
 
-  // Romanize & slugify (e.g., spaces -> "-", lowercase)
-  let base = translitSlugify(name, {
-    lowercase: true,
-    separator: '-',          // use dashes
-    trim: true,
-  });
-
-  // Remove duplicate dashes
-  base = (base || '').replace(/-+/g, '-').replace(/^-|-$/g, '');
-
-  // Truncate
-  if (base.length > maxLen) base = base.slice(0, maxLen).replace(/-+$/g, '');
-
-  // Fallback if transliteration produced nothing
-  if (!base) base = `band-${Date.now()}`;
-
-  return base;
+  if (s.length > maxLen) s = s.slice(0, maxLen).replace(/-+$/g, '');
+  if (!s) s = `band-${Date.now()}`;
+  return s;
 };
 
-/**
- * Ensure uniqueness by appending -2, -3, ... if needed.
- */
-const ensureUniqueSlug = async (uid, base, currentId = null) => {
-  // Find existing slugs starting with base (or base-<number>)
-  const existing = await strapi.entityService.findMany(uid, {
+// Optional: ASCII fallback (not used unless you want to force ASCII)
+// const makeAsciiSlug = (name, maxLen = MAX_LEN) => {
+//   let base = translitSlugify(name || '', { lowercase: true, separator: '-', trim: true })
+//     .replace(/-+/g, '-').replace(/^-|-$/g, '');
+//   if (!base) base = `band-${Date.now()}`;
+//   if (base.length > maxLen) base = base.slice(0, maxLen).replace(/-+$/g, '');
+//   return base;
+// };
+
+// Sanitize a manually-entered slug (respect Unicode)
+const sanitizeIncomingSlug = (slug, maxLen = MAX_LEN) => {
+  if (!slug || typeof slug !== 'string') return null;
+  let s = slug
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/gu, '-')                    // spaces → dash
+    .replace(/[^\p{L}\p{N}\-._~]+/gu, '-')    // keep unicode letters/digits and -._~
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  if (s.length > maxLen) s = s.slice(0, maxLen).replace(/-+$/g, '');
+  return s || null;
+};
+
+const ensureUniqueSlug = async (base, currentId = null) => {
+  // Find existing exact + suffixed matches
+  const existing = await strapi.entityService.findMany(UID, {
     filters: {
       $or: [
         { slug: base },
@@ -45,61 +62,66 @@ const ensureUniqueSlug = async (uid, base, currentId = null) => {
       ],
     },
     fields: ['id', 'slug'],
-    limit: 1000, // practical cap
-    publicationState: 'preview', // include drafts just in case
+    limit: 1000,
+    publicationState: 'preview',
   });
 
-  // If no conflicts or only conflict is self
   const conflicts = existing.filter(e => String(e.id) !== String(currentId));
-  if (conflicts.length === 0) return base;
+  if (!conflicts.length) return base;
 
-  // Collect used suffix numbers
   const used = new Set();
   for (const e of conflicts) {
     if (e.slug === base) {
       used.add(1);
     } else {
-      const m = e.slug.match(new RegExp(`^${base}-(\\d+)$`));
+      // Build a safe regex for Unicode base
+      const rx = new RegExp(`^${escapeRegExp(base)}-(\\d+)$`, 'u');
+      const m = e.slug.match(rx);
       if (m) used.add(parseInt(m[1], 10));
     }
   }
-
-  // Find the smallest available suffix >= 2 (we treat exact base as -1 internally)
   let n = 2;
   while (used.has(n)) n++;
   return `${base}-${n}`;
 };
 
-const setSlug = async (event) => {
-  const uid = 'api::band.band';
-  const { data, where } = event.params;
-
-  // Prefer name from incoming update; if missing on update, do nothing
-  if (!data || !data.name) return;
-
-  // Create base slug
-  const base = makeBaseSlug(data.name);
-
-  // Determine current entity id (needed to avoid colliding with self on update)
-  let currentId = null;
+const getExistingNameIfNeeded = async (where) => {
+  if (!where?.id) return null;
   try {
-    if (where && where.id) {
-      currentId = where.id;
-    } else if (event.params?.data?.id) {
-      currentId = event.params.data.id;
-    }
-  } catch (_) { /* noop */ }
+    const entry = await strapi.entityService.findOne(UID, where.id, { fields: ['name'] });
+    return entry?.name || null;
+  } catch {
+    return null;
+  }
+};
 
-  // Ensure uniqueness
-  const unique = await ensureUniqueSlug(uid, base, currentId);
-  data.slug = unique;
+const setSlug = async (event) => {
+  const { data, where } = event.params;
+  if (!data) return;
+
+  const currentId = where?.id ?? data?.id ?? null;
+
+  // 1) If user provided a slug manually, sanitize & de-dupe and KEEP IT.
+  if (data.slug) {
+    const sanitized = sanitizeIncomingSlug(data.slug) || `band-${Date.now()}`;
+    data.slug = await ensureUniqueSlug(sanitized, currentId);
+    return;
+  }
+
+  // 2) Else generate from name (payload or DB)
+  const name = data.name || (await getExistingNameIfNeeded(where));
+  if (!name) return;
+
+  // Unicode slug that preserves Thai (preferred)
+  let base = makeUnicodeSlug(name);
+
+  // If you ever want to fallback to ASCII only when Unicode becomes empty:
+  // if (!base) base = makeAsciiSlug(name);
+
+  data.slug = await ensureUniqueSlug(base, currentId);
 };
 
 module.exports = {
-  async beforeCreate(event) {
-    await setSlug(event);
-  },
-  async beforeUpdate(event) {
-    await setSlug(event);
-  },
+  async beforeCreate(event) { await setSlug(event); },
+  async beforeUpdate(event) { await setSlug(event); },
 };
