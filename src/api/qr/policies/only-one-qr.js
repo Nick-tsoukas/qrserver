@@ -10,18 +10,31 @@ module.exports = async (policyContext, config, { strapi }) => {
     return response.unauthorized('You must be logged in to create a QR code.');
   }
 
-  // 2) Count how many QR records this user already has
-  //    We only need up to 3, so limit pageSize to 3
-  const existing = await strapi.entityService.findMany('api::qr.qr', {
-    filters: { users_permissions_user: user.id },
-    pagination: { pageSize: 1 }, // fetch at most 3
-  });
+  // 2) Define special users with higher QR limits
+  const specialUsers = [
+    'mjc773@gmail.com',
+    'partner@musicbizqr.com',
+  ];
 
-  // 3) If user already has 3 or more, block creation
-  if (existing.length >= 1) {
-    return response.forbidden('You can only create up to 3 QR codes.');
+  // Default QR limit
+  let qrLimit = 1;
+
+  // Special users get higher limit
+  if (specialUsers.includes(user.email)) {
+    qrLimit = 10;
   }
 
-  // 4) Otherwise allow
+  // 3) Count how many QR codes this user already has
+  const existing = await strapi.entityService.findMany('api::qr.qr', {
+    filters: { users_permissions_user: user.id },
+    pagination: { pageSize: qrLimit + 1 }, // no need to fetch more than limit
+  });
+
+  // 4) Enforce limit
+  if (existing.length >= qrLimit) {
+    return response.forbidden(`You may only create up to ${qrLimit} QR code(s).`);
+  }
+
+  // 5) Otherwise allow
   return true;
 };
