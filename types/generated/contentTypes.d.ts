@@ -1160,6 +1160,41 @@ export interface ApiFuntestFuntest extends Schema.CollectionType {
   };
 }
 
+export interface ApiHowtovideoHowtovideo extends Schema.CollectionType {
+  collectionName: 'howtovideos';
+  info: {
+    singularName: 'howtovideo';
+    pluralName: 'howtovideos';
+    displayName: 'HowToVideo';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Title: Attribute.String;
+    slug: Attribute.UID<'api::howtovideo.howtovideo', 'Title'>;
+    YouTubeID: Attribute.String;
+    Thumbnail: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    Description: Attribute.Text;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::howtovideo.howtovideo',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::howtovideo.howtovideo',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiLinkClickLinkClick extends Schema.CollectionType {
   collectionName: 'link_clicks';
   info: {
@@ -1550,6 +1585,7 @@ declare module '@strapi/types' {
       'api::event.event': ApiEventEvent;
       'api::event-page-view.event-page-view': ApiEventPageViewEventPageView;
       'api::funtest.funtest': ApiFuntestFuntest;
+      'api::howtovideo.howtovideo': ApiHowtovideoHowtovideo;
       'api::link-click.link-click': ApiLinkClickLinkClick;
       'api::media-play.media-play': ApiMediaPlayMediaPlay;
       'api::qr.qr': ApiQrQr;
