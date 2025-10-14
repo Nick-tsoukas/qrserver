@@ -13,6 +13,7 @@ module.exports = async (policyContext, config, { strapi }) => {
   // 2) Define special users with higher QR limits
   const specialUsers = [
     'mjc773@gmail.com',
+    'nick.tsoukas101@gmail.com',
     'partner@musicbizqr.com',
   ];
 
