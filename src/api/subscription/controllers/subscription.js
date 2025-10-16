@@ -168,7 +168,7 @@ async register(ctx) {
   }
 
   // ─── Determine Price ID ─────────────────────────────────────────
-  const priceId = process.env.STRIPE_PRICE_ID || 'price_1QRHWpC26iqgLxbxvIw2311F';
+  const priceId = process.env.STRIPE_DEFAULT_PRICE_ID || 'price_1RmcQ5C26iqgLxbxnMSy4JFY';
   strapi.log.debug('[register] using Stripe price ID:', priceId);
 
   // 1️⃣ Create Stripe Customer
