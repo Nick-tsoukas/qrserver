@@ -997,7 +997,7 @@ export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     band: Attribute.Relation<
@@ -1010,9 +1010,11 @@ export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
     userAgent: Attribute.String;
     referrer: Attribute.String;
     path: Attribute.String;
+    city: Attribute.String;
+    region: Attribute.String;
+    country: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::band-page-view.band-page-view',
       'oneToOne',
