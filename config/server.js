@@ -1,19 +1,23 @@
+// config/server.js
+const cronTasks = require('./cron-tasks');
+
 module.exports = ({ env }) => ({
   host: env('HOST', '0.0.0.0'),
   port: env.int('PORT', 1337),
   app: {
-    keys: env.array('APP_KEYS'),  // Reference the APP_KEYS environment variable
+    keys: env.array('APP_KEYS'),
   },
   webhooks: {
     populateRelations: env.bool('WEBHOOKS_POPULATE_RELATIONS', false),
   },
   cron: {
-    enabled: true, // ✅ enable cron
+    enabled: true,
+    tasks: cronTasks,            // ← explicitly attach tasks
   },
-  // Enable more detailed logging
   logger: {
-    level: 'debug',  // Set the log level to 'debug' for detailed logs
-    exposeInContext: true,  // Exposes the logger inside API routes, controllers, etc.
-    requests: true,  // Logs each incoming HTTP request
+    exposeInContext: true,
+    requests: true,
+    level: env('STRAPI_LOG_LEVEL', 'info'),
+    timestamps: true,
   },
 });

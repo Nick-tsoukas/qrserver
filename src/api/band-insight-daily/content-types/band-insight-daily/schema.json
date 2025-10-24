@@ -1,0 +1,75 @@
+{
+  "kind": "collectionType",
+  "collectionName": "band_insights_daily",
+  "info": {
+    "singularName": "band-insight-daily",
+    "pluralName": "band-insights-daily",
+    "displayName": "Band Insight (Daily)",
+    "description": "Daily rollups for band analytics"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "key": {
+      "type": "string",
+      "unique": true,
+      "required": true
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "required": true
+    },
+    "pageViews": {
+      "type": "integer",
+      "default": 0
+    },
+    "uniqueIps": {
+      "type": "integer",
+      "default": 0
+    },
+    "linkClicks": {
+      "type": "integer",
+      "default": 0
+    },
+    "songPlays": {
+      "type": "integer",
+      "default": 0
+    },
+    "videoPlays": {
+      "type": "integer",
+      "default": 0
+    },
+    "deviceDesktop": {
+      "type": "integer",
+      "default": 0
+    },
+    "deviceMobile": {
+      "type": "integer",
+      "default": 0
+    },
+    "deviceTablet": {
+      "type": "integer",
+      "default": 0
+    },
+    "topCities": {
+      "type": "json"
+    },
+    "topLinks": {
+      "type": "json"
+    },
+    "growthPct": {
+      "type": "float",
+      "default": 0
+    },
+    "lastUpdated": {
+      "type": "datetime"
+    }
+  }
+}

@@ -988,6 +988,56 @@ export interface ApiBandBand extends Schema.CollectionType {
   };
 }
 
+export interface ApiBandInsightDailyBandInsightDaily
+  extends Schema.CollectionType {
+  collectionName: 'band_insights_daily';
+  info: {
+    singularName: 'band-insight-daily';
+    pluralName: 'band-insights-daily';
+    displayName: 'Band Insight (Daily)';
+    description: 'Daily rollups for band analytics';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    key: Attribute.String & Attribute.Required & Attribute.Unique;
+    date: Attribute.Date & Attribute.Required;
+    band: Attribute.Relation<
+      'api::band-insight-daily.band-insight-daily',
+      'manyToOne',
+      'api::band.band'
+    > &
+      Attribute.Required;
+    pageViews: Attribute.Integer & Attribute.DefaultTo<0>;
+    uniqueIps: Attribute.Integer & Attribute.DefaultTo<0>;
+    linkClicks: Attribute.Integer & Attribute.DefaultTo<0>;
+    songPlays: Attribute.Integer & Attribute.DefaultTo<0>;
+    videoPlays: Attribute.Integer & Attribute.DefaultTo<0>;
+    deviceDesktop: Attribute.Integer & Attribute.DefaultTo<0>;
+    deviceMobile: Attribute.Integer & Attribute.DefaultTo<0>;
+    deviceTablet: Attribute.Integer & Attribute.DefaultTo<0>;
+    topCities: Attribute.JSON;
+    topLinks: Attribute.JSON;
+    growthPct: Attribute.Float & Attribute.DefaultTo<0>;
+    lastUpdated: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::band-insight-daily.band-insight-daily',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::band-insight-daily.band-insight-daily',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
   collectionName: 'band_page_views';
   info: {
@@ -1582,6 +1632,7 @@ declare module '@strapi/types' {
       'plugin::i18n.locale': PluginI18NLocale;
       'api::album.album': ApiAlbumAlbum;
       'api::band.band': ApiBandBand;
+      'api::band-insight-daily.band-insight-daily': ApiBandInsightDailyBandInsightDaily;
       'api::band-page-view.band-page-view': ApiBandPageViewBandPageView;
       'api::event.event': ApiEventEvent;
       'api::event-page-view.event-page-view': ApiEventPageViewEventPageView;

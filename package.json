@@ -6,6 +6,7 @@
   "scripts": {
     "develop": "strapi develop",
     "start": "strapi start",
+    "backfill:insights": "node scripts/backfill-band-insights.js",
     "build": "strapi build",
     "strapi": "strapi"
   },
