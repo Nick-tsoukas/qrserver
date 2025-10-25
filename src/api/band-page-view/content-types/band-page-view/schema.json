@@ -21,6 +21,24 @@
     "timestamp": {
       "type": "datetime"
     },
+    "pageUrl": { "type": "string" },
+    "landingPath": { "type": "string" },
+    "landingQuery": { "type": "text" },
+
+    "refDomain": { "type": "string" },
+    "refSource": { "type": "string" },
+    "refMedium": { "type": "string" },
+
+    "utmSource": { "type": "string" },
+    "utmMedium": { "type": "string" },
+    "utmCampaign": { "type": "string" },
+    "utmTerm": { "type": "string" },
+    "utmContent": { "type": "string" },
+
+    "gclid": { "type": "string" },
+    "fbclid": { "type": "string" },
+    "ttclid": { "type": "string" },
+    "twclid": { "type": "string" },
     "ipAddress": {
       "type": "string"
     },

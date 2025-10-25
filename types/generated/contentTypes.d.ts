@@ -1056,6 +1056,21 @@ export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
       'api::band.band'
     >;
     timestamp: Attribute.DateTime;
+    pageUrl: Attribute.String;
+    landingPath: Attribute.String;
+    landingQuery: Attribute.Text;
+    refDomain: Attribute.String;
+    refSource: Attribute.String;
+    refMedium: Attribute.String;
+    utmSource: Attribute.String;
+    utmMedium: Attribute.String;
+    utmCampaign: Attribute.String;
+    utmTerm: Attribute.String;
+    utmContent: Attribute.String;
+    gclid: Attribute.String;
+    fbclid: Attribute.String;
+    ttclid: Attribute.String;
+    twclid: Attribute.String;
     ipAddress: Attribute.String;
     userAgent: Attribute.String;
     referrer: Attribute.String;
