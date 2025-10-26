@@ -18,13 +18,16 @@
       "target": "api::band.band",
       "inversedBy": "band_page_views"
     },
-    "timestamp": {
-      "type": "datetime"
-    },
+
+    "timestamp": { "type": "datetime" },
+
+    "title": { "type": "string" },
     "pageUrl": { "type": "string" },
     "landingPath": { "type": "string" },
     "landingQuery": { "type": "text" },
 
+    "referrer": { "type": "string" },
+    "refUrl": { "type": "text" },
     "refDomain": { "type": "string" },
     "refSource": { "type": "string" },
     "refMedium": { "type": "string" },
@@ -39,26 +42,55 @@
     "fbclid": { "type": "string" },
     "ttclid": { "type": "string" },
     "twclid": { "type": "string" },
-    "ipAddress": {
-      "type": "string"
+
+    "ipAddress": { "type": "string" },
+    "userAgent": { "type": "string" },
+
+    "path": { "type": "string" },
+
+    "city": { "type": "string" },
+    "region": { "type": "string" },
+    "country": { "type": "string" },
+    "lat": { "type": "decimal" },
+    "lon": { "type": "decimal" },
+    "geoSource": {
+      "type": "enumeration",
+      "enum": ["override", "cloudflare", "geoip", "external", "none"]
     },
-    "userAgent": {
-      "type": "string"
+
+    "deviceType": {
+      "type": "enumeration",
+      "enum": ["desktop", "mobile", "tablet", "bot", "unknown"]
     },
-    "referrer": {
-      "type": "string"
-    },
-    "path": {
-      "type": "string"
-    },
-    "city": {
-      "type": "string"
-    },
-    "region": {
-      "type": "string"
-    },
-    "country": {
-      "type": "string"
+    "os": { "type": "string" },
+    "browser": { "type": "string" },
+
+    "host": { "type": "string" },
+    "protocol": { "type": "string" },
+
+    "sessionId": { "type": "string" },
+    "visitorId": { "type": "string" },
+
+    "pageLoadMs": { "type": "integer" },
+
+    "screenW": { "type": "integer" },
+    "screenH": { "type": "integer" },
+    "tzOffset": { "type": "integer" },
+    "lang": { "type": "string" },
+
+    "fcpMs": { "type": "integer" },
+    "lcpMs": { "type": "integer" },
+    "cls": { "type": "decimal" },
+    "fidMs": { "type": "integer" },
+    "inpMs": { "type": "integer" },
+
+    "botScore": { "type": "decimal" },
+    "asn": { "type": "string" },
+    "isp": { "type": "string" },
+
+    "sourceCategory": {
+      "type": "enumeration",
+      "enum": ["direct", "search", "social", "referral", "email", "ads", "unknown"]
     }
   }
 }
