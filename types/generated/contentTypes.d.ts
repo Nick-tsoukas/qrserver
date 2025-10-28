@@ -1056,9 +1056,12 @@ export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
       'api::band.band'
     >;
     timestamp: Attribute.DateTime;
+    title: Attribute.String;
     pageUrl: Attribute.String;
     landingPath: Attribute.String;
     landingQuery: Attribute.Text;
+    referrer: Attribute.String;
+    refUrl: Attribute.Text;
     refDomain: Attribute.String;
     refSource: Attribute.String;
     refMedium: Attribute.String;
@@ -1073,11 +1076,40 @@ export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
     twclid: Attribute.String;
     ipAddress: Attribute.String;
     userAgent: Attribute.String;
-    referrer: Attribute.String;
     path: Attribute.String;
     city: Attribute.String;
     region: Attribute.String;
     country: Attribute.String;
+    lat: Attribute.Decimal;
+    lon: Attribute.Decimal;
+    geoSource: Attribute.Enumeration<
+      ['override', 'cloudflare', 'geoip', 'external', 'none']
+    >;
+    deviceType: Attribute.Enumeration<
+      ['desktop', 'mobile', 'tablet', 'bot', 'unknown']
+    >;
+    os: Attribute.String;
+    browser: Attribute.String;
+    host: Attribute.String;
+    protocol: Attribute.String;
+    sessionId: Attribute.String;
+    visitorId: Attribute.String;
+    pageLoadMs: Attribute.Integer;
+    screenW: Attribute.Integer;
+    screenH: Attribute.Integer;
+    tzOffset: Attribute.Integer;
+    lang: Attribute.String;
+    fcpMs: Attribute.Integer;
+    lcpMs: Attribute.Integer;
+    cls: Attribute.Decimal;
+    fidMs: Attribute.Integer;
+    inpMs: Attribute.Integer;
+    botScore: Attribute.Decimal;
+    asn: Attribute.String;
+    isp: Attribute.String;
+    sourceCategory: Attribute.Enumeration<
+      ['direct', 'search', 'social', 'referral', 'email', 'ads', 'unknown']
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
