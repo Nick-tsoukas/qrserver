@@ -1019,6 +1019,10 @@ export interface ApiBandInsightDailyBandInsightDaily
     deviceTablet: Attribute.Integer & Attribute.DefaultTo<0>;
     topCities: Attribute.JSON;
     topLinks: Attribute.JSON;
+    sources: Attribute.JSON;
+    mediums: Attribute.JSON;
+    refDomains: Attribute.JSON;
+    platforms: Attribute.JSON;
     growthPct: Attribute.Float & Attribute.DefaultTo<0>;
     lastUpdated: Attribute.DateTime;
     createdAt: Attribute.DateTime;

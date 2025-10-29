@@ -64,6 +64,18 @@
     "topLinks": {
       "type": "json"
     },
+    "sources": {
+      "type": "json"
+    },
+    "mediums": {
+      "type": "json"
+    },
+    "refDomains": {
+      "type": "json"
+    },
+    "platforms": {
+      "type": "json"
+    },
     "growthPct": {
       "type": "float",
       "default": 0
