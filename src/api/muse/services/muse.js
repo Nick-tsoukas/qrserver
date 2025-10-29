@@ -99,7 +99,7 @@ module.exports = () => ({
     // ---------- MEDIA PLAYS ----------
     const mpRows = await strapi.entityService.findMany(UID_MP, {
       filters,
-      fields: ['id', FIELD_TS, 'mediaType'], // only field that exists
+      fields: ['id', FIELD_TS, 'mediaType'],
       pagination: { limit: 100000 },
     });
 
@@ -178,15 +178,15 @@ module.exports = () => ({
     return { ok: true, count: results.length, results };
   },
 
-  // ---------------- PHASE 2 ----------------
+  // ---------------- PHASE 2.5 ----------------
   async aggregateSummary({ bandId, range = '7d' }) {
     const days = Number(range.replace('d', '')) || 7;
     const now = DateTime.utc();
-    const from = now.minus({ days: days - 1 }).startOf('day').toISO();
-    const to   = now.endOf('day').toISO();
+    const from = now.minus({ days: days - 1 }).startOf('day');
+    const to   = now.endOf('day');
 
     const rows = await strapi.entityService.findMany(UID_DI, {
-      filters: { band: { id: bandId }, date: { $gte: from, $lte: to } },
+      filters: { band: { id: bandId }, date: { $gte: from.toISO(), $lte: to.toISO() } },
       fields: [
         'date', 'pageViews', 'linkClicks', 'songPlays', 'videoPlays',
         'growthPct', 'topCities', 'sources', 'mediums', 'platforms'
@@ -206,6 +206,24 @@ module.exports = () => ({
       rows.reduce((s, r) => s + (r.growthPct || 0), 0) / rows.length * 10
     ) / 10;
 
+    // --- Engagement rate ---
+    const engagementRate = totalViews > 0
+      ? Math.round(((totalClicks + totalSongs + totalVideos) / totalViews) * 1000) / 10
+      : 0;
+
+    // --- Previous period comparison ---
+    const prevStart = from.minus({ days });
+    const prevEnd = from.minus({ days: 1 });
+    const prevRows = await strapi.entityService.findMany(UID_DI, {
+      filters: { band: { id: bandId }, date: { $gte: prevStart.toISODate(), $lte: prevEnd.toISODate() } },
+      fields: ['pageViews'],
+      pagination: { limit: 1000 },
+    });
+    const prevViews = prevRows.reduce((s, r) => s + (r.pageViews || 0), 0);
+    const prevComparison = prevViews > 0
+      ? Math.round(((totalViews - prevViews) / prevViews) * 1000) / 10
+      : (totalViews > 0 ? 100 : 0);
+
     // --- Top aggregations ---
     const mergeTop = (acc, list) => {
       (list || []).forEach(([key, count]) => {
@@ -219,19 +237,21 @@ module.exports = () => ({
     const srcAgg  = rows.reduce((m, r) => mergeTop(m, r.sources), {});
     const platAgg = rows.reduce((m, r) => mergeTop(m, r.platforms), {});
 
-    const topCity     = Object.entries(cityAgg).sort((a,b)=>b[1]-a[1])[0]?.[0] || null;
-    const topSource   = Object.entries(srcAgg).sort((a,b)=>b[1]-a[1])[0]?.[0] || null;
-    const topPlatform = Object.entries(platAgg).sort((a,b)=>b[1]-a[1])[0]?.[0] || null;
+    const topCities    = Object.entries(cityAgg).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const topSources   = Object.entries(srcAgg).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const topPlatforms = Object.entries(platAgg).sort((a,b)=>b[1]-a[1]).slice(0,3);
 
     const summary = {
       pageViews: totalViews,
       linkClicks: totalClicks,
       songPlays: totalSongs,
       videoPlays: totalVideos,
+      engagementRate,
       growthPct: avgGrowth,
-      topCity,
-      topSource,
-      topPlatform,
+      prevComparison,
+      topCities,
+      topSources,
+      topPlatforms,
       days,
     };
 
