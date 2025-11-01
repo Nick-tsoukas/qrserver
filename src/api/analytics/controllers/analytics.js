@@ -16,11 +16,7 @@ const safeInt = (n) => (Number.isFinite(n) ? n : 0);
  * Always returns ISO in UTC or null.
  */
 const resolveDate = (row = {}) => {
-  const raw =
-    row[fieldTS] ||
-    row.updatedAt ||
-    row.createdAt ||
-    null;
+  const raw = row[fieldTS] || row.updatedAt || row.createdAt || null;
 
   if (!raw) return null;
   // normalize to UTC
@@ -33,11 +29,7 @@ const resolveDate = (row = {}) => {
  */
 const resolveScanDate = (row = {}) => {
   const raw =
-    row.date ||
-    row[fieldTS] ||
-    row.updatedAt ||
-    row.createdAt ||
-    null;
+    row.date || row[fieldTS] || row.updatedAt || row.createdAt || null;
 
   if (!raw) return null;
   const dt = DateTime.fromISO(raw, { zone: "utc" });
@@ -59,11 +51,16 @@ const normalizeMediaType = (mt) => {
  * Build simple, layout-safe Muse insights.
  * Only uses data we already have in rollups.
  */
-const buildMuseInsights = ({
-  totals = {},
-  series = [],
-  sources = [],
-}) => {
+// put this near the top of analytics.js, replacing the old helper
+/**
+ * Build Muse insights from the data we ALREADY have in this endpoint.
+ * We generate a bunch, then sort by importance, then cap to 3 so the UI never explodes.
+ */
+/**
+ * Always include a traffic delta insight (last day vs previous day),
+ * then add up to 2 more supporting insights.
+ */
+const buildMuseInsights = ({ totals = {}, series = [], sources = [] }) => {
   const insights = [];
 
   const views = totals.views || 0;
@@ -71,93 +68,116 @@ const buildMuseInsights = ({
   const songPlays = totals.songPlays || 0;
   const videoPlays = totals.videoPlays || 0;
   const qrScans = totals.qrScans || 0;
-
-  // 1) too little data
-  if (views < 5 && qrScans < 3) {
-    insights.push({
-      title: "We need a little more traffic to analyze this page. Share your link or scan the QR a few times.",
-      kind: "traffic",
-      severity: "info",
-    });
-    return insights;
-  }
-
-  // 2) traffic change (compare last day vs average of previous days)
-  if (Array.isArray(series) && series.length >= 2) {
-    const last = series[series.length - 1];
-    const prev = series.slice(0, -1);
-    const lastViews = last?.views || 0;
-    const avgPrev =
-      prev.reduce((sum, d) => sum + (d.views || 0), 0) /
-      (prev.length || 1);
-
-    if (avgPrev > 0) {
-      const diffPct = ((lastViews - avgPrev) / avgPrev) * 100;
-      if (diffPct >= 30) {
-        insights.push({
-          title: "Traffic is up today compared to your normal level. Keep sharing this page.",
-          kind: "traffic",
-          severity: "success",
-          value: Number(diffPct.toFixed(1)),
-        });
-      } else if (diffPct <= -30) {
-        insights.push({
-          title: "Traffic dipped today vs your normal level. Post or share the page again.",
-          kind: "traffic",
-          severity: "warn",
-          value: Number(diffPct.toFixed(1)),
-        });
-      }
-    }
-  }
-
-  // 3) media is working
   const mediaPlays = songPlays + videoPlays;
-  if (views >= 10 && mediaPlays > 0) {
-    const mediaRate = (mediaPlays / views) * 100;
-    if (mediaRate >= 25) {
+
+  /* ---------------------------
+   * 1) MANDATORY: traffic insight
+   * --------------------------- */
+  const hasSeries = Array.isArray(series) && series.length > 0;
+  const last = hasSeries ? series[series.length - 1] : null;
+  const prev = hasSeries && series.length > 1 ? series[series.length - 2] : null;
+  const lastViews = last?.views || 0;
+  const prevViews = prev?.views || 0;
+
+  if (prevViews > 0) {
+    const diffPct = ((lastViews - prevViews) / prevViews) * 100;
+    const rounded = Number(diffPct.toFixed(1));
+    if (rounded > 0) {
       insights.push({
-        title: "Fans are playing your featured media. Keep this song/video featured.",
-        kind: "media",
+        title: `Traffic is up ${rounded}% vs. yesterday.`,
+        kind: "traffic",
+        severity: "success",
+        weight: 100,
+      });
+    } else if (rounded < 0) {
+      insights.push({
+        title: `Traffic is down ${Math.abs(rounded)}% vs. yesterday.`,
+        kind: "traffic",
+        severity: "warn",
+        weight: 100,
+      });
+    } else {
+      insights.push({
+        title: "Traffic is flat vs. yesterday.",
+        kind: "traffic",
         severity: "info",
-        value: Number(mediaRate.toFixed(1)),
+        weight: 100,
       });
     }
-  }
-
-  // 4) links are the hero today (but no “fix links” suggestion)
-  if (views >= 20 && mediaPlays === 0 && clicks > 0) {
+  } else if (lastViews > 0) {
+    // yesterday had 0, today has some
     insights.push({
-      title: "Visitors are using your links more than your media today. Keep your streaming and socials updated.",
-      kind: "links",
+      title: "Traffic started coming in today.",
+      kind: "traffic",
       severity: "info",
+      weight: 100,
+    });
+  } else {
+    // both 0 → still say something, but neutral
+    insights.push({
+      title: "No traffic recorded yet today.",
+      kind: "traffic",
+      severity: "info",
+      weight: 100,
     });
   }
 
-  // 5) QR is active
+  /* ---------------------------
+   * 2) Supporting insights
+   * --------------------------- */
+
+  // engagement
+  if (views > 0) {
+    const engagement = ((clicks + mediaPlays + qrScans) / views) * 100;
+    const roundedEng = Number(engagement.toFixed(1));
+    insights.push({
+      title: `Engagement rate is ${roundedEng}%.`,
+      kind: "engagement",
+      severity: "info",
+      weight: 80,
+    });
+  }
+
+  // QR activity
   if (qrScans > 0) {
     insights.push({
-      title: "Your QR codes are getting scans — keep using them on flyers, posters, and shows.",
+      title: `QR codes were scanned ${qrScans} time${qrScans === 1 ? "" : "s"} in this range.`,
       kind: "qr",
       severity: "info",
-      value: qrScans,
+      weight: 70,
     });
   }
 
-  // 6) city/source flavor (very light)
+  // media activity
+  if (mediaPlays > 0) {
+    insights.push({
+      title: `Fans played your media ${mediaPlays} time${mediaPlays === 1 ? "" : "s"}.`,
+      kind: "media",
+      severity: "info",
+      weight: 65,
+    });
+  }
+
+  // top source
   if (Array.isArray(sources) && sources.length) {
     const [topSource, count] = sources[0];
     if (topSource && count) {
       insights.push({
-        title: `Most traffic this period came from ${topSource}. Share your page there again.`,
+        title: `Top source for this period: ${topSource} (${count}).`,
         kind: "source",
         severity: "info",
+        weight: 50,
       });
     }
   }
 
-  return insights;
+  // sort just in case + hard cap to 3 so the box never explodes
+  return insights
+    .sort((a, b) => (b.weight || 0) - (a.weight || 0))
+    .slice(0, 3)
+    .map(({ weight, ...rest }) => rest);
 };
+
 
 module.exports = {
   async rollups(ctx) {
@@ -169,7 +189,10 @@ module.exports = {
       const days = Number(range.replace("d", "")) || 30;
 
       const now = DateTime.utc();
-      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const from = now
+        .minus({ days: days - 1 })
+        .startOf("day")
+        .toISO();
       const to = now.endOf("day").toISO();
 
       // Common filters (for pv, clicks, media)
@@ -203,8 +226,12 @@ module.exports = {
           return m;
         }, {});
 
-      const sources = Object.entries(by(pvRows, (r) => r.refSource)).sort((a, b) => b[1] - a[1]);
-      const mediums = Object.entries(by(pvRows, (r) => r.refMedium)).sort((a, b) => b[1] - a[1]);
+      const sources = Object.entries(by(pvRows, (r) => r.refSource)).sort(
+        (a, b) => b[1] - a[1]
+      );
+      const mediums = Object.entries(by(pvRows, (r) => r.refMedium)).sort(
+        (a, b) => b[1] - a[1]
+      );
       const refDomains = Object.entries(by(pvRows, (r) => r.refDomain))
         .sort((a, b) => b[1] - a[1])
         .slice(0, 10);
@@ -391,10 +418,11 @@ module.exports = {
       }
 
       // build insights (simple, safe)
-      const museInsights = buildMuseInsights({
+      const muse = buildMuseInsights({
         totals: {
-          views: totalViews,
-          clicks: totalClicks,
+          views: pvRows.length,
+          clicks: lcRows.length,
+          plays: totalPlays,
           songPlays: totalSongPlays,
           videoPlays: totalVideoPlays,
           qrScans: totalQrScans,
@@ -413,8 +441,8 @@ module.exports = {
         ok: true,
         range,
         totals: {
-          views: totalViews,
-          clicks: totalClicks,
+          views: pvRows.length,
+          clicks: lcRows.length,
           plays: totalPlays,
           songPlays: totalSongPlays,
           videoPlays: totalVideoPlays,
@@ -428,15 +456,13 @@ module.exports = {
         platforms,
         mediaTypes,
         series,
-        // 👇 NEW
         muse: {
-          insights: museInsights,
-          engagementRate: Number(engagementRate.toFixed(2)),
-          growthPct: Number(growthPct.toFixed(2)),
-          // we can pass these so frontend doesn't have to re-slice
-          topSources: sources.slice(0, 3),
+          insights: muse,
         },
-        external,
+        external: {
+          spotify: { streams: 0, listeners: 0 },
+          youtube: { views: 0, watchTime: 0 },
+        },
       };
     } catch (err) {
       strapi.log.error("[analytics.rollups] ", err);
@@ -453,7 +479,10 @@ module.exports = {
 
       const days = Number(range.replace("d", "")) || 30;
       const now = DateTime.utc();
-      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const from = now
+        .minus({ days: days - 1 })
+        .startOf("day")
+        .toISO();
       const to = now.endOf("day").toISO();
 
       const rows = await strapi.entityService.findMany(uidPV, {
@@ -477,7 +506,9 @@ module.exports = {
           };
         map[key].count++;
       }
-      const list = Object.values(map).sort((a, b) => b.count - a.count).slice(0, 50);
+      const list = Object.values(map)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 50);
 
       ctx.body = { ok: true, list };
     } catch (err) {
@@ -495,10 +526,16 @@ module.exports = {
 
       const days = Number(range.replace("d", "")) || 30;
       const now = DateTime.utc();
-      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const from = now
+        .minus({ days: days - 1 })
+        .startOf("day")
+        .toISO();
       const to = now.endOf("day").toISO();
 
-      const filters = { band: { id: bandId }, [fieldTS]: { $gte: from, $lte: to } };
+      const filters = {
+        band: { id: bandId },
+        [fieldTS]: { $gte: from, $lte: to },
+      };
 
       const views = await strapi.entityService.count(uidPV, { filters });
       const clicks = await strapi.entityService.count(uidLC, { filters });
