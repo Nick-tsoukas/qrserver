@@ -1114,6 +1114,11 @@ export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
     sourceCategory: Attribute.Enumeration<
       ['direct', 'search', 'social', 'referral', 'email', 'ads', 'unknown']
     >;
+    sourceType: Attribute.String;
+    sourceQR: Attribute.Integer;
+    sourceBand: Attribute.Integer;
+    sourceLabel: Attribute.String;
+    qrScanId: Attribute.Integer;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

@@ -91,6 +91,23 @@
     "sourceCategory": {
       "type": "enumeration",
       "enum": ["direct", "search", "social", "referral", "email", "ads", "unknown"]
+    },
+
+    "sourceType": {
+      "type": "string"
+     
+    },
+    "sourceQR": {
+      "type": "integer"
+    },
+    "sourceBand": {
+      "type": "integer"
+    },
+    "sourceLabel": {
+      "type": "string"
+    },
+    "qrScanId": {
+      "type": "integer"
     }
   }
 }
