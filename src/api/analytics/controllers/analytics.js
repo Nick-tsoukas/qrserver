@@ -9,6 +9,35 @@ const uidMP = "api::media-play.media-play";
 const fieldTS = "timestamp"; // explicit datetime in your schemas
 const safeInt = (n) => (Number.isFinite(n) ? n : 0);
 
+/**
+ * Resolve the best timestamp for a row.
+ * Priority: explicit timestamp -> updatedAt -> createdAt.
+ * Always returns ISO in UTC or null.
+ */
+const resolveDate = (row = {}) => {
+  const raw =
+    row[fieldTS] ||
+    row.updatedAt ||
+    row.createdAt ||
+    null;
+
+  if (!raw) return null;
+  // normalize to UTC
+  const dt = DateTime.fromISO(raw, { zone: "utc" });
+  return dt.isValid ? dt.toISO() : null;
+};
+
+/**
+ * Normalize mediaType → "song" | "video" | "other"
+ */
+const normalizeMediaType = (mt) => {
+  const v = String(mt || "").toLowerCase();
+  if (!v) return "other";
+  if (v === "song" || v === "audio" || v === "music") return "song";
+  if (v === "video" || v === "youtube" || v === "yt") return "video";
+  return "other";
+};
+
 module.exports = {
   async rollups(ctx) {
     try {
@@ -31,7 +60,17 @@ module.exports = {
       // ---------- PAGE VIEWS ----------
       const pvRows = await strapi.entityService.findMany(uidPV, {
         filters,
-        fields: ["id", "userAgent", "refDomain", "refSource", "refMedium", "city", fieldTS],
+        fields: [
+          "id",
+          "userAgent",
+          "refDomain",
+          "refSource",
+          "refMedium",
+          "city",
+          fieldTS,
+          "createdAt",
+          "updatedAt",
+        ],
         pagination: { limit: 100000 },
       });
 
@@ -68,11 +107,11 @@ module.exports = {
       );
 
       // ---------- LINK CLICKS ----------
-   const lcRows = await strapi.entityService.findMany(uidLC, {
-   filters,
-   fields: ["id", "platform", fieldTS], // url removed
-  pagination: { limit: 100000 },
- });
+      const lcRows = await strapi.entityService.findMany(uidLC, {
+        filters,
+        fields: ["id", "platform", fieldTS, "createdAt", "updatedAt"],
+        pagination: { limit: 100000 },
+      });
       const platforms = Object.entries(
         lcRows.reduce((m, r) => {
           const k = (r.platform || "unknown").toString().toLowerCase();
@@ -81,12 +120,19 @@ module.exports = {
         }, {})
       ).sort((a, b) => b[1] - a[1]);
 
-      // ---------- MEDIA PLAYS ----------
+      // ---------- MEDIA PLAYS (FIXED) ----------
+      // We need timestamp + mediaType + dedupe
       const mpRows = await strapi.entityService.findMany(uidMP, {
-        filters,
-        fields: ["id", "mediaType", fieldTS],
+        filters: {
+          band: { id: bandId },
+          // we still filter by the time window, but we will resolve again below
+          [fieldTS]: { $gte: from, $lte: to },
+        },
+        fields: ["id", "mediaType", fieldTS, "createdAt", "updatedAt"],
         pagination: { limit: 100000 },
       });
+
+      // Count media types (for the sidebar cards)
       const mediaTypes = Object.entries(
         mpRows.reduce((m, r) => {
           const k = (r.mediaType || "unknown").toString().toLowerCase();
@@ -96,22 +142,72 @@ module.exports = {
       ).sort((a, b) => b[1] - a[1]);
 
       // ---------- TIME SERIES (by day) ----------
+      // build buckets first
       const bucket = {};
       for (let i = 0; i < days; i++) {
         const d = now.minus({ days: days - 1 - i }).toISODate(); // YYYY-MM-DD
-        bucket[d] = { date: d, views: 0, clicks: 0, plays: 0 };
+        bucket[d] = {
+          date: d,
+          views: 0,
+          clicks: 0,
+          plays: 0,
+          songPlays: 0,
+          videoPlays: 0,
+        };
       }
 
       const incByISO = (iso, key) => {
         if (!iso) return;
-        // ISO string → YYYY-MM-DD
         const d = DateTime.fromISO(iso, { zone: "utc" }).toISODate();
         if (d && bucket[d]) bucket[d][key]++;
       };
 
-      pvRows.forEach((r) => incByISO(r[fieldTS], "views"));
-      lcRows.forEach((r) => incByISO(r[fieldTS], "clicks"));
-      mpRows.forEach((r) => incByISO(r[fieldTS], "plays"));
+      // page views → views
+      pvRows.forEach((r) => {
+        const iso = resolveDate(r);
+        incByISO(iso, "views");
+      });
+
+      // link clicks → clicks
+      lcRows.forEach((r) => {
+        const iso = resolveDate(r);
+        incByISO(iso, "clicks");
+      });
+
+      // media plays → plays + type split
+      // safeguard: dedupe by (id + day) so if a row has timestamp+updatedAt, it still only counts once per day
+      const mpSeen = new Set();
+      let totalPlays = 0;
+      let totalSongPlays = 0;
+      let totalVideoPlays = 0;
+      let totalOtherPlays = 0;
+
+      mpRows.forEach((r) => {
+        const iso = resolveDate(r);
+        if (!iso) return;
+        const day = DateTime.fromISO(iso, { zone: "utc" }).toISODate();
+        if (!day || !bucket[day]) return;
+
+        const key = `${r.id}:${day}`;
+        if (mpSeen.has(key)) return; // dedupe
+        mpSeen.add(key);
+
+        // count generic
+        bucket[day].plays++;
+        totalPlays++;
+
+        // type split
+        const type = normalizeMediaType(r.mediaType);
+        if (type === "song") {
+          bucket[day].songPlays++;
+          totalSongPlays++;
+        } else if (type === "video") {
+          bucket[day].videoPlays++;
+          totalVideoPlays++;
+        } else {
+          totalOtherPlays++;
+        }
+      });
 
       const series = Object.values(bucket);
 
@@ -121,7 +217,10 @@ module.exports = {
         totals: {
           views: pvRows.length,
           clicks: lcRows.length,
-          plays: mpRows.length,
+          plays: totalPlays,
+          songPlays: totalSongPlays,
+          videoPlays: totalVideoPlays,
+          otherPlays: totalOtherPlays,
         },
         sources,
         mediums,
@@ -195,6 +294,8 @@ module.exports = {
 
       const views = await strapi.entityService.count(uidPV, { filters });
       const clicks = await strapi.entityService.count(uidLC, { filters });
+
+      // for plays we need media, but count is fine here
       const plays = await strapi.entityService.count(uidMP, { filters });
 
       const links = [
