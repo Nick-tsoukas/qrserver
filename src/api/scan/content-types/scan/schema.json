@@ -27,8 +27,7 @@
     "band": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::band.band",
-     
+      "target": "api::band.band"
     }
   }
 }
