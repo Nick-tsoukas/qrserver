@@ -28,7 +28,7 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::band.band",
-      "inversedBy": "scans"
+     
     }
   }
 }
