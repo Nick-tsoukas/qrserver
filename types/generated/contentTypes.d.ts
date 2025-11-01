@@ -1436,6 +1436,7 @@ export interface ApiScanScan extends Schema.CollectionType {
     date: Attribute.DateTime;
     custom: Attribute.JSON;
     qr: Attribute.Relation<'api::scan.scan', 'manyToOne', 'api::qr.qr'>;
+    band: Attribute.Relation<'api::scan.scan', 'manyToOne', 'api::band.band'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::scan.scan', 'oneToOne', 'admin::user'> &
