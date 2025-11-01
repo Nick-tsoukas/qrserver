@@ -23,6 +23,12 @@
       "relation": "manyToOne",
       "target": "api::qr.qr",
       "inversedBy": "scans"
+    },
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "inversedBy": "scans"
     }
   }
 }
