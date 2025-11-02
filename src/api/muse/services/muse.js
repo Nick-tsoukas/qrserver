@@ -267,6 +267,7 @@ module.exports = () => ({
   },
 
   // ---------------- PHASE 2.5 ----------------
+  // ---------------- PHASE 2.5 ----------------
   async aggregateSummary({ bandId, range = '7d' }) {
     const days = Number(range.replace('d', '')) || 7;
     const now = DateTime.utc();
@@ -277,13 +278,36 @@ module.exports = () => ({
       filters: { band: { id: bandId }, date: { $gte: from.toISO(), $lte: to.toISO() } },
       fields: [
         'date', 'pageViews', 'linkClicks', 'songPlays', 'videoPlays',
-        'growthPct', 'topCities', 'sources', 'mediums', 'platforms', 'extras'
+        'growthPct', 'topCities', 'sources', 'mediums', 'platforms'
       ],
       sort: ['date:asc'],
       pagination: { limit: 1000 },
     });
 
-    if (!rows.length) return { ok: true, bandId, range, summary: null };
+    if (!rows.length) {
+      // 👇 still return external so frontend can safely check it
+      const external = {};
+      try {
+        const latestYoutube = await strapi.entityService.findMany(
+          'api::band-external-metric.band-external-metric',
+          {
+            filters: { band: bandId, provider: 'youtube' },
+            sort: ['date:desc', 'createdAt:desc'],
+            pagination: { limit: 1 },
+          }
+        );
+        if (latestYoutube && latestYoutube.length) {
+          const row = latestYoutube[0];
+          external.youtube = {
+            date: row.date,
+            ...(row.normalizedData || {}),
+          };
+        }
+      } catch (e) {
+        // don't break muse
+      }
+      return { ok: true, bandId, range, summary: null, external };
+    }
 
     // --- Totals ---
     const totalViews  = rows.reduce((s, r) => s + (r.pageViews || 0), 0);
@@ -291,7 +315,7 @@ module.exports = () => ({
     const totalSongs  = rows.reduce((s, r) => s + (r.songPlays || 0), 0);
     const totalVideos = rows.reduce((s, r) => s + (r.videoPlays || 0), 0);
     const avgGrowth   = Math.round(
-      rows.reduce((s, r) => s + (r.growthPct || 0), 0) / rows.length * 10
+      (rows.reduce((s, r) => s + (r.growthPct || 0), 0) / rows.length) * 10
     ) / 10;
 
     // --- Engagement rate ---
@@ -329,11 +353,6 @@ module.exports = () => ({
     const topSources   = Object.entries(srcAgg).sort((a,b)=>b[1]-a[1]).slice(0,3);
     const topPlatforms = Object.entries(platAgg).sort((a,b)=>b[1]-a[1]).slice(0,3);
 
-    // --- NEW: surface latest external in the aggregate ---
-    // simplest thing: just take the last day's extras (most recent)
-    const latestWithExtras = [...rows].reverse().find(r => r.extras && r.extras.external);
-    const external = latestWithExtras?.extras?.external || { youtube: [], spotify: [], raw: [] };
-
     const summary = {
       pageViews: totalViews,
       linkClicks: totalClicks,
@@ -346,11 +365,36 @@ module.exports = () => ({
       topSources,
       topPlatforms,
       days,
-
-      // 👇 NEW
-      external,
     };
 
-    return { ok: true, bandId, range, summary };
+    // 👇 NEW: append externals here, but don't ever throw
+    const external = {};
+    try {
+      // youtube first
+      const latestYoutube = await strapi.entityService.findMany(
+        'api::band-external-metric.band-external-metric',
+        {
+          filters: { band: bandId, provider: 'youtube' },
+          sort: ['date:desc', 'createdAt:desc'],
+          pagination: { limit: 1 },
+        }
+      );
+      if (latestYoutube && latestYoutube.length) {
+        const row = latestYoutube[0];
+        external.youtube = {
+          date: row.date,
+          ...(row.normalizedData || {}),
+        };
+      }
+
+      // later: spotify
+      // const latestSpotify = ...
+      // external.spotify = ...
+    } catch (e) {
+      // swallow
+    }
+
+    return { ok: true, bandId, range, summary, external };
   },
+
 });
