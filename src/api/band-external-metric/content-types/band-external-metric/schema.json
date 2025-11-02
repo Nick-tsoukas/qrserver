@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "band_external_metrics",
+  "info": {
+    "singularName": "band-external-metric",
+    "pluralName": "band-external-metrics",
+    "displayName": "Band External Metric",
+    "description": "Daily external analytics snapshot per band per provider (AI-ready)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "inversedBy": "externalMetrics"
+    },
+    "provider": {
+      "type": "string",
+      "required": true
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "normalized": {
+      "type": "json",
+      "required": false
+    },
+    "raw": {
+      "type": "json",
+      "required": false
+    },
+    "syncedAt": {
+      "type": "datetime"
+    }
+  }
+}

@@ -974,6 +974,16 @@ export interface ApiBandBand extends Schema.CollectionType {
     reverbnation: Attribute.String;
     isBandNameInLogo: Attribute.Boolean & Attribute.DefaultTo<false>;
     slug: Attribute.String & Attribute.Unique;
+    externalAccounts: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::band-external-account.band-external-account'
+    >;
+    externalMetrics: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::band-external-metric.band-external-metric'
+    >;
     band_page_views: Attribute.Relation<
       'api::band.band',
       'oneToMany',
@@ -984,6 +994,93 @@ export interface ApiBandBand extends Schema.CollectionType {
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     updatedBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiBandExternalAccountBandExternalAccount
+  extends Schema.CollectionType {
+  collectionName: 'band_external_accounts';
+  info: {
+    singularName: 'band-external-account';
+    pluralName: 'band-external-accounts';
+    displayName: 'Band External Account';
+    description: 'OAuth / API connection to external platforms (YouTube, Spotify, etc.)';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::band-external-account.band-external-account',
+      'manyToOne',
+      'api::band.band'
+    >;
+    provider: Attribute.Enumeration<
+      ['youtube', 'spotify', 'apple', 'tiktok', 'instagram', 'soundcloud']
+    > &
+      Attribute.Required;
+    externalId: Attribute.String;
+    displayName: Attribute.String;
+    accessToken: Attribute.Password & Attribute.Private;
+    refreshToken: Attribute.Password & Attribute.Private;
+    expiresAt: Attribute.DateTime;
+    lastSyncAt: Attribute.DateTime;
+    status: Attribute.String & Attribute.DefaultTo<'connected'>;
+    meta: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::band-external-account.band-external-account',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::band-external-account.band-external-account',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiBandExternalMetricBandExternalMetric
+  extends Schema.CollectionType {
+  collectionName: 'band_external_metrics';
+  info: {
+    singularName: 'band-external-metric';
+    pluralName: 'band-external-metrics';
+    displayName: 'Band External Metric';
+    description: 'Daily external analytics snapshot per band per provider (AI-ready)';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::band-external-metric.band-external-metric',
+      'manyToOne',
+      'api::band.band'
+    >;
+    provider: Attribute.String & Attribute.Required;
+    date: Attribute.Date & Attribute.Required;
+    normalized: Attribute.JSON;
+    raw: Attribute.JSON;
+    syncedAt: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::band-external-metric.band-external-metric',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::band-external-metric.band-external-metric',
+      'oneToOne',
+      'admin::user'
+    > &
       Attribute.Private;
   };
 }
@@ -1689,6 +1786,8 @@ declare module '@strapi/types' {
       'plugin::i18n.locale': PluginI18NLocale;
       'api::album.album': ApiAlbumAlbum;
       'api::band.band': ApiBandBand;
+      'api::band-external-account.band-external-account': ApiBandExternalAccountBandExternalAccount;
+      'api::band-external-metric.band-external-metric': ApiBandExternalMetricBandExternalMetric;
       'api::band-insight-daily.band-insight-daily': ApiBandInsightDailyBandInsightDaily;
       'api::band-page-view.band-page-view': ApiBandPageViewBandPageView;
       'api::event.event': ApiEventEvent;

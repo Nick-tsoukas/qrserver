@@ -29,9 +29,7 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "images"
-      ]
+      "allowedTypes": ["images"]
     },
     "members": {
       "type": "component",
@@ -150,6 +148,18 @@
     "slug": {
       "type": "string",
       "unique": true
+    },
+    "externalAccounts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::band-external-account.band-external-account",
+      "mappedBy": "band"
+    },
+    "externalMetrics": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::band-external-metric.band-external-metric",
+      "mappedBy": "band"
     },
     "band_page_views": {
       "type": "relation",
