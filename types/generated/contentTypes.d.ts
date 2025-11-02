@@ -1065,7 +1065,7 @@ export interface ApiBandExternalMetricBandExternalMetric
     >;
     provider: Attribute.String & Attribute.Required;
     date: Attribute.Date & Attribute.Required;
-    normalized: Attribute.JSON;
+    normalizedData: Attribute.JSON;
     raw: Attribute.JSON;
     syncedAt: Attribute.DateTime;
     createdAt: Attribute.DateTime;

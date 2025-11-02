@@ -25,7 +25,7 @@
       "type": "date",
       "required": true
     },
-    "normalized": {
+    "normalizedData": {
       "type": "json",
       "required": false
     },

@@ -7,6 +7,9 @@ const UID_LC = 'api::link-click.link-click';
 const UID_MP = 'api::media-play.media-play';
 const UID_DI = 'api::band-insight-daily.band-insight-daily';
 
+// 👇 new: where our YouTube/Spotify/etc. daily imports will land
+const UID_BEM = 'api::band-external-metric.band-external-metric';
+
 const FIELD_TS = 'timestamp';
 
 const deviceOf = (ua = '') => {
@@ -29,6 +32,76 @@ const aggSorted = (rows, pick, topN = 10) => {
   return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, topN);
 };
 
+/**
+ * Try to load external metrics (YouTube/Spotify/etc.) for *this* band and *this* day.
+ * We keep it flexible because we might change the schema later.
+ *
+ * Expected shape (not enforced):
+ * - provider: "youtube" | "spotify" | ...
+ * - metricDate: ISO day or datetime
+ * - payload: json with the actual numbers
+ *
+ * We’ll return:
+ * {
+ *   youtube: [ {...}, {...} ],
+ *   spotify: [ {...} ],
+ *   raw: [ ...original rows... ]
+ * }
+ */
+async function loadExternalForDay({ bandId, dayStartISO, dayEndISO }) {
+  try {
+    // if collection doesn’t exist or is empty, this just returns []
+    const rows = await strapi.entityService.findMany(UID_BEM, {
+      filters: {
+        band: { id: bandId },
+        // some people will store metricDate
+        $or: [
+          { metricDate: { $gte: dayStartISO, $lte: dayEndISO } },
+          // others might just rely on createdAt
+          { createdAt: { $gte: dayStartISO, $lte: dayEndISO } },
+        ],
+      },
+      fields: ['id', 'provider', 'kind', 'metricDate', 'createdAt', 'updatedAt', 'payload'],
+      pagination: { limit: 1000 },
+    });
+
+    if (!rows || !rows.length) {
+      return {
+        youtube: [],
+        spotify: [],
+        raw: [],
+      };
+    }
+
+    const bucket = {
+      youtube: [],
+      spotify: [],
+      raw: rows,
+    };
+
+    for (const r of rows) {
+      const prov = String(r.provider || '').toLowerCase();
+      if (prov === 'youtube') {
+        bucket.youtube.push(r);
+      } else if (prov === 'spotify') {
+        bucket.spotify.push(r);
+      } else {
+        // ignore or later: bucket[prov] = ...
+      }
+    }
+
+    return bucket;
+  } catch (err) {
+    // don’t break Muse if the external table is missing
+    strapi.log.warn('[muse] external metrics load failed:', err.message);
+    return {
+      youtube: [],
+      spotify: [],
+      raw: [],
+    };
+  }
+}
+
 module.exports = () => ({
 
   // ---------------- PHASE 1 ----------------
@@ -37,6 +110,7 @@ module.exports = () => ({
 
     const d = day
       ? DateTime.fromISO(`${day}T00:00:00`, { zone: 'utc' })
+      // ⬇️ stays the same: default = yesterday
       : DateTime.utc().minus({ days: 1 }).startOf('day');
     if (!d.isValid) throw new Error('Invalid day');
 
@@ -110,6 +184,14 @@ module.exports = () => ({
       else songPlays++;
     }
 
+    // ---------- EXTERNAL (YouTube / Spotify / …) ----------
+    // this is the ONLY new part in computeDay
+    const external = await loadExternalForDay({
+      bandId,
+      dayStartISO: start,
+      dayEndISO: end,
+    });
+
     // ---------- GROWTH ----------
     const prev = d.minus({ days: 1 });
     const prevViews = await strapi.entityService.count(UID_PV, {
@@ -144,6 +226,12 @@ module.exports = () => ({
       platforms,
       growthPct,
       lastUpdated: nowISO,
+
+      // 👇 NEW — totally safe, won’t break existing rows
+      // we store exactly what we found
+      extras: {
+        external, // { youtube: [...], spotify: [...], raw: [...] }
+      },
     };
 
     const existing = await strapi.entityService.findMany(UID_DI, {
@@ -189,7 +277,7 @@ module.exports = () => ({
       filters: { band: { id: bandId }, date: { $gte: from.toISO(), $lte: to.toISO() } },
       fields: [
         'date', 'pageViews', 'linkClicks', 'songPlays', 'videoPlays',
-        'growthPct', 'topCities', 'sources', 'mediums', 'platforms'
+        'growthPct', 'topCities', 'sources', 'mediums', 'platforms', 'extras'
       ],
       sort: ['date:asc'],
       pagination: { limit: 1000 },
@@ -241,6 +329,11 @@ module.exports = () => ({
     const topSources   = Object.entries(srcAgg).sort((a,b)=>b[1]-a[1]).slice(0,3);
     const topPlatforms = Object.entries(platAgg).sort((a,b)=>b[1]-a[1]).slice(0,3);
 
+    // --- NEW: surface latest external in the aggregate ---
+    // simplest thing: just take the last day's extras (most recent)
+    const latestWithExtras = [...rows].reverse().find(r => r.extras && r.extras.external);
+    const external = latestWithExtras?.extras?.external || { youtube: [], spotify: [], raw: [] };
+
     const summary = {
       pageViews: totalViews,
       linkClicks: totalClicks,
@@ -253,6 +346,9 @@ module.exports = () => ({
       topSources,
       topPlatforms,
       days,
+
+      // 👇 NEW
+      external,
     };
 
     return { ok: true, bandId, range, summary };
