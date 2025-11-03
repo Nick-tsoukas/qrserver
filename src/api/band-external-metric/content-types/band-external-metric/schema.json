@@ -21,6 +21,12 @@
       "type": "string",
       "required": true
     },
+    "metricDate": {
+      "type": "datetime"
+    },
+    "kind": {
+      "type": "string"
+    },
     "date": {
       "type": "date",
       "required": true

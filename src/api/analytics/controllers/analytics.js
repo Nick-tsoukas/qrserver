@@ -274,7 +274,7 @@ module.exports = {
             external[prov] = {
               connected: true,
               lastFetchedAt: row.syncedAt || row.updatedAt || row.createdAt,
-              metrics: row.normalized || {},
+              metrics: row.normalizedData || {},
               history: [],
             };
           }

@@ -4,26 +4,36 @@ const { DateTime } = require('luxon');
 const qs = require('querystring');
 
 const YT_API_BASE = 'https://www.googleapis.com/youtube/v3';
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 module.exports = () => ({
   /**
    * Find existing external account for band/provider
    */
   async findExternalAccount(bandId, provider) {
-    const rows = await strapi.entityService.findMany('api::band-external-account.band-external-account', {
-      filters: {
-        band: bandId,
-        provider,
-      },
-      limit: 1,
-    });
+    const rows = await strapi.entityService.findMany(
+      'api::band-external-account.band-external-account',
+      {
+        filters: { band: bandId, provider },
+        limit: 1,
+      }
+    );
     return rows && rows.length ? rows[0] : null;
   },
 
   /**
    * Create or update external account
    */
-  async upsertExternalAccount({ bandId, provider, accessToken, refreshToken, channelId, channelTitle, raw }) {
+  async upsertExternalAccount({
+    bandId,
+    provider,
+    accessToken,
+    refreshToken,
+    channelId,
+    channelTitle,
+    raw,
+    expiresAt,
+  }) {
     const existing = await this.findExternalAccount(bandId, provider);
 
     const data = {
@@ -35,6 +45,7 @@ module.exports = () => ({
       channelTitle: channelTitle || null,
       raw: raw || null,
       syncedAt: new Date().toISOString(),
+      expiresAt: expiresAt || null,
     };
 
     if (existing) {
@@ -45,13 +56,56 @@ module.exports = () => ({
       );
     }
 
-    return await strapi.entityService.create('api::band-external-account.band-external-account', {
-      data,
-    });
+    return await strapi.entityService.create(
+      'api::band-external-account.band-external-account',
+      { data }
+    );
   },
 
   /**
-   * Call YouTube to get channels for this accessToken
+   * refresh access token with refresh_token
+   */
+  async refreshAccessToken(refreshToken) {
+    if (!refreshToken) {
+      strapi.log.error('[youtube.refreshAccessToken] missing refreshToken');
+      return null;
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      strapi.log.error('[youtube.refreshAccessToken] google env missing');
+      return null;
+    }
+
+    try {
+      const res = await fetch(GOOGLE_TOKEN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: qs.stringify({
+          client_id: clientId,
+          client_secret: clientSecret,
+          refresh_token: refreshToken,
+          grant_type: 'refresh_token',
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        strapi.log.error('[youtube.refreshAccessToken] error', json);
+        return null;
+      }
+
+      return json; // { access_token, expires_in, ... }
+    } catch (err) {
+      strapi.log.error('[youtube.refreshAccessToken] error', err);
+      return null;
+    }
+  },
+
+  /**
+   * channels?mine=true
    */
   async fetchChannels(accessToken) {
     const url = `${YT_API_BASE}/channels?${qs.stringify({
@@ -69,7 +123,11 @@ module.exports = () => ({
     const json = await res.json();
 
     if (!res.ok) {
-      strapi.log.error('[youtube.fetchChannels] error', json);
+      strapi.log.error(
+        '[youtube.fetchChannels] error',
+        res.status,
+        json?.error || json
+      );
       return [];
     }
 
@@ -77,99 +135,313 @@ module.exports = () => ({
   },
 
   /**
-   * Internal: fetch latest upload (playlistItems) for the uploads playlist
+   * channels?id=XXXX
    */
-  async fetchLatestUpload(accessToken, uploadsPlaylistId) {
-    if (!uploadsPlaylistId) return null;
+  async fetchChannelById(accessToken, channelId) {
+    const url = `${YT_API_BASE}/channels?${qs.stringify({
+      part: 'snippet,statistics,contentDetails',
+      id: channelId,
+      maxResults: 1,
+    })}`;
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const json = await res.json();
+    if (!res.ok || !json.items || !json.items.length) {
+      strapi.log.error('[youtube.fetchChannelById] error', json);
+      return null;
+    }
+    return json.items[0];
+  },
+
+  /**
+   * playlistItems for uploads playlist
+   * grabs first 20
+   */
+  async fetchUploadsVideos(accessToken, uploadsPlaylistId, max = 20) {
+    if (!uploadsPlaylistId) return [];
 
     const url = `${YT_API_BASE}/playlistItems?${qs.stringify({
       part: 'snippet,contentDetails',
       playlistId: uploadsPlaylistId,
-      maxResults: 1,
+      maxResults: max,
     })}`;
 
     const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     const json = await res.json();
-
     if (!res.ok) {
-      strapi.log.error('[youtube.fetchLatestUpload] error', json);
-      return null;
+      strapi.log.error('[youtube.fetchUploadsVideos] error', json);
+      return [];
     }
 
-    const item = (json.items && json.items[0]) || null;
-    return item;
+    return json.items || [];
   },
 
   /**
-   * Internal: fetch video stats for 1 video
+   * videos?part=...&id=...
+   * get stats for multiple videos (up to 50 ids)
    */
-  async fetchVideoStats(accessToken, videoId) {
-    if (!videoId) return null;
+  async fetchVideosStats(accessToken, videoIds = []) {
+    if (!videoIds.length) return [];
 
     const url = `${YT_API_BASE}/videos?${qs.stringify({
-      part: 'statistics,snippet',
-      id: videoId,
-      maxResults: 1,
+      part: 'snippet,statistics,contentDetails',
+      id: videoIds.join(','),
+      maxResults: videoIds.length,
     })}`;
 
     const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     const json = await res.json();
-
     if (!res.ok) {
-      strapi.log.error('[youtube.fetchVideoStats] error', json);
-      return null;
+      strapi.log.error('[youtube.fetchVideosStats] error', json);
+      return [];
     }
 
-    const item = (json.items && json.items[0]) || null;
-    return item;
+    return json.items || [];
   },
 
   /**
-   * Main sync:
-   * - fetch channel (we already have channelId, but we also need uploads playlist)
-   * - fetch latest upload
-   * - fetch video stats
-   * - normalize
-   * - upsert into band-external-metric
+   * playlists for channel
+   */
+  async fetchPlaylists(accessToken, channelId, max = 25) {
+    const url = `${YT_API_BASE}/playlists?${qs.stringify({
+      part: 'snippet,contentDetails',
+      channelId,
+      maxResults: max,
+    })}`;
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const json = await res.json();
+    if (!res.ok) {
+      strapi.log.error('[youtube.fetchPlaylists] error', json);
+      return [];
+    }
+
+    return json.items || [];
+  },
+
+  /**
+   * HEAVY SYNC — use this right after OAuth (we know token is good)
+   * creates 2–3 rows in band-external-metric
+   */
+  async heavySyncForBand({ bandId, accessToken, refreshToken, channelId }) {
+    if (!bandId || !accessToken) return null;
+
+    // 1) get channel (by id if we have it, otherwise mine=true)
+    let channel = null;
+    if (channelId) {
+      channel = await this.fetchChannelById(accessToken, channelId);
+    }
+    if (!channel) {
+      const channels = await this.fetchChannels(accessToken);
+      if (!channels.length) {
+        strapi.log.error('[youtube.heavySyncForBand] no channels for token');
+        return null;
+      }
+      channel = channels[0];
+      channelId = channel.id;
+    }
+
+    // 2) uploads (first 20)
+    const uploadsPlaylistId =
+      channel?.contentDetails?.relatedPlaylists?.uploads || null;
+
+    const uploadsItems = uploadsPlaylistId
+      ? await this.fetchUploadsVideos(accessToken, uploadsPlaylistId, 20)
+      : [];
+
+    const videoIds = uploadsItems
+      .map((it) => it?.contentDetails?.videoId)
+      .filter(Boolean);
+
+    const videoStats = videoIds.length
+      ? await this.fetchVideosStats(accessToken, videoIds)
+      : [];
+
+    // 3) playlists
+    const playlists = await this.fetchPlaylists(accessToken, channelId, 25);
+
+    // 4) now store 2–3 rows
+
+    const today = DateTime.utc().toISODate();
+    const nowISO = new Date().toISOString();
+
+    // 4a) channel row
+    await strapi.entityService.create(
+      'api::band-external-metric.band-external-metric',
+      {
+        data: {
+          band: bandId,
+          provider: 'youtube',
+          kind: 'channel',
+          date: today,
+          metricDate: channel?.snippet?.publishedAt || null,
+          normalizedData: {
+            title: channel?.snippet?.title || null,
+            views: Number(channel?.statistics?.viewCount || 0),
+            subs: Number(channel?.statistics?.subscriberCount || 0),
+            videos: Number(channel?.statistics?.videoCount || 0),
+          },
+          raw: channel,
+          syncedAt: nowISO,
+        },
+      }
+    );
+
+    // 4b) videos row
+    await strapi.entityService.create(
+      'api::band-external-metric.band-external-metric',
+      {
+        data: {
+          band: bandId,
+          provider: 'youtube',
+          kind: 'videos',
+          date: today,
+          normalizedData: {
+            count: videoStats.length || uploadsItems.length || 0,
+            latestVideoId: uploadsItems[0]?.contentDetails?.videoId || null,
+            latestPublishedAt: uploadsItems[0]?.snippet?.publishedAt || null,
+          },
+          raw: {
+            uploadsPlaylistId,
+            uploadsItems,
+            videoStats,
+          },
+          syncedAt: nowISO,
+        },
+      }
+    );
+
+    // 4c) playlists row (only if we have some)
+    if (playlists && playlists.length) {
+      await strapi.entityService.create(
+        'api::band-external-metric.band-external-metric',
+        {
+          data: {
+            band: bandId,
+            provider: 'youtube',
+            kind: 'playlists',
+            date: today,
+            normalizedData: {
+              count: playlists.length,
+            },
+            raw: playlists,
+            syncedAt: nowISO,
+          },
+        }
+      );
+    }
+
+    return {
+      views: Number(channel?.statistics?.viewCount || 0),
+      subs: Number(channel?.statistics?.subscriberCount || 0),
+      watchTime: 0,
+      topVideo: uploadsItems[0]
+        ? {
+            title: uploadsItems[0]?.snippet?.title || null,
+            videoId: uploadsItems[0]?.contentDetails?.videoId || null,
+            publishedAt: uploadsItems[0]?.snippet?.publishedAt || null,
+            // we might have stats for it
+            views: videoStats[0]?.statistics?.viewCount
+              ? Number(videoStats[0].statistics.viewCount)
+              : null,
+          }
+        : null,
+    };
+  },
+
+  /**
+   * LIGHT sync — used by /api/youtube/sync
+   * (just tries to refresh + get channel again)
    */
   async syncYoutubeForBand({ bandId, accessToken, refreshToken, channelId }) {
     try {
-      if (!bandId || !accessToken) return null;
-
-      // 1) get channel by id or by mine=true
-      // since we have channelId, we can fetch channel directly:
-      const channelUrl = `${YT_API_BASE}/channels?${qs.stringify({
-        part: 'snippet,statistics,contentDetails',
-        id: channelId,
-        maxResults: 1,
-      })}`;
-
-      const chRes = await fetch(channelUrl, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      const chJson = await chRes.json();
-
-      if (!chRes.ok || !chJson.items || !chJson.items.length) {
-        // if direct fetch fails, try mine=true as a fallback
-        const channels = await this.fetchChannels(accessToken);
-        if (!channels.length) return null;
-        // pick the one that matches channelId, or first
-        const ch = channels.find((c) => c.id === channelId) || channels[0];
-        return await this._normalizeAndUpsert(bandId, accessToken, ch);
+      if (!bandId) return null;
+      if (!accessToken && !refreshToken) {
+        strapi.log.error('[youtube.syncYoutubeForBand] no tokens');
+        return null;
       }
 
-      const channel = chJson.items[0];
-      return await this._normalizeAndUpsert(bandId, accessToken, channel);
+      // if no access token → try refresh
+      let tokenToUse = accessToken;
+      if (!tokenToUse && refreshToken) {
+        const refreshed = await this.refreshAccessToken(refreshToken);
+        if (!refreshed || !refreshed.access_token) {
+          strapi.log.error('[youtube.syncYoutubeForBand] refresh failed');
+          return null;
+        }
+        tokenToUse = refreshed.access_token;
+
+        await this.upsertExternalAccount({
+          bandId,
+          provider: 'youtube',
+          accessToken: tokenToUse,
+          refreshToken,
+          channelId,
+          channelTitle: null,
+          raw: null,
+          expiresAt: refreshed.expires_in
+            ? new Date(Date.now() + refreshed.expires_in * 1000).toISOString()
+            : null,
+        });
+      }
+
+      // try channel by id
+      let channel = null;
+      if (channelId) {
+        channel = await this.fetchChannelById(tokenToUse, channelId);
+      }
+
+      // fallback → mine=true
+      if (!channel) {
+        const channels = await this.fetchChannels(tokenToUse);
+        if (!channels.length) {
+          strapi.log.error('[youtube.syncYoutubeForBand] no channels for token');
+          return null;
+        }
+        channel = channels[0];
+      }
+
+      // store a simple snapshot (not the heavy version)
+      const today = DateTime.utc().toISODate();
+      await strapi.entityService.create(
+        'api::band-external-metric.band-external-metric',
+        {
+          data: {
+            band: bandId,
+            provider: 'youtube',
+            kind: 'channel',
+            date: today,
+            metricDate: channel?.snippet?.publishedAt || null,
+            normalizedData: {
+              title: channel?.snippet?.title || null,
+              views: Number(channel?.statistics?.viewCount || 0),
+              subs: Number(channel?.statistics?.subscriberCount || 0),
+              videos: Number(channel?.statistics?.videoCount || 0),
+            },
+            raw: channel,
+            syncedAt: new Date().toISOString(),
+          },
+        }
+      );
+
+      return {
+        views: Number(channel?.statistics?.viewCount || 0),
+        subs: Number(channel?.statistics?.subscriberCount || 0),
+        watchTime: 0,
+        topVideo: null, // light sync won’t fetch latest uploads
+      };
     } catch (err) {
       strapi.log.error('[youtube.syncYoutubeForBand] error', err);
       return null;
@@ -177,64 +449,25 @@ module.exports = () => ({
   },
 
   /**
-   * helper: normalize channel + maybe latest upload + video stats
+   * remove account (used in purge/disconnect)
    */
-  async _normalizeAndUpsert(bandId, accessToken, channelObj) {
-    // channel-level stats
-    const uploadsPlaylistId =
-      channelObj?.contentDetails?.relatedPlaylists?.uploads || null;
+  async removeExternalAccount(bandId, provider) {
+    const rows = await strapi.entityService.findMany(
+      'api::band-external-account.band-external-account',
+      {
+        filters: { band: bandId, provider },
+        limit: 200,
+      }
+    );
 
-    // call #2: latest upload
-    let latest = null;
-    if (uploadsPlaylistId) {
-      latest = await this.fetchLatestUpload(accessToken, uploadsPlaylistId);
-    }
-
-    // call #3: video stats
-    let videoStats = null;
-    let topVideo = null;
-
-    if (latest?.contentDetails?.videoId) {
-      videoStats = await this.fetchVideoStats(
-        accessToken,
-        latest.contentDetails.videoId
+    let deleted = 0;
+    for (const r of rows) {
+      await strapi.entityService.delete(
+        'api::band-external-account.band-external-account',
+        r.id
       );
-
-      const viewCount = videoStats?.statistics?.viewCount
-        ? Number(videoStats.statistics.viewCount)
-        : null;
-
-      topVideo = {
-        title: latest?.snippet?.title || videoStats?.snippet?.title || null,
-        views: viewCount,
-        videoId: latest.contentDetails.videoId,
-        publishedAt: latest?.snippet?.publishedAt || null,
-      };
+      deleted++;
     }
-
-    const normalized = {
-      views: channelObj?.statistics?.viewCount
-        ? Number(channelObj.statistics.viewCount)
-        : 0,
-      subs: channelObj?.statistics?.subscriberCount
-        ? Number(channelObj.statistics.subscriberCount)
-        : 0,
-      watchTime: 0, // placeholder for later YouTube Analytics
-      topVideo: topVideo || null,
-    };
-
-    // upsert into band-external-metric using your existing structure
-    await strapi.entityService.create('api::band-external-metric.band-external-metric', {
-      data: {
-        band: bandId,
-        provider: 'youtube',
-        date: DateTime.utc().toISODate(),
-        normalizedData: normalized,
-        raw: channelObj, // optional
-        syncedAt: new Date().toISOString(),
-      },
-    });
-
-    return normalized;
+    return { deleted };
   },
 });

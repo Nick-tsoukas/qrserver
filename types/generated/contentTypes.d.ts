@@ -1028,6 +1028,10 @@ export interface ApiBandExternalAccountBandExternalAccount
     lastSyncAt: Attribute.DateTime;
     status: Attribute.String & Attribute.DefaultTo<'connected'>;
     meta: Attribute.JSON;
+    channelId: Attribute.String;
+    channelTitle: Attribute.String;
+    raw: Attribute.JSON;
+    syncedAt: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1064,6 +1068,8 @@ export interface ApiBandExternalMetricBandExternalMetric
       'api::band.band'
     >;
     provider: Attribute.String & Attribute.Required;
+    metricDate: Attribute.DateTime;
+    kind: Attribute.String;
     date: Attribute.Date & Attribute.Required;
     normalizedData: Attribute.JSON;
     raw: Attribute.JSON;
