@@ -4,8 +4,18 @@ const qs = require("querystring");
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const YT_SCOPE = "https://www.googleapis.com/auth/youtube.readonly";
+  const isTokenExpired = (expiresAt) => {
+  if (!expiresAt) return false; // if missing, let service try with what it has
+  const expMs = new Date(expiresAt).getTime();
+  const nowMs = Date.now();
+  const margin = 2 * 60 * 1000; // 2 minutes safety margin
+  return expMs <= nowMs - margin;
+};
 
 module.exports = {
+
+
+
   // GET /api/youtube/oauth/init?bandId=5
   async oauthInit(ctx) {
     try {
@@ -238,56 +248,111 @@ module.exports = {
   },
 
   // GET or POST /api/youtube/sync?bandId=5
-  async sync(ctx) {
-    const bandId = Number(ctx.request.body?.bandId) || Number(ctx.query.bandId);
+// POST /api/youtube/sync
+// POST or GET /api/youtube/sync?bandId=5
+ // POST or GET /api/youtube/sync
+// POST /api/youtube/sync
+// POST /api/youtube/sync
+async sync(ctx) {
+  const bandId = Number(ctx.request.body?.bandId) || Number(ctx.query.bandId);
+  if (!bandId) return ctx.badRequest("bandId required");
 
-    if (!bandId) return ctx.badRequest("bandId required");
+  try {
+    const youtubeService = strapi.service("api::youtube.youtube");
+    const account = await youtubeService.findExternalAccount(bandId, "youtube");
 
-    try {
-      const youtubeService = strapi.service("api::youtube.youtube");
-      const account = await youtubeService.findExternalAccount(
-        bandId,
-        "youtube"
-      );
-
-      if (!account || !account.accessToken) {
-        ctx.body = {
-          ok: false,
-          reason: "not-connected",
-        };
-        return;
-      }
-
-      const normalized = await youtubeService.syncYoutubeForBand({
-        bandId,
-        accessToken: account.accessToken,
-        refreshToken: account.refreshToken,
-        channelId: account.channelId,
-      });
-
-      if (!normalized) {
-        ctx.body = {
-          ok: false,
-          provider: "youtube",
-          bandId,
-          reason: "sync-failed",
-          action: "reconnect",
-        };
-        return;
-      }
-
+    if (!account) {
       ctx.body = {
-        ok: true,
+        ok: false,
         provider: "youtube",
         bandId,
-        metrics: normalized,
+        reason: "not-connected",
       };
-    } catch (err) {
-      strapi.log.error("[youtube.sync] error", err);
-      ctx.status = 500;
-      ctx.body = { ok: false, error: err.message };
+      return;
     }
-  },
+
+    if (!account.refreshToken) {
+      ctx.body = {
+        ok: false,
+        provider: "youtube",
+        bandId,
+        reason: "no-refresh-token",
+      };
+      return;
+    }
+
+    // 1) Always refresh access token for a resync
+    const refreshed = await youtubeService.refreshAccessToken(
+      account.refreshToken
+    );
+
+    if (!refreshed || !refreshed.access_token) {
+      ctx.body = {
+        ok: false,
+        provider: "youtube",
+        bandId,
+        reason: "refresh-failed",
+        details: refreshed || null,
+      };
+      return;
+    }
+
+    const accessToken = refreshed.access_token;
+    const expiresAt = refreshed.expires_in
+      ? new Date(Date.now() + refreshed.expires_in * 1000).toISOString()
+      : null;
+
+    // 2) Update stored account with fresh token
+    await youtubeService.upsertExternalAccount({
+      bandId,
+      provider: "youtube",
+      accessToken,
+      refreshToken: account.refreshToken,
+      channelId: account.channelId,
+      channelTitle: account.channelTitle,
+      raw: account.raw || null,
+      expiresAt,
+    });
+
+    // 3) Re-run heavy sync (channel + uploads + playlists)
+    const normalized = await youtubeService.heavySyncForBand({
+      bandId,
+      accessToken,
+      refreshToken: account.refreshToken,
+      channelId: account.channelId,
+    });
+
+    if (!normalized) {
+      ctx.body = {
+        ok: false,
+        provider: "youtube",
+        bandId,
+        reason: "sync-failed",
+      };
+      return;
+    }
+
+    // 4) Done
+    ctx.body = {
+      ok: true,
+      provider: "youtube",
+      bandId,
+      metrics: normalized,
+    };
+  } catch (err) {
+    strapi.log?.error?.("[youtube.sync] error", err);
+    ctx.status = 500;
+    ctx.body = { ok: false, error: err.message };
+  }
+},
+
+
+
+// POST or GET /api/youtube/sync
+
+
+
+
 
   // GET /api/youtube/debug?bandId=5
   async debug(ctx) {
@@ -315,34 +380,45 @@ module.exports = {
   },
 
   // GET /api/youtube/debug/sync?bandId=5
-  async debugSync(ctx) {
-    const bandId = Number(ctx.query.bandId);
-    if (!bandId) return ctx.badRequest("bandId required");
+// GET /api/youtube/debug/sync?bandId=5
+async debugSync(ctx) {
+  const bandId = Number(ctx.query.bandId);
+  if (!bandId) return ctx.badRequest("bandId required");
 
-    const youtubeService = strapi.service("api::youtube.youtube");
-    const account = await youtubeService.findExternalAccount(bandId, "youtube");
+  const youtubeService = strapi.service("api::youtube.youtube");
+  const account = await youtubeService.findExternalAccount(bandId, "youtube");
 
-    if (!account) {
-      ctx.body = {
-        ok: false,
-        reason: "no-account",
-      };
-      return;
-    }
-
-    const out = await youtubeService.syncYoutubeForBand({
-      bandId,
-      accessToken: account.accessToken,
-      refreshToken: account.refreshToken,
-      channelId: account.channelId,
-    });
-
+  if (!account) {
     ctx.body = {
-      ok: !!out,
-      bandId,
-      data: out,
+      ok: false,
+      reason: "no-account",
     };
-  },
+    return;
+  }
+
+  let accessTokenToUse = account.accessToken;
+  if (isTokenExpired(account.expiresAt)) {
+    strapi.log.info(
+      "[youtube.debugSync] access token expired for band %s, using refreshToken",
+      bandId
+    );
+    accessTokenToUse = null;
+  }
+
+  const out = await youtubeService.syncYoutubeForBand({
+    bandId,
+    accessToken: accessTokenToUse,
+    refreshToken: account.refreshToken,
+    channelId: account.channelId,
+  });
+
+  ctx.body = {
+    ok: !!out,
+    bandId,
+    data: out,
+  };
+},
+
 
   // GET /api/youtube/debug/metrics?bandId=5
   async debugMetrics(ctx) {
