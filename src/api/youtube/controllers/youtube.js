@@ -4,13 +4,15 @@ const qs = require("querystring");
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const YT_SCOPE = "https://www.googleapis.com/auth/youtube.readonly";
-  const isTokenExpired = (expiresAt) => {
-  if (!expiresAt) return false; // if missing, let service try with what it has
+
+const isTokenExpired = (expiresAt) => {
+  if (!expiresAt) return true; // be safe: force refresh if we don’t know
   const expMs = new Date(expiresAt).getTime();
   const nowMs = Date.now();
-  const margin = 2 * 60 * 1000; // 2 minutes safety margin
-  return expMs <= nowMs - margin;
+  const margin = 2 * 60 * 1000; // 2 min early refresh
+  return expMs <= (nowMs + margin);
 };
+
 
 module.exports = {
 
@@ -247,12 +249,20 @@ module.exports = {
     }
   },
 
-  // GET or POST /api/youtube/sync?bandId=5
-// POST /api/youtube/sync
-// POST or GET /api/youtube/sync?bandId=5
- // POST or GET /api/youtube/sync
-// POST /api/youtube/sync
-// POST /api/youtube/sync
+// controller
+async debugRefresh(ctx) {
+  const bandId = Number(ctx.query.bandId);
+  if (!bandId) return ctx.badRequest('bandId required');
+
+  const youtubeService = strapi.service('api::youtube.youtube');
+  const account = await youtubeService.findExternalAccount(bandId, 'youtube');
+  if (!account?.refreshToken) {
+    ctx.body = { ok: false, reason: 'no-refresh-token' };
+    return;
+  }
+  const out = await youtubeService.refreshAccessToken(account.refreshToken);
+  ctx.body = { ok: !!out?.access_token, raw: out };
+},
 // POST or GET /api/youtube/sync?bandId=5
 async sync(ctx) {
   

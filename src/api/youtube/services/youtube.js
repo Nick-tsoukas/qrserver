@@ -381,11 +381,7 @@ async syncYoutubeForBand({ bandId, accessToken, refreshToken, channelId }) {
 
     strapi.log.info('[youtube.sync] starting for band %s', bandId);
     strapi.log.info('[youtube.sync] incoming channelId=%s', channelId);
-    strapi.log.info(
-      '[youtube.sync] hasAccessToken=%s hasRefreshToken=%s',
-      !!accessToken,
-      !!refreshToken
-    );
+    strapi.log.info('[youtube.sync] hasAccessToken=%s hasRefreshToken=%s', !!accessToken, !!refreshToken);
 
     if (!accessToken && !refreshToken) {
       strapi.log.error('[youtube.sync] no tokens at all');
@@ -393,98 +389,89 @@ async syncYoutubeForBand({ bandId, accessToken, refreshToken, channelId }) {
     }
 
     let tokenToUse = accessToken;
-    if (!tokenToUse && refreshToken) {
-      strapi.log.info('[youtube.sync] no accessToken; trying refresh');
-      const refreshed = await this.refreshAccessToken(refreshToken);
-      strapi.log.info('[youtube.sync] refresh result', refreshed);
+    let refreshedOnce = false;
 
-      if (!refreshed || !refreshed.access_token) {
-        strapi.log.error(
-          '[youtube.sync] refresh failed or missing access_token',
-          refreshed
-        );
-        return null;
+    const ensureToken = async (force=false) => {
+      if (force || !tokenToUse) {
+        if (!refreshToken) return false;
+        const refreshed = await this.refreshAccessToken(refreshToken);
+        strapi.log.info('[youtube.sync] refresh result %j', refreshed);
+        if (!refreshed || !refreshed.access_token) return false;
+        tokenToUse = refreshed.access_token;
+
+        await this.upsertExternalAccount({
+          bandId,
+          provider: 'youtube',
+          accessToken: tokenToUse,
+          refreshToken,
+          channelId,
+          channelTitle: null,
+          raw: null,
+          expiresAt: refreshed.expires_in
+            ? new Date(Date.now() + refreshed.expires_in * 1000).toISOString()
+            : null,
+        });
+        strapi.log.info('[youtube.sync] token refreshed & account updated');
+        return true;
       }
+      return true;
+    };
 
-      tokenToUse = refreshed.access_token;
-
-      await this.upsertExternalAccount({
-        bandId,
-        provider: 'youtube',
-        accessToken: tokenToUse,
-        refreshToken,
-        channelId,
-        channelTitle: null,
-        raw: null,
-        expiresAt: refreshed.expires_in
-          ? new Date(Date.now() + refreshed.expires_in * 1000).toISOString()
-          : null,
-      });
-      strapi.log.info('[youtube.sync] token refreshed & account updated');
+    // if we came in without accessToken (expired), refresh first
+    if (!tokenToUse) {
+      const ok = await ensureToken(true);
+      if (!ok) return null;
+      refreshedOnce = true;
     }
 
-    strapi.log.info(
-      '[youtube.sync] fetching channel info for %s',
-      channelId || 'mine'
-    );
+    const fetchChannelOrMine = async () => {
+      let channel = null;
+      if (channelId) {
+        channel = await this.fetchChannelById(tokenToUse, channelId);
+      }
+      if (!channel) {
+        const channels = await this.fetchChannels(tokenToUse);
+        if (!channels || !channels.length) return null;
+        channel = channels[0];
+      }
+      return channel;
+    };
 
-    let channel = null;
-    if (channelId) {
-      channel = await this.fetchChannelById(tokenToUse, channelId);
-      strapi.log.info(
-        '[youtube.sync] fetchChannelById returned %s',
-        channel ? 'ok' : 'null'
-      );
+    let channel = await fetchChannelOrMine();
+
+    // If still no channel (stale token?), try one forced refresh then retry once
+    if (!channel && !refreshedOnce && refreshToken) {
+      strapi.log.warn('[youtube.sync] channel fetch failed; trying a forced refresh once');
+      const ok = await ensureToken(true);
+      if (ok) {
+        refreshedOnce = true;
+        channel = await fetchChannelOrMine();
+      }
     }
 
     if (!channel) {
-      strapi.log.info('[youtube.sync] fallback: fetchChannels mine=true');
-      const channels = await this.fetchChannels(tokenToUse);
-      strapi.log.info(
-        '[youtube.sync] fetched %d channels',
-        channels.length || 0
-      );
-      if (!channels.length) {
-        strapi.log.error(
-          '[youtube.sync] no channels for token (401 or bad scope?)'
-        );
-        return null;
-      }
-      channel = channels[0];
+      strapi.log.error('[youtube.sync] unable to fetch channel after retry (401/scope?)');
+      return null;
     }
 
     const today = DateTime.utc().toISODate();
-    strapi.log.info(
-      '[youtube.sync] writing band-external-metric for %s (%s)',
-      bandId,
-      today
-    );
-
-    await strapi.entityService.create(
-      'api::band-external-metric.band-external-metric',
-      {
-        data: {
-          band: bandId,
-          provider: 'youtube',
-          kind: 'channel',
-          date: today,
-          metricDate: channel?.snippet?.publishedAt || null,
-          normalizedData: {
-            title: channel?.snippet?.title || null,
-            views: Number(channel?.statistics?.viewCount || 0),
-            subs: Number(channel?.statistics?.subscriberCount || 0),
-            videos: Number(channel?.statistics?.videoCount || 0),
-          },
-          raw: channel,
-          syncedAt: new Date().toISOString(),
+    await strapi.entityService.create('api::band-external-metric.band-external-metric', {
+      data: {
+        band: bandId,
+        provider: 'youtube',
+        kind: 'channel',
+        date: today,
+        metricDate: channel?.snippet?.publishedAt || null,
+        normalizedData: {
+          title: channel?.snippet?.title || null,
+          views: Number(channel?.statistics?.viewCount || 0),
+          subs: Number(channel?.statistics?.subscriberCount || 0),
+          videos: Number(channel?.statistics?.videoCount || 0),
         },
-      }
-    );
-
-    strapi.log.info(
-      '[youtube.sync] metric written successfully for band %s',
-      bandId
-    );
+        raw: channel,
+        syncedAt: new Date().toISOString(),
+      },
+    });
 
     return {
       views: Number(channel?.statistics?.viewCount || 0),
@@ -497,6 +484,7 @@ async syncYoutubeForBand({ bandId, accessToken, refreshToken, channelId }) {
     return null;
   }
 },
+
 
 
 
