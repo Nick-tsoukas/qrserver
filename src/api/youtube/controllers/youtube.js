@@ -277,6 +277,63 @@ module.exports = {
     }
   },
 
+  // controller: add this
+async debugTokenInfo(ctx) {
+  const bandId = Number(ctx.query.bandId);
+  if (!bandId) return ctx.badRequest("bandId required");
+
+  const youtubeService = strapi.service("api::youtube.youtube");
+  const account = await youtubeService.findExternalAccount(bandId, "youtube");
+  if (!account?.accessToken) {
+    ctx.body = { ok: false, reason: "no-access-token" };
+    return;
+  }
+
+  // Google tokeninfo endpoint: returns scopes, audience, expiry, etc.
+  const url = `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(account.accessToken)}`;
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+    ctx.body = {
+      ok: res.ok,
+      status: res.status,
+      tokeninfo: json, // includes 'scope' (space-delimited), 'aud', 'expires_in'
+      needScope: "https://www.googleapis.com/auth/youtube.readonly",
+    };
+  } catch (e) {
+    ctx.body = { ok: false, error: e.message };
+  }
+},
+
+// controller: add this
+async debugChannels(ctx) {
+  const bandId = Number(ctx.query.bandId);
+  if (!bandId) return ctx.badRequest("bandId required");
+
+  const youtubeService = strapi.service("api::youtube.youtube");
+  const account = await youtubeService.findExternalAccount(bandId, "youtube");
+  if (!account?.accessToken) {
+    ctx.body = { ok: false, reason: "no-access-token" };
+    return;
+  }
+
+  const url = "https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&mine=true&maxResults=5";
+  try {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${account.accessToken}` },
+    });
+    const json = await res.json();
+    ctx.body = {
+      ok: res.ok,
+      status: res.status,
+      body: json,
+      hint: "If status=401 and error=insufficientPermissions, your token lacks youtube.readonly or wrong project.",
+    };
+  } catch (e) {
+    ctx.body = { ok: false, error: e.message };
+  }
+},
+
   // GET /api/youtube/debug/refresh?bandId=5
   async debugRefresh(ctx) {
     try {

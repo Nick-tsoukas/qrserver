@@ -76,7 +76,8 @@ module.exports = {
       config: { auth: false },
     },
     { method: 'GET', path: '/youtube/debug/refresh', handler: 'youtube.debugRefresh', config: { auth: false } },
-    
+    { method: "GET", path: "/youtube/debug/tokeninfo", handler: "youtube.debugTokenInfo", config: { auth: false } },
+{ method: "GET", path: "/youtube/debug/channels",  handler: "youtube.debugChannels",  config: { auth: false } },
 
   ],
 };
