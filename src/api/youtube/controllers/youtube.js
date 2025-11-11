@@ -253,9 +253,14 @@ module.exports = {
  // POST or GET /api/youtube/sync
 // POST /api/youtube/sync
 // POST /api/youtube/sync
+// POST or GET /api/youtube/sync?bandId=5
 async sync(ctx) {
+  
   const bandId = Number(ctx.request.body?.bandId) || Number(ctx.query.bandId);
+  
   if (!bandId) return ctx.badRequest("bandId required");
+    strapi.log.info("[youtube.sync] >>> NEW SYNC HANDLER HIT <<< bandId=%s", bandId);
+
 
   try {
     const youtubeService = strapi.service("api::youtube.youtube");
@@ -281,43 +286,19 @@ async sync(ctx) {
       return;
     }
 
-    // 1) Always refresh access token for a resync
-    const refreshed = await youtubeService.refreshAccessToken(
-      account.refreshToken
-    );
-
-    if (!refreshed || !refreshed.access_token) {
-      ctx.body = {
-        ok: false,
-        provider: "youtube",
-        bandId,
-        reason: "refresh-failed",
-        details: refreshed || null,
-      };
-      return;
+    // Decide which token to use, SAME as debugSync:
+    let accessTokenToUse = account.accessToken;
+    if (isTokenExpired(account.expiresAt)) {
+      strapi.log.info(
+        "[youtube.sync] access token expired for band %s, forcing refresh via service",
+        bandId
+      );
+      accessTokenToUse = null; // triggers refresh inside syncYoutubeForBand
     }
 
-    const accessToken = refreshed.access_token;
-    const expiresAt = refreshed.expires_in
-      ? new Date(Date.now() + refreshed.expires_in * 1000).toISOString()
-      : null;
-
-    // 2) Update stored account with fresh token
-    await youtubeService.upsertExternalAccount({
+    const normalized = await youtubeService.syncYoutubeForBand({
       bandId,
-      provider: "youtube",
-      accessToken,
-      refreshToken: account.refreshToken,
-      channelId: account.channelId,
-      channelTitle: account.channelTitle,
-      raw: account.raw || null,
-      expiresAt,
-    });
-
-    // 3) Re-run heavy sync (channel + uploads + playlists)
-    const normalized = await youtubeService.heavySyncForBand({
-      bandId,
-      accessToken,
+      accessToken: accessTokenToUse,
       refreshToken: account.refreshToken,
       channelId: account.channelId,
     });
@@ -332,7 +313,6 @@ async sync(ctx) {
       return;
     }
 
-    // 4) Done
     ctx.body = {
       ok: true,
       provider: "youtube",
@@ -340,11 +320,12 @@ async sync(ctx) {
       metrics: normalized,
     };
   } catch (err) {
-    strapi.log?.error?.("[youtube.sync] error", err);
+    strapi.log.error("[youtube.sync] error", err);
     ctx.status = 500;
     ctx.body = { ok: false, error: err.message };
   }
 },
+
 
 
 

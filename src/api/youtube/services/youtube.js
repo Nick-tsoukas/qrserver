@@ -361,10 +361,7 @@ module.exports = () => ({
     };
   },
 
-  /**
-   * LIGHT sync — used by /api/youtube/sync
-   * (just tries to refresh + get channel again)
-   */
+
 /**
  * LIGHT sync — used by /api/youtube/sync
  * (just tries to refresh + get channel again)
