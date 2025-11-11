@@ -65,44 +65,50 @@ module.exports = () => ({
   /**
    * refresh access token with refresh_token
    */
-  async refreshAccessToken(refreshToken) {
-    if (!refreshToken) {
-      strapi.log.error('[youtube.refreshAccessToken] missing refreshToken');
-      return null;
+ async refreshAccessToken(refreshToken) {
+  if (!refreshToken) {
+    const errJson = { error: 'missing-refresh-token' };
+    strapi.log.error('[youtube.refreshAccessToken] missing refreshToken', errJson);
+    return errJson;
+  }
+
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    const errJson = { error: 'missing-google-env' };
+    strapi.log.error('[youtube.refreshAccessToken] google env missing', errJson);
+    return errJson;
+  }
+
+  try {
+    const res = await fetch(GOOGLE_TOKEN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: qs.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token',
+      }),
+    });
+
+    const json = await res.json();
+
+    if (!res.ok || json.error) {
+      // This will include things like `invalid_grant`, `invalid_client`, etc.
+      strapi.log.error('[youtube.refreshAccessToken] error response', json);
+      return json; // return error payload instead of null
     }
 
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    return json; // { access_token, expires_in, ... }
+  } catch (err) {
+    const errJson = { error: 'network-error', message: err.message };
+    strapi.log.error('[youtube.refreshAccessToken] network error', err);
+    return errJson;
+  }
+},
 
-    if (!clientId || !clientSecret) {
-      strapi.log.error('[youtube.refreshAccessToken] google env missing');
-      return null;
-    }
-
-    try {
-      const res = await fetch(GOOGLE_TOKEN_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: qs.stringify({
-          client_id: clientId,
-          client_secret: clientSecret,
-          refresh_token: refreshToken,
-          grant_type: 'refresh_token',
-        }),
-      });
-
-      const json = await res.json();
-      if (!res.ok || json.error) {
-        strapi.log.error('[youtube.refreshAccessToken] error', json);
-        return null;
-      }
-
-      return json; // { access_token, expires_in, ... }
-    } catch (err) {
-      strapi.log.error('[youtube.refreshAccessToken] error', err);
-      return null;
-    }
-  },
 
   /**
    * channels?mine=true
