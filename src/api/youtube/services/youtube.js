@@ -24,43 +24,52 @@ module.exports = () => ({
   /**
    * Create or update external account
    */
-  async upsertExternalAccount({
-    bandId,
+async upsertExternalAccount({
+  bandId,
+  provider,
+  accessToken,
+  refreshToken,
+  channelId,
+  channelTitle,
+  raw,
+  expiresAt,
+  providerClientId, // <— NEW: the client that minted these tokens
+}) {
+  const existing = await this.findExternalAccount(bandId, provider);
+
+  // keep whatever raw was passed, but also stamp providerClientId inside
+  const rawMerged = raw || {};
+  if (providerClientId) {
+    rawMerged.providerClientId = providerClientId; // <-- stored in raw (no schema change)
+  }
+
+  const data = {
+    band: bandId,
     provider,
     accessToken,
     refreshToken,
-    channelId,
-    channelTitle,
-    raw,
-    expiresAt,
-  }) {
-    const existing = await this.findExternalAccount(bandId, provider);
+    channelId: channelId || null,
+    channelTitle: channelTitle || null,
+    raw: rawMerged,
+    syncedAt: new Date().toISOString(),
+    expiresAt: expiresAt || null,
+  };
 
-    const data = {
-      band: bandId,
-      provider,
-      accessToken,
-      refreshToken,
-      channelId: channelId || null,
-      channelTitle: channelTitle || null,
-      raw: raw || null,
-      syncedAt: new Date().toISOString(),
-      expiresAt: expiresAt || null,
-    };
-
-    if (existing) {
-      return await strapi.entityService.update(
-        'api::band-external-account.band-external-account',
-        existing.id,
-        { data }
-      );
-    }
-
-    return await strapi.entityService.create(
+  if (existing) {
+    return await strapi.entityService.update(
       'api::band-external-account.band-external-account',
+      existing.id,
       { data }
     );
-  },
+  }
+
+  return await strapi.entityService.create(
+    'api::band-external-account.band-external-account',
+    { data }
+  );
+},
+
+
 
   /**
    * refresh access token with refresh_token
