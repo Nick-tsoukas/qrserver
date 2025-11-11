@@ -5,13 +5,16 @@ const qs = require("querystring");
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const YT_SCOPE = "https://www.googleapis.com/auth/youtube.readonly";
 
+// replace your current helper
 const isTokenExpired = (expiresAt) => {
-  if (!expiresAt) return true; // be safe: force refresh if we don’t know
+  // If we don't know, force refresh.
+  if (!expiresAt) return true;
   const expMs = new Date(expiresAt).getTime();
   const nowMs = Date.now();
-  const margin = 2 * 60 * 1000; // 2 min early refresh
+  const margin = 2 * 60 * 1000; // refresh within 2 minutes of expiry
   return expMs <= (nowMs + margin);
 };
+
 
 
 module.exports = {
@@ -264,77 +267,84 @@ async debugRefresh(ctx) {
   ctx.body = { ok: !!out?.access_token, raw: out };
 },
 // POST or GET /api/youtube/sync?bandId=5
+// REPLACE the whole sync() in this controller
 async sync(ctx) {
-  
   const bandId = Number(ctx.request.body?.bandId) || Number(ctx.query.bandId);
-  
   if (!bandId) return ctx.badRequest("bandId required");
-    strapi.log.info("[youtube.sync] >>> NEW SYNC HANDLER HIT <<< bandId=%s", bandId);
-
 
   try {
     const youtubeService = strapi.service("api::youtube.youtube");
     const account = await youtubeService.findExternalAccount(bandId, "youtube");
 
     if (!account) {
-      ctx.body = {
-        ok: false,
-        provider: "youtube",
-        bandId,
-        reason: "not-connected",
-      };
+      ctx.body = { ok: false, provider: "youtube", bandId, reason: "not-connected" };
       return;
     }
-
     if (!account.refreshToken) {
-      ctx.body = {
-        ok: false,
-        provider: "youtube",
-        bandId,
-        reason: "no-refresh-token",
-      };
+      ctx.body = { ok: false, provider: "youtube", bandId, reason: "no-refresh-token" };
       return;
     }
 
-    // Decide which token to use, SAME as debugSync:
+    // --- PRE-REFRESH LOGIC (controller does it explicitly) ---
     let accessTokenToUse = account.accessToken;
-    if (isTokenExpired(account.expiresAt)) {
-      strapi.log.info(
-        "[youtube.sync] access token expired for band %s, forcing refresh via service",
-        bandId
-      );
-      accessTokenToUse = null; // triggers refresh inside syncYoutubeForBand
+
+    if (!accessTokenToUse || isTokenExpired(account.expiresAt)) {
+      const refreshed = await youtubeService.refreshAccessToken(account.refreshToken);
+
+      // If refresh failed, bubble the actual Google payload up to the FE.
+      if (!refreshed || !refreshed.access_token) {
+        ctx.body = {
+          ok: false,
+          provider: "youtube",
+          bandId,
+          reason: "refresh-failed",
+          details: refreshed || null, // <- FE finally sees e.g. { error:"invalid_grant", ... }
+        };
+        return;
+      }
+
+      accessTokenToUse = refreshed.access_token;
+
+      await youtubeService.upsertExternalAccount({
+        bandId,
+        provider: "youtube",
+        accessToken: accessTokenToUse,
+        refreshToken: account.refreshToken,
+        channelId: account.channelId || null,
+        channelTitle: account.channelTitle || null,
+        raw: account.raw || null,
+        expiresAt: refreshed.expires_in
+          ? new Date(Date.now() + refreshed.expires_in * 1000).toISOString()
+          : null,
+      });
     }
 
-    const normalized = await youtubeService.syncYoutubeForBand({
+    // --- SYNC (service assumes a valid access token now) ---
+    const out = await youtubeService.syncYoutubeForBand({
       bandId,
       accessToken: accessTokenToUse,
-      refreshToken: account.refreshToken,
-      channelId: account.channelId,
+      channelId: account.channelId || null,
     });
 
-    if (!normalized) {
+    if (!out || out.ok === false) {
       ctx.body = {
         ok: false,
         provider: "youtube",
         bandId,
-        reason: "sync-failed",
+        reason: out?.reason || "sync-failed",
+        details: out?.details || null,
       };
       return;
     }
 
-    ctx.body = {
-      ok: true,
-      provider: "youtube",
-      bandId,
-      metrics: normalized,
-    };
+    ctx.body = { ok: true, provider: "youtube", bandId, metrics: out.metrics || out };
   } catch (err) {
     strapi.log.error("[youtube.sync] error", err);
     ctx.status = 500;
     ctx.body = { ok: false, error: err.message };
   }
 },
+
 
 
 
@@ -369,6 +379,9 @@ async sync(ctx) {
         : null,
     };
   },
+
+
+
 
   // GET /api/youtube/debug/sync?bandId=5
 // GET /api/youtube/debug/sync?bandId=5
