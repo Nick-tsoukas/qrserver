@@ -1022,8 +1022,8 @@ export interface ApiBandExternalAccountBandExternalAccount
       Attribute.Required;
     externalId: Attribute.String;
     displayName: Attribute.String;
-    accessToken: Attribute.Password & Attribute.Private;
-    refreshToken: Attribute.Password & Attribute.Private;
+    accessToken: Attribute.Text & Attribute.Private;
+    refreshToken: Attribute.Text & Attribute.Private;
     expiresAt: Attribute.DateTime;
     lastSyncAt: Attribute.DateTime;
     status: Attribute.String & Attribute.DefaultTo<'connected'>;

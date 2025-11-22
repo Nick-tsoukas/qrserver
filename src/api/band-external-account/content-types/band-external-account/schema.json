@@ -37,11 +37,11 @@
       "type": "string"
     },
     "accessToken": {
-      "type": "password",
+       "type": "text",
       "private": true
     },
     "refreshToken": {
-      "type": "password",
+      "type": "text",
       "private": true
     },
     "expiresAt": {
