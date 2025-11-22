@@ -74,10 +74,13 @@ async upsertExternalAccount({
   /**
    * refresh access token with refresh_token
    */
- async refreshAccessToken(refreshToken) {
+/**
+ * refresh access token with refresh_token
+ */
+async refreshAccessToken(refreshToken) {
   if (!refreshToken) {
     const errJson = { error: 'missing-refresh-token' };
-    strapi.log.error('[youtube.refreshAccessToken] missing refreshToken', errJson);
+    strapi.log.error('[youtube.refreshAccessToken] missing refreshToken ' + JSON.stringify(errJson));
     return errJson;
   }
 
@@ -86,11 +89,12 @@ async upsertExternalAccount({
 
   if (!clientId || !clientSecret) {
     const errJson = { error: 'missing-google-env' };
-    strapi.log.error('[youtube.refreshAccessToken] google env missing', errJson);
+    strapi.log.error('[youtube.refreshAccessToken] google env missing ' + JSON.stringify(errJson));
     return errJson;
   }
 
   try {
+    /** @type {any} */
     const res = await fetch(GOOGLE_TOKEN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -102,21 +106,30 @@ async upsertExternalAccount({
       }),
     });
 
-    const json = await res.json();
+    const text = await res.text();
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      json = { parseError: true, raw: text };
+    }
 
     if (!res.ok || json.error) {
-      // This will include things like `invalid_grant`, `invalid_client`, etc.
-      strapi.log.error('[youtube.refreshAccessToken] error response', json);
+      // e.g. { "error": "invalid_grant", "error_description": "Token has been expired or revoked." }
+      strapi.log.error(
+        `[youtube.refreshAccessToken] error response status=${res.status} body=${JSON.stringify(json)}`
+      );
       return json; // return error payload instead of null
     }
 
     return json; // { access_token, expires_in, ... }
   } catch (err) {
     const errJson = { error: 'network-error', message: err.message };
-    strapi.log.error('[youtube.refreshAccessToken] network error', err);
+    strapi.log.error('[youtube.refreshAccessToken] network error ' + JSON.stringify(errJson));
     return errJson;
   }
 },
+
 
 
   /**
@@ -137,14 +150,12 @@ async upsertExternalAccount({
 
     const json = await res.json();
 
-    if (!res.ok) {
-      strapi.log.error(
-        '[youtube.fetchChannels] error',
-        res.status,
-        json?.error || json
-      );
-      return [];
-    }
+   if (!res.ok) {
+  strapi.log.error(
+    `[youtube.fetchChannels] error status=${res.status} body=${JSON.stringify(json)}`
+  );
+  return [];
+}
 
     return json.items || [];
   },
@@ -165,7 +176,7 @@ async upsertExternalAccount({
 
     const json = await res.json();
     if (!res.ok || !json.items || !json.items.length) {
-      strapi.log.error('[youtube.fetchChannelById] error', json);
+      strapi.log.error(`[youtube.fetchChannelById] error status=${res.status} body=${JSON.stringify(json)}`);
       return null;
     }
     return json.items[0];

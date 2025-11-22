@@ -233,6 +233,8 @@ module.exports = {
 
       if (!account) return ctx.badRequest("Youtube account not found for this band");
 
+      // 🔍 BIG-PICTURE SANITY LOG
+
       await youtubeService.upsertExternalAccount({
         bandId,
         provider: "youtube",
@@ -364,6 +366,16 @@ async debugChannels(ctx) {
     try {
       const youtubeService = strapi.service("api::youtube.youtube");
       const account = await youtubeService.findExternalAccount(bandId, "youtube");
+
+       strapi.log.info(
+      '[youtube.sync] band=' + bandId + ' account=' +
+      JSON.stringify({
+        hasAccount: !!account,
+        hasRefreshToken: !!(account && account.refreshToken),
+        expiresAt: account?.expiresAt || null,
+        providerClientId: account?.raw?.providerClientId || null,
+      })
+    );
 
       if (!account) {
         ctx.body = { ok: false, provider: "youtube", bandId, reason: "not-connected" };
