@@ -69,6 +69,12 @@ module.exports = {
       handler: "youtube.debugSync",
       config: { auth: false },
     },
+    {
+  method: "GET",
+  path: "/youtube/debug/env",
+  handler: "youtube.debugEnv",
+  config: { auth: false },
+},
      {
       method: 'GET',
       path: '/youtube/debug',
