@@ -453,36 +453,52 @@ async debugChannels(ctx) {
   },
 
   // GET /api/youtube/debug?bandId=5
-  async debug(ctx) {
-    try {
-      const bandId = Number(ctx.query.bandId);
-      if (!bandId) return ctx.badRequest("bandId required");
+ // GET /api/youtube/debug?bandId=5
+async debug(ctx) {
+  try {
+    const bandId = Number(ctx.query.bandId);
+    if (!bandId) return ctx.badRequest("bandId required");
 
-      const youtubeService = strapi.service("api::youtube.youtube");
-      const account = await youtubeService.findExternalAccount(bandId, "youtube");
+    const youtubeService = strapi.service("api::youtube.youtube");
+    const account = await youtubeService.findExternalAccount(bandId, "youtube");
 
-      ctx.body = {
-        ok: true,
-        bandId,
-        account: account
-          ? {
-              id: account.id,
-              provider: account.provider,
-              channelId: account.channelId,
-              channelTitle: account.channelTitle,
-              hasAccessToken: !!account.accessToken,
-              hasRefreshToken: !!account.refreshToken,
-              expiresAt: account.expiresAt || null,
-              mintedByClientId: account.raw?.providerClientId || null, // <— important for mismatch debugging
-            }
-          : null,
-      };
-    } catch (err) {
-      strapi.log.error("[youtube.debug] error", err);
-      ctx.status = 500;
-      ctx.body = { ok: false, error: err.message };
-    }
-  },
+    ctx.body = {
+      ok: true,
+      bandId,
+      account: account
+        ? {
+            id: account.id,
+            provider: account.provider,
+            channelId: account.channelId,
+            channelTitle: account.channelTitle,
+            hasAccessToken: !!account.accessToken,
+            hasRefreshToken: !!account.refreshToken,
+            expiresAt: account.expiresAt || null,
+            mintedByClientId: account.raw?.providerClientId || null,
+
+            // ✅ ADD THESE FOUR LINES
+            accessTokenLength: account.accessToken
+              ? account.accessToken.length
+              : 0,
+            refreshTokenLength: account.refreshToken
+              ? account.refreshToken.length
+              : 0,
+            rawAccessTokenStart: account.accessToken
+              ? account.accessToken.slice(0, 10)
+              : null,
+            rawRefreshTokenStart: account.refreshToken
+              ? account.refreshToken.slice(0, 10)
+              : null,
+          }
+        : null,
+    };
+  } catch (err) {
+    strapi.log.error("[youtube.debug] error", err);
+    ctx.status = 500;
+    ctx.body = { ok: false, error: err.message };
+  }
+},
+
 
   // GET /api/youtube/debug/sync?bandId=5
   async debugSync(ctx) {
