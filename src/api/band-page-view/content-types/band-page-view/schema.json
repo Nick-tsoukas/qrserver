@@ -18,84 +18,178 @@
       "target": "api::band.band",
       "inversedBy": "band_page_views"
     },
-
-    "timestamp": { "type": "datetime" },
-
-    "title": { "type": "string" },
-    "pageUrl": { "type": "string" },
-    "landingPath": { "type": "string" },
-    "landingQuery": { "type": "text" },
-
-    "referrer": { "type": "string" },
-    "refUrl": { "type": "text" },
-    "refDomain": { "type": "string" },
-    "refSource": { "type": "string" },
-    "refMedium": { "type": "string" },
-
-    "utmSource": { "type": "string" },
-    "utmMedium": { "type": "string" },
-    "utmCampaign": { "type": "string" },
-    "utmTerm": { "type": "string" },
-    "utmContent": { "type": "string" },
-
-    "gclid": { "type": "string" },
-    "fbclid": { "type": "string" },
-    "ttclid": { "type": "string" },
-    "twclid": { "type": "string" },
-
-    "ipAddress": { "type": "string" },
-    "userAgent": { "type": "string" },
-
-    "path": { "type": "string" },
-
-    "city": { "type": "string" },
-    "region": { "type": "string" },
-    "country": { "type": "string" },
-    "lat": { "type": "decimal" },
-    "lon": { "type": "decimal" },
+    "timestamp": {
+      "type": "datetime"
+    },
+    "title": {
+      "type": "string"
+    },
+    "pageUrl": {
+      "type": "string"
+    },
+    "landingPath": {
+      "type": "string"
+    },
+    "landingQuery": {
+      "type": "text"
+    },
+    "referrer": {
+      "type": "string"
+    },
+    "refUrl": {
+      "type": "text"
+    },
+    "refDomain": {
+      "type": "string"
+    },
+    "refSource": {
+      "type": "string"
+    },
+    "refMedium": {
+      "type": "string"
+    },
+    "utmSource": {
+      "type": "string"
+    },
+    "utmMedium": {
+      "type": "string"
+    },
+    "utmCampaign": {
+      "type": "string"
+    },
+    "utmTerm": {
+      "type": "string"
+    },
+    "utmContent": {
+      "type": "string"
+    },
+    "gclid": {
+      "type": "string"
+    },
+    "fbclid": {
+      "type": "string"
+    },
+    "ttclid": {
+      "type": "string"
+    },
+    "twclid": {
+      "type": "string"
+    },
+    "ipAddress": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "decimal"
+    },
+    "lon": {
+      "type": "decimal"
+    },
     "geoSource": {
       "type": "enumeration",
-      "enum": ["override", "cloudflare", "geoip", "external", "none"]
+      "enum": [
+        "override",
+        "cloudflare",
+        "geoip",
+        "external",
+        "none"
+      ]
     },
-
     "deviceType": {
       "type": "enumeration",
-      "enum": ["desktop", "mobile", "tablet", "bot", "unknown"]
+      "enum": [
+        "desktop",
+        "mobile",
+        "tablet",
+        "bot",
+        "unknown"
+      ]
     },
-    "os": { "type": "string" },
-    "browser": { "type": "string" },
-
-    "host": { "type": "string" },
-    "protocol": { "type": "string" },
-
-    "sessionId": { "type": "string" },
-    "visitorId": { "type": "string" },
-
-    "pageLoadMs": { "type": "integer" },
-
-    "screenW": { "type": "integer" },
-    "screenH": { "type": "integer" },
-    "tzOffset": { "type": "integer" },
-    "lang": { "type": "string" },
-
-    "fcpMs": { "type": "integer" },
-    "lcpMs": { "type": "integer" },
-    "cls": { "type": "decimal" },
-    "fidMs": { "type": "integer" },
-    "inpMs": { "type": "integer" },
-
-    "botScore": { "type": "decimal" },
-    "asn": { "type": "string" },
-    "isp": { "type": "string" },
-
+    "os": {
+      "type": "string"
+    },
+    "browser": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "protocol": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "visitorId": {
+      "type": "string"
+    },
+    "pageLoadMs": {
+      "type": "integer"
+    },
+    "screenW": {
+      "type": "integer"
+    },
+    "screenH": {
+      "type": "integer"
+    },
+    "tzOffset": {
+      "type": "integer"
+    },
+    "lang": {
+      "type": "string"
+    },
+    "fcpMs": {
+      "type": "integer"
+    },
+    "lcpMs": {
+      "type": "integer"
+    },
+    "cls": {
+      "type": "decimal"
+    },
+    "fidMs": {
+      "type": "integer"
+    },
+    "inpMs": {
+      "type": "integer"
+    },
+    "botScore": {
+      "type": "decimal"
+    },
+    "asn": {
+      "type": "string"
+    },
+    "isp": {
+      "type": "string"
+    },
     "sourceCategory": {
       "type": "enumeration",
-      "enum": ["direct", "search", "social", "referral", "email", "ads", "unknown"]
+      "enum": [
+        "direct",
+        "search",
+        "social",
+        "referral",
+        "email",
+        "ads",
+        "unknown"
+      ]
     },
-
     "sourceType": {
       "type": "string"
-     
     },
     "sourceQR": {
       "type": "integer"

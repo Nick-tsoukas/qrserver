@@ -913,7 +913,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     draftAndPublish: false;
   };
   attributes: {
-    name: Attribute.String & Attribute.Required;
+    name: Attribute.String & Attribute.Required & Attribute.Unique;
     genre: Attribute.String & Attribute.Required;
     bio: Attribute.Text &
       Attribute.Required &

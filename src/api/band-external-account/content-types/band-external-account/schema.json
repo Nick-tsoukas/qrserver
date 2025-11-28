@@ -37,7 +37,7 @@
       "type": "string"
     },
     "accessToken": {
-       "type": "text",
+      "type": "text",
       "private": true
     },
     "refreshToken": {
