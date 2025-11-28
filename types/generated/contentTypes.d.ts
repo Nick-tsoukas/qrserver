@@ -1581,6 +1581,7 @@ export interface ApiSeoPageSeoPage extends Schema.CollectionType {
         'case-studies'
       ]
     >;
+    jsonLd: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

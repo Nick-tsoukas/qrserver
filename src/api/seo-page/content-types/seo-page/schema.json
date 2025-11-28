@@ -57,6 +57,9 @@
         "analytics",
         "case-studies"
       ]
+    },
+    "jsonLd": {
+      "type": "json"
     }
   }
 }
