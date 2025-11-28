@@ -47,7 +47,7 @@ module.exports = ({ env }) => ({
   },
 
   //------------------------------------------------
-  // 3) USERS & PERMISSIONS CONFIG
+  // 3) USERS & PERMISSIONS CONFIG test push to git 
   //------------------------------------------------
   'users-permissions': {
     config: {
