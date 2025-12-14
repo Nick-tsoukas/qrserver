@@ -1582,6 +1582,7 @@ export interface ApiSeoPageSeoPage extends Schema.CollectionType {
       ]
     >;
     jsonLd: Attribute.JSON;
+    isPillar: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

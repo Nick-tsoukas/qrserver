@@ -60,6 +60,9 @@
     },
     "jsonLd": {
       "type": "json"
+    },
+    "isPillar": {
+      "type": "boolean"
     }
   }
 }
