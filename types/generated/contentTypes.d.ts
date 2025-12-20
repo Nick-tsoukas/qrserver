@@ -1584,6 +1584,7 @@ export interface ApiSeoPageSeoPage extends Schema.CollectionType {
     jsonLd: Attribute.JSON;
     isPillar: Attribute.Boolean;
     executiveSummary: Attribute.RichText;
+    executiveSummaryTakeaways: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
