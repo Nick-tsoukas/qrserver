@@ -989,6 +989,10 @@ export interface ApiBandBand extends Schema.CollectionType {
       'oneToMany',
       'api::band-page-view.band-page-view'
     >;
+    paymentsEnabled: Attribute.Boolean & Attribute.DefaultTo<false>;
+    stripeAccountId: Attribute.String;
+    stripeOnboardingComplete: Attribute.Boolean & Attribute.DefaultTo<false>;
+    paymentButtons: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &

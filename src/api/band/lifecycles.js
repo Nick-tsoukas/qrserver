@@ -121,7 +121,61 @@ const setSlug = async (event) => {
   data.slug = await ensureUniqueSlug(base, currentId);
 };
 
+
+// @ts-ignore
+const defaultButtons = require("../../../../../config/paymentButtons.default");
+// Ensures all canonical buttons exist, without overwriting customizations.
+function mergeButtons(existing = []) {
+  const safe = Array.isArray(existing) ? existing : [];
+  const byKey = new Map(safe.filter(Boolean).map((b) => [b.key, b]));
+
+  const merged = defaultButtons.map((d) => ({
+    ...d,
+    ...(byKey.get(d.key) || {}),
+  }));
+
+  const extras = safe.filter(
+    (b) => b?.key && !defaultButtons.some((d) => d.key === b.key)
+  );
+
+  return [...merged, ...extras];
+}
+
+
+
 module.exports = {
-  async beforeCreate(event) { await setSlug(event); },
-  async beforeUpdate(event) { await setSlug(event); },
+  async beforeCreate(event) {
+    // 1) slug
+    await setSlug(event);
+
+    // 2) payments defaults
+    const data = event.params.data;
+
+    if (!("paymentsEnabled" in data)) data.paymentsEnabled = false;
+    if (!("stripeOnboardingComplete" in data)) data.stripeOnboardingComplete = false;
+    if (!("stripeAccountId" in data)) data.stripeAccountId = null;
+
+    if (!Array.isArray(data.paymentButtons)) {
+      data.paymentButtons = defaultButtons;
+    } else {
+      data.paymentButtons = mergeButtons(data.paymentButtons);
+    }
+  },
+
+  async beforeUpdate(event) {
+    // 1) slug
+    await setSlug(event);
+
+    // 2) payments normalization (only when paymentButtons is being updated)
+    const data = event.params.data;
+
+    if ("paymentButtons" in data) {
+      if (!Array.isArray(data.paymentButtons)) {
+        data.paymentButtons = defaultButtons;
+      } else {
+        data.paymentButtons = mergeButtons(data.paymentButtons);
+      }
+    }
+  },
 };
+

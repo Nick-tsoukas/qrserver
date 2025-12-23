@@ -169,6 +169,20 @@
       "relation": "oneToMany",
       "target": "api::band-page-view.band-page-view",
       "mappedBy": "band"
+    },
+    "paymentsEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "stripeAccountId": {
+      "type": "string"
+    },
+    "stripeOnboardingComplete": {
+      "type": "boolean",
+      "default": false
+    },
+    "paymentButtons": {
+      "type": "json"
     }
   }
 }
