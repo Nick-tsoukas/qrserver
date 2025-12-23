@@ -993,6 +993,11 @@ export interface ApiBandBand extends Schema.CollectionType {
     stripeAccountId: Attribute.String;
     stripeOnboardingComplete: Attribute.Boolean & Attribute.DefaultTo<false>;
     paymentButtons: Attribute.JSON;
+    support_moments: Attribute.Relation<
+      'api::band.band',
+      'oneToMany',
+      'api::support-moment.support-moment'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
@@ -1696,6 +1701,64 @@ export interface ApiStreamStream extends Schema.CollectionType {
   };
 }
 
+export interface ApiSupportMomentSupportMoment extends Schema.CollectionType {
+  collectionName: 'support_moments';
+  info: {
+    singularName: 'support-moment';
+    pluralName: 'support-moments';
+    displayName: 'Support Moment';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::support-moment.support-moment',
+      'manyToOne',
+      'api::band.band'
+    >;
+    bandNameSnapshot: Attribute.String;
+    bandSlugSnapshot: Attribute.String;
+    bandImageSnapshot: Attribute.String;
+    buttonKey: Attribute.String;
+    supportLabel: Attribute.String;
+    badgeId: Attribute.String;
+    amount: Attribute.Integer;
+    currency: Attribute.String;
+    status: Attribute.Enumeration<['pending', 'paid', 'failed', 'refunded']> &
+      Attribute.DefaultTo<'pending'>;
+    paidAt: Attribute.DateTime;
+    stripePaymentIntentId: Attribute.String;
+    stripeChargeId: Attribute.String;
+    fanDisplayName: Attribute.String;
+    fanHandle: Attribute.String;
+    fanMessage: Attribute.String;
+    fanEmail: Attribute.String;
+    shareOptIn: Attribute.Boolean & Attribute.DefaultTo<false>;
+    showAmountOnShare: Attribute.Boolean & Attribute.DefaultTo<false>;
+    supporterWallOptIn: Attribute.Boolean & Attribute.DefaultTo<false>;
+    source: Attribute.String & Attribute.DefaultTo<'band-profile'>;
+    qrId: Attribute.String;
+    eventId: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::support-moment.support-moment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::support-moment.support-moment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiTourTour extends Schema.CollectionType {
   collectionName: 'tours';
   info: {
@@ -1815,6 +1878,7 @@ declare module '@strapi/types' {
       'api::seo-page.seo-page': ApiSeoPageSeoPage;
       'api::socialpage.socialpage': ApiSocialpageSocialpage;
       'api::stream.stream': ApiStreamStream;
+      'api::support-moment.support-moment': ApiSupportMomentSupportMoment;
       'api::tour.tour': ApiTourTour;
       'api::video.video': ApiVideoVideo;
     }

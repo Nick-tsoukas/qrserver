@@ -183,6 +183,12 @@
     },
     "paymentButtons": {
       "type": "json"
+    },
+    "support_moments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::support-moment.support-moment",
+      "mappedBy": "band"
     }
   }
 }
