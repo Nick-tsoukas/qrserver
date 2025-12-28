@@ -993,6 +993,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     stripeAccountId: Attribute.String;
     stripeOnboardingComplete: Attribute.Boolean & Attribute.DefaultTo<false>;
     paymentButtons: Attribute.JSON;
+    hiddenLinks: Attribute.JSON;
     support_moments: Attribute.Relation<
       'api::band.band',
       'oneToMany',

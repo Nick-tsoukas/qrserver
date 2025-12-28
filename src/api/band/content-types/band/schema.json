@@ -184,6 +184,9 @@
     "paymentButtons": {
       "type": "json"
     },
+    "hiddenLinks": {
+      "type": "json"
+    },
     "support_moments": {
       "type": "relation",
       "relation": "oneToMany",
