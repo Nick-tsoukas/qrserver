@@ -55,6 +55,9 @@
     "paidAt": {
       "type": "datetime"
     },
+    "stripeCheckoutSessionId": {
+      "type": "string"
+    },
     "stripePaymentIntentId": {
       "type": "string"
     },

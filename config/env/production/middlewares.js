@@ -33,7 +33,15 @@ module.exports = [
     // 4) CORS
     {
       name: 'strapi::cors',
-      config: { /* your CORS config */ },
+      config: {
+        origin: [
+          'https://musicbizqr.com',
+          'https://www.musicbizqr.com',
+        ],
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+        keepHeaderOnError: true,
+      },
     },
   
     // 5) Logger, Query, Session, Favicon, Public
@@ -44,4 +52,3 @@ module.exports = [
     'strapi::favicon',
     'strapi::public',
   ];
-  

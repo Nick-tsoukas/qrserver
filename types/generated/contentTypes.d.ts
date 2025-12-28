@@ -1729,6 +1729,7 @@ export interface ApiSupportMomentSupportMoment extends Schema.CollectionType {
     status: Attribute.Enumeration<['pending', 'paid', 'failed', 'refunded']> &
       Attribute.DefaultTo<'pending'>;
     paidAt: Attribute.DateTime;
+    stripeCheckoutSessionId: Attribute.String;
     stripePaymentIntentId: Attribute.String;
     stripeChargeId: Attribute.String;
     fanDisplayName: Attribute.String;
