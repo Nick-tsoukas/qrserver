@@ -1,13 +1,14 @@
 "use strict";
 
-const Stripe = require("stripe");
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const { default: Stripe } = require("stripe");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 module.exports = {
   async handle(ctx) {
     const sig = ctx.request.headers["stripe-signature"];
-    const secret =
-      process.env.STRIPE_CONNECT_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET;
+    const secret = String(
+      process.env.STRIPE_CONNECT_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET || ""
+    ).trim();
     const hasSecret = !!secret;
 
     const debug = String(process.env.DEBUG || "").toLowerCase() === "true";
@@ -124,7 +125,10 @@ module.exports = {
           }
         } else {
           let stripeChargeId = null;
-          let stripePaymentIntentId = session.payment_intent || null;
+          let stripePaymentIntentId =
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : session.payment_intent?.id || null;
 
           // If this event is for a connected account, Stripe includes event.account.
           // Use it to retrieve the PaymentIntent/charge on the correct account.

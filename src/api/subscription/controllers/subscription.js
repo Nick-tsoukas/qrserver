@@ -126,11 +126,21 @@ async subscriptionStatus(ctx) {
   async webhook(ctx) {
     strapi.log.debug('[Webhook] Received event', { headers: ctx.request.headers });
     const sig   = ctx.request.headers['stripe-signature'];
-    const raw   = ctx.request.body[UNPARSED];
+    const raw =
+      ctx.request.body?.[UNPARSED] ||
+      ctx.request.body?.data?.[UNPARSED];
     let event;
 
     try {
-      event = stripe.webhooks.constructEvent(raw, sig, process.env.STRIPE_WEBHOOK_SECRET);
+      if (!sig) return ctx.badRequest('Webhook Error: Missing stripe-signature header');
+
+      if (!raw) {
+        strapi.log.error('[Webhook] Missing raw body (unparsedBody)');
+        return ctx.badRequest('Webhook Error: Missing raw body. Ensure strapi::body includeUnparsed: true and no middleware consumes the request stream.');
+      }
+
+      const secret = String(process.env.STRIPE_WEBHOOK_SECRET || '').trim();
+      event = stripe.webhooks.constructEvent(raw, sig, secret);
       strapi.log.debug('[Webhook] event.type', event.type);
     } catch (e) {
       strapi.log.error('[Webhook] Signature verification failed', e.message);
