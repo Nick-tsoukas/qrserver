@@ -247,9 +247,10 @@ module.exports = {
         providerClientId: account?.raw?.providerClientId || null, // preserve minting client id
       });
 
-      const normalized = await youtubeService.syncYoutubeForBand({
+      const normalized = await youtubeService.heavySyncForBand({
         bandId,
         accessToken: account.accessToken,
+        refreshToken: account.refreshToken,
         channelId,
       });
 
@@ -421,10 +422,11 @@ async debugChannels(ctx) {
         });
       }
 
-      // --- Light sync (service assumes valid access token now) ---
-      const out = await youtubeService.syncYoutubeForBand({
+      // --- Heavy sync (refresh channel + recent uploads + playlists) ---
+      const out = await youtubeService.heavySyncForBand({
         bandId,
         accessToken: accessTokenToUse,
+        refreshToken: account.refreshToken,
         channelId: account.channelId || null,
       });
 

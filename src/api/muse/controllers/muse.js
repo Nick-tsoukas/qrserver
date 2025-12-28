@@ -41,31 +41,84 @@ module.exports = {
         analyticsRes = { ok: true, totals: {}, series: [] };
       }
 
-      // 2) pull external youtube (from band-external-metric) – latest only
-      const ytRows = await strapi.entityService.findMany(
-        "api::band-external-metric.band-external-metric",
-        {
-          filters: {
-            band: { id: bandId },
-            provider: "youtube",
-          },
-          sort: ["date:desc", "id:desc"],
-          limit: 1,
-        }
-      );
+      const [ytChannelRows, ytVideosRows, ytPlaylistsRows] = await Promise.all([
+        strapi.entityService.findMany(
+          "api::band-external-metric.band-external-metric",
+          {
+            filters: {
+              band: { id: bandId },
+              provider: "youtube",
+              kind: "channel",
+            },
+            sort: ["date:desc", "id:desc"],
+            limit: 1,
+          }
+        ),
+        strapi.entityService.findMany(
+          "api::band-external-metric.band-external-metric",
+          {
+            filters: {
+              band: { id: bandId },
+              provider: "youtube",
+              kind: "videos",
+            },
+            sort: ["date:desc", "id:desc"],
+            limit: 1,
+          }
+        ),
+        strapi.entityService.findMany(
+          "api::band-external-metric.band-external-metric",
+          {
+            filters: {
+              band: { id: bandId },
+              provider: "youtube",
+              kind: "playlists",
+            },
+            sort: ["date:desc", "id:desc"],
+            limit: 1,
+          }
+        ),
+      ]);
+
+      const channelRow = ytChannelRows && ytChannelRows.length ? ytChannelRows[0] : null;
+      const videosRow = ytVideosRows && ytVideosRows.length ? ytVideosRows[0] : null;
+      const playlistsRow = ytPlaylistsRows && ytPlaylistsRows.length ? ytPlaylistsRows[0] : null;
 
       let youtube = null;
-      if (ytRows && ytRows.length) {
-        const row = ytRows[0];
-        const normalized = row.normalizedData || {};
-        const raw = row.raw || {};
-        const date = row.date || row.createdAt || DateTime.utc().toISO();
+      if (channelRow || videosRow || playlistsRow) {
+        const channelNormalized = channelRow?.normalizedData || {};
+        const channelRaw = channelRow?.raw || {};
+        const videosRaw = videosRow?.raw || {};
+
+        const dateCandidates = [
+          channelRow?.syncedAt,
+          videosRow?.syncedAt,
+          playlistsRow?.syncedAt,
+          channelRow?.createdAt,
+          videosRow?.createdAt,
+          playlistsRow?.createdAt,
+        ].filter(Boolean);
+
+        const date = dateCandidates.length
+          ? dateCandidates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0]
+          : DateTime.utc().toISO();
 
         const recentVideos = [];
 
-        // prefer raw.videoStats
-        if (Array.isArray(raw.videoStats) && raw.videoStats.length) {
-          for (const v of raw.videoStats) {
+        const videoStats = Array.isArray(videosRaw.videoStats)
+          ? videosRaw.videoStats
+          : Array.isArray(videosRaw?.raw?.videoStats)
+            ? videosRaw.raw.videoStats
+            : [];
+
+        const uploadsItems = Array.isArray(videosRaw.uploadsItems)
+          ? videosRaw.uploadsItems
+          : Array.isArray(videosRaw?.raw?.uploadsItems)
+            ? videosRaw.raw.uploadsItems
+            : [];
+
+        if (Array.isArray(videoStats) && videoStats.length) {
+          for (const v of videoStats) {
             recentVideos.push({
               videoId: v.id,
               title: v.snippet?.title || "",
@@ -78,10 +131,13 @@ module.exports = {
                 null,
             });
           }
-        } else if (Array.isArray(raw.uploadsItems) && raw.uploadsItems.length) {
-          for (const v of raw.uploadsItems) {
+        } else if (Array.isArray(uploadsItems) && uploadsItems.length) {
+          for (const v of uploadsItems) {
             recentVideos.push({
-              videoId: v.contentDetails?.videoId || v.snippet?.resourceId?.videoId || null,
+              videoId:
+                v.contentDetails?.videoId ||
+                v.snippet?.resourceId?.videoId ||
+                null,
               title: v.snippet?.title || "",
               views: 0,
               publishedAt: v.snippet?.publishedAt || null,
@@ -98,20 +154,21 @@ module.exports = {
           connected: true,
           date,
           views:
-            normalized.views ??
-            normalized.viewCount ??
-            raw.statistics?.viewCount ??
+            channelNormalized.views ??
+            channelNormalized.viewCount ??
+            channelRaw.statistics?.viewCount ??
             0,
           subs:
-            normalized.subs ??
-            normalized.subscriberCount ??
-            raw.statistics?.subscriberCount ??
+            channelNormalized.subs ??
+            channelNormalized.subscriberCount ??
+            channelRaw.statistics?.subscriberCount ??
             0,
           videos:
-            normalized.videos ??
-            normalized.videoCount ??
+            channelNormalized.videos ??
+            channelNormalized.videoCount ??
+            channelRaw.statistics?.videoCount ??
             (Array.isArray(recentVideos) ? recentVideos.length : 0),
-          topVideo: normalized.topVideo || recentVideos[0] || null,
+          topVideo: recentVideos[0] || null,
           recentVideos,
         };
       }
