@@ -1,11 +1,5 @@
 // config/middlewares.js
 module.exports = [
-    // 0) Our custom raw-logging middleware
-    {
-      name: 'global::log-raw',
-      config: {},
-    },
-  
   // 1) Body parser with raw-body support: MUST be first
   {
     name: 'strapi::body',
@@ -18,6 +12,12 @@ module.exports = [
       jsonLimit: '50mb',
       textLimit: '50mb',
     },
+  },
+
+  // 0) Our custom raw-logging middleware (must run AFTER body parser)
+  {
+    name: 'global::log-raw',
+    config: {},
   },
 
   // 2) Error handling middleware

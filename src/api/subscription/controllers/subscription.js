@@ -1,7 +1,7 @@
 // path: src/api/subscription/controllers/subscription.js
 'use strict';
 
-const Stripe = require('stripe');
+const { default: Stripe } = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 const crypto = require('crypto');
 const UNPARSED = Symbol.for('unparsedBody');
@@ -298,7 +298,14 @@ async function onCheckoutCompleted(session) {
 
 async function onInvoicePaid(invoice) {
   strapi.log.debug('[Webhook] invoice.payment_succeeded', invoice.id);
-  if (invoice.amount_due === 0) return;
+
+  const amountPaid = Number(invoice.amount_paid ?? 0);
+  const amountTotal = Number(invoice.total ?? 0);
+  const paidFlag = invoice.paid === true;
+  const effectivePaid = amountPaid || amountTotal;
+
+  // Skip truly $0 invoices (trial start, coupons, etc.)
+  if (!paidFlag || effectivePaid <= 0) return;
 
   const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
     filters: { customerId: invoice.customer }

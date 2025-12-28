@@ -1,7 +1,7 @@
 // path: src/api/subscription/controllers/stripe.js
 'use strict';
 
-const Stripe = require('stripe');
+const { default: Stripe } = require('stripe');
 const crypto = require('crypto');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 const UNPARSED = Symbol.for('unparsedBody');
@@ -46,8 +46,7 @@ async subscriptionStatus(ctx) {
     const liveTrialEndRaw = sub?.trial_end || null; // seconds
     const liveTrialEnd = liveTrialEndRaw ? new Date(liveTrialEndRaw * 1000) : null;
 
-    // For DB write-through, map ONLY 'past_due' -> 'pastDue' to avoid breaking existing consumers
-    const mapForUserRow = (s) => (s === 'past_due' ? 'pastDue' : (s || 'inactive'));
+    const mapForUserRow = (s) => normalizeSubscriptionStatusForUserRow(s);
 
     // Prepare what's going to the user row (idempotent update)
     const nextData = {
@@ -103,11 +102,19 @@ async subscriptionStatus(ctx) {
         limit: 1,
       });
   
-      const subscription = subscriptions.data[0];
+      const subscription = subscriptions.data[0] || null;
+
+      const planNickname =
+        subscription?.items?.data?.[0]?.price?.nickname ||
+        subscription?.items?.data?.[0]?.plan?.nickname ||
+        null;
+
+      const trialEndsAtSeconds = subscription?.trial_end || null;
+      const trialEndsAtIso = trialEndsAtSeconds ? new Date(trialEndsAtSeconds * 1000).toISOString() : null;
   
       // Check if there's at least one attached payment method
       const hasPaymentMethod =
-        customer.invoice_settings?.default_payment_method != null;
+        customer && customer.deleted !== true && customer.invoice_settings?.default_payment_method != null;
   
       strapi.log.debug('[getBillingInfo] Retrieved billing info', {
         hasPaymentMethod,
@@ -116,7 +123,16 @@ async subscriptionStatus(ctx) {
   
       return ctx.send({
         hasPaymentMethod,
-        trialEndsAt: user.trialEndsAt,
+        trialEndsAt: trialEndsAtIso || user.trialEndsAt,
+        subscription: subscription
+          ? {
+              id: subscription.id,
+              status: subscription.status,
+              trial_end: trialEndsAtSeconds,
+              plan: { nickname: planNickname },
+              current_period_end: subscription.current_period_end || null,
+            }
+          : null,
       });
     } catch (error) {
       strapi.log.error('[getBillingInfo] error', error);
@@ -206,7 +222,7 @@ async subscriptionStatus(ctx) {
         strapi.log.error('[confirmPayment] No customer in session', { session });
         return ctx.badRequest('Invalid session or no customer found.');
       }
-      const customerId = session.customer;
+      const customerId = typeof session.customer === 'string' ? session.customer : session.customer.id;
 
       // 2️⃣ Ensure they have a card on file
       strapi.log.debug('[confirmPayment] Listing payment methods', { customerId });
@@ -355,3 +371,14 @@ async confirmSocial(ctx) {
     return ctx.send({ message: 'This is a test route' });
   },
 };
+
+function normalizeSubscriptionStatusForUserRow(status) {
+  const s = String(status || '').trim();
+  if (s === 'past_due') return 'pastDue';
+  if (s === 'active') return 'active';
+  if (s === 'trialing') return 'trialing';
+  if (s === 'canceled') return 'canceled';
+  if (s === 'unpaid') return 'unpaid';
+  if (s === 'incomplete' || s === 'incomplete_expired' || s === 'paused') return 'unpaid';
+  return 'trialing';
+}
