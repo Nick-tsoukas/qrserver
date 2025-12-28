@@ -47,8 +47,7 @@ async subscriptionStatus(ctx) {
     const liveTrialEndRaw = sub?.trial_end || null; // seconds
     const liveTrialEnd = liveTrialEndRaw ? new Date(liveTrialEndRaw * 1000) : null;
 
-    // For DB write-through, map ONLY 'past_due' -> 'pastDue' to avoid breaking existing consumers
-    const mapForUserRow = (s) => (s === 'past_due' ? 'pastDue' : (s || 'inactive'));
+    const mapForUserRow = (s) => normalizeSubscriptionStatusForUserRow(s);
 
     // Prepare what's going to the user row (idempotent update)
     const nextData = {
@@ -299,7 +298,7 @@ async function onCheckoutCompleted(session) {
 
 async function onInvoicePaid(invoice) {
   strapi.log.debug('[Webhook] invoice.payment_succeeded', invoice.id);
-  if (invoice.billing_reason === 'subscription_create' || invoice.amount_due === 0) return;
+  if (invoice.amount_due === 0) return;
 
   const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
     filters: { customerId: invoice.customer }
@@ -364,7 +363,7 @@ async function onSubscriptionUpdated(subscription) {
   // Build update payload (non-destructive, minimal)
   const data = {
     // Keep snake_case status as-is; you have existing code that reads snake and camel elsewhere
-    subscriptionStatus: subscription.status,
+    subscriptionStatus: normalizeSubscriptionStatusForUserRow(subscription.status),
     plan:               planNickname,
     trialEndsAt:        trialEndsAtDate,
   };
@@ -419,4 +418,15 @@ async function onSubscriptionCanceled(subscription) {
 
 async function onUnhandledEvent(data, event) {
   strapi.log.info('[Webhook] Unhandled event', event.type);
+}
+
+function normalizeSubscriptionStatusForUserRow(status) {
+  const s = String(status || '').trim();
+  if (s === 'past_due') return 'pastDue';
+  if (s === 'active') return 'active';
+  if (s === 'trialing') return 'trialing';
+  if (s === 'canceled') return 'canceled';
+  if (s === 'unpaid') return 'unpaid';
+  if (s === 'incomplete' || s === 'incomplete_expired' || s === 'paused') return 'unpaid';
+  return 'trialing';
 }

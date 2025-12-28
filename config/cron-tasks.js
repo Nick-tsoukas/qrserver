@@ -1,8 +1,19 @@
 'use strict';
 
-const Stripe = require('stripe');
+const { default: Stripe } = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 const { subDays } = require('date-fns');
+
+function normalizeSubscriptionStatusForUserRow(status) {
+  const s = String(status || '').trim();
+  if (s === 'past_due') return 'pastDue';
+  if (s === 'active') return 'active';
+  if (s === 'trialing') return 'trialing';
+  if (s === 'canceled') return 'canceled';
+  if (s === 'unpaid') return 'unpaid';
+  if (s === 'incomplete' || s === 'incomplete_expired' || s === 'paused') return 'unpaid';
+  return 'trialing';
+}
 
 module.exports = {
   '* * * * *': async ({ strapi }) => {
@@ -29,7 +40,7 @@ module.exports = {
             null;
 
           const updates = {
-            subscriptionStatus: sub.status,
+            subscriptionStatus: normalizeSubscriptionStatusForUserRow(sub.status),
             plan: planNickname,
             trialEndsAt: sub.trial_end ? new Date(sub.trial_end * 1000) : null,
             cancelAt: sub.cancel_at ? new Date(sub.cancel_at * 1000) : null,
