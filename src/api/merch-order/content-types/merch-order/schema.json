@@ -1,0 +1,81 @@
+{
+  "kind": "collectionType",
+  "collectionName": "merch_orders",
+  "info": {
+    "singularName": "merch-order",
+    "pluralName": "merch-orders",
+    "displayName": "Merch Order",
+    "description": "Merch Concierge orders"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band"
+    },
+    "orderCode": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "paid", "refund_pending", "refunded", "failed"],
+      "default": "pending"
+    },
+    "bandNameSnapshot": {
+      "type": "string"
+    },
+    "bandSlugSnapshot": {
+      "type": "string"
+    },
+    "itemSlotIndex": {
+      "type": "integer",
+      "required": true
+    },
+    "itemTitleSnapshot": {
+      "type": "string"
+    },
+    "selectedSize": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "integer",
+      "default": 1
+    },
+    "priceCentsSnapshot": {
+      "type": "integer"
+    },
+    "pickupInstructionsSnapshot": {
+      "type": "text"
+    },
+    "customerName": {
+      "type": "string"
+    },
+    "customerEmail": {
+      "type": "string"
+    },
+    "stripeCheckoutSessionId": {
+      "type": "string"
+    },
+    "stripePaymentIntentId": {
+      "type": "string"
+    },
+    "stripeChargeId": {
+      "type": "string"
+    },
+    "paidAt": {
+      "type": "datetime"
+    },
+    "refundedAt": {
+      "type": "datetime"
+    },
+    "errorMessage": {
+      "type": "string"
+    }
+  }
+}

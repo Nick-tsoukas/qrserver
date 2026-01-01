@@ -184,6 +184,9 @@
     "paymentButtons": {
       "type": "json"
     },
+    "merchConcierge": {
+      "type": "json"
+    },
     "hiddenLinks": {
       "type": "json"
     },

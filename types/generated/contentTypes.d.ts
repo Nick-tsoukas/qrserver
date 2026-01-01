@@ -993,6 +993,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     stripeAccountId: Attribute.String;
     stripeOnboardingComplete: Attribute.Boolean & Attribute.DefaultTo<false>;
     paymentButtons: Attribute.JSON;
+    merchConcierge: Attribute.JSON;
     hiddenLinks: Attribute.JSON;
     support_moments: Attribute.Relation<
       'api::band.band',
@@ -1489,6 +1490,61 @@ export interface ApiMediaPlayMediaPlay extends Schema.CollectionType {
   };
 }
 
+export interface ApiMerchOrderMerchOrder extends Schema.CollectionType {
+  collectionName: 'merch_orders';
+  info: {
+    singularName: 'merch-order';
+    pluralName: 'merch-orders';
+    displayName: 'Merch Order';
+    description: 'Merch Concierge orders';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::merch-order.merch-order',
+      'manyToOne',
+      'api::band.band'
+    >;
+    orderCode: Attribute.String & Attribute.Required & Attribute.Unique;
+    status: Attribute.Enumeration<
+      ['pending', 'paid', 'refund_pending', 'refunded', 'failed']
+    > &
+      Attribute.DefaultTo<'pending'>;
+    bandNameSnapshot: Attribute.String;
+    bandSlugSnapshot: Attribute.String;
+    itemSlotIndex: Attribute.Integer & Attribute.Required;
+    itemTitleSnapshot: Attribute.String;
+    selectedSize: Attribute.String;
+    quantity: Attribute.Integer & Attribute.DefaultTo<1>;
+    priceCentsSnapshot: Attribute.Integer;
+    pickupInstructionsSnapshot: Attribute.Text;
+    customerName: Attribute.String;
+    customerEmail: Attribute.String;
+    stripeCheckoutSessionId: Attribute.String;
+    stripePaymentIntentId: Attribute.String;
+    stripeChargeId: Attribute.String;
+    paidAt: Attribute.DateTime;
+    refundedAt: Attribute.DateTime;
+    errorMessage: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::merch-order.merch-order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::merch-order.merch-order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiQrQr extends Schema.CollectionType {
   collectionName: 'qrs';
   info: {
@@ -1875,6 +1931,7 @@ declare module '@strapi/types' {
       'api::howtovideo.howtovideo': ApiHowtovideoHowtovideo;
       'api::link-click.link-click': ApiLinkClickLinkClick;
       'api::media-play.media-play': ApiMediaPlayMediaPlay;
+      'api::merch-order.merch-order': ApiMerchOrderMerchOrder;
       'api::qr.qr': ApiQrQr;
       'api::scan.scan': ApiScanScan;
       'api::seo-page.seo-page': ApiSeoPageSeoPage;
