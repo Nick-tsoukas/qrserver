@@ -10,21 +10,19 @@ const MAX_LEN = 60;
 // Escape a string for use inside a RegExp
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-// Unicode-safe sanitizer: keep letters/numbers (any script), - . _ ~
-// Convert whitespace → "-", collapse dashes, trim, truncate.
+// Canonical sanitizer: keep letters/numbers (any script).
+// Convert whitespace/punctuation → "" (no hyphens), trim, truncate.
 const makeUnicodeSlug = (name, maxLen = MAX_LEN) => {
   if (!name || typeof name !== 'string') return null;
   let s = name
     .normalize('NFKC')
     .trim()
     .toLowerCase()
-    .replace(/\s+/gu, '-')                    // spaces → dash
-    .replace(/[^\p{L}\p{N}\-._~]+/gu, '-')    // keep unicode letters/digits and -._~
-    .replace(/-+/g, '-')                      // collapse dashes
-    .replace(/^-|-$/g, '');                   // trim edge dashes
+    .replace(/\s+/gu, '')                     // spaces → nothing
+    .replace(/[^\p{L}\p{N}]+/gu, '');         // keep unicode letters/digits only
 
-  if (s.length > maxLen) s = s.slice(0, maxLen).replace(/-+$/g, '');
-  if (!s) s = `band-${Date.now()}`;
+  if (s.length > maxLen) s = s.slice(0, maxLen);
+  if (!s) s = `band${Date.now()}`;
   return s;
 };
 
@@ -37,18 +35,16 @@ const makeUnicodeSlug = (name, maxLen = MAX_LEN) => {
 //   return base;
 // };
 
-// Sanitize a manually-entered slug (respect Unicode)
+// Sanitize a manually-entered slug (respect Unicode, no hyphens)
 const sanitizeIncomingSlug = (slug, maxLen = MAX_LEN) => {
   if (!slug || typeof slug !== 'string') return null;
   let s = slug
     .normalize('NFKC')
     .trim()
     .toLowerCase()
-    .replace(/\s+/gu, '-')                    // spaces → dash
-    .replace(/[^\p{L}\p{N}\-._~]+/gu, '-')    // keep unicode letters/digits and -._~
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-  if (s.length > maxLen) s = s.slice(0, maxLen).replace(/-+$/g, '');
+    .replace(/\s+/gu, '')
+    .replace(/[^\p{L}\p{N}]+/gu, '');
+  if (s.length > maxLen) s = s.slice(0, maxLen);
   return s || null;
 };
 
@@ -58,7 +54,7 @@ const ensureUniqueSlug = async (base, currentId = null) => {
     filters: {
       $or: [
         { slug: base },
-        { slug: { $startsWith: `${base}-` } },
+        { slug: { $startsWith: `${base}` } },
       ],
     },
     fields: ['id', 'slug'],
@@ -66,7 +62,16 @@ const ensureUniqueSlug = async (base, currentId = null) => {
     publicationState: 'preview',
   });
 
-  const conflicts = existing.filter(e => String(e.id) !== String(currentId));
+  const conflicts = existing
+    .filter((e) => String(e.id) !== String(currentId))
+    // Only treat true suffix collisions as conflicts.
+    // e.g. base, base2, base-2 are conflicts. baseXYZ is NOT.
+    .filter((e) => {
+      const s = String(e.slug || '');
+      if (s === base) return true;
+      const rx = new RegExp(`^${escapeRegExp(base)}(?:-(\\d+)|(\\d+))$`, 'u');
+      return rx.test(s);
+    });
   if (!conflicts.length) return base;
 
   const used = new Set();
@@ -74,15 +79,17 @@ const ensureUniqueSlug = async (base, currentId = null) => {
     if (e.slug === base) {
       used.add(1);
     } else {
-      // Build a safe regex for Unicode base
-      const rx = new RegExp(`^${escapeRegExp(base)}-(\\d+)$`, 'u');
-      const m = e.slug.match(rx);
-      if (m) used.add(parseInt(m[1], 10));
+      const rest = String(e.slug || '').slice(base.length);
+      // Support both legacy "base-2" and canonical "base2"
+      const m1 = rest.match(/^-(\d+)$/u);
+      const m2 = rest.match(/^(\d+)$/u);
+      if (m1) used.add(parseInt(m1[1], 10));
+      if (m2) used.add(parseInt(m2[1], 10));
     }
   }
   let n = 2;
   while (used.has(n)) n++;
-  return `${base}-${n}`;
+  return `${base}${n}`;
 };
 
 const getExistingNameIfNeeded = async (where) => {
@@ -103,7 +110,7 @@ const setSlug = async (event) => {
 
   // 1) If user provided a slug manually, sanitize & de-dupe and KEEP IT.
   if (data.slug) {
-    const sanitized = sanitizeIncomingSlug(data.slug) || `band-${Date.now()}`;
+    const sanitized = sanitizeIncomingSlug(data.slug) || `band${Date.now()}`;
     data.slug = await ensureUniqueSlug(sanitized, currentId);
     return;
   }
@@ -164,12 +171,17 @@ module.exports = {
 
   async beforeUpdate(event) {
     // 1) slug
-    await setSlug(event);
+    // IMPORTANT: never regenerate slug on arbitrary edits.
+    // Only sanitize/update slug when the slug field is explicitly provided.
+    const data = event.params.data;
+    if (data && Object.prototype.hasOwnProperty.call(data, 'slug')) {
+      await setSlug(event);
+    }
 
     // 2) payments normalization (only when paymentButtons is being updated)
-    const data = event.params.data;
+    // (reuse data from above)
 
-    if ("paymentButtons" in data) {
+    if (data && "paymentButtons" in data) {
       if (!Array.isArray(data.paymentButtons)) {
         data.paymentButtons = defaultButtons;
       } else {
