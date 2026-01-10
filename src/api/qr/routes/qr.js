@@ -19,7 +19,8 @@ module.exports = {
       handler: 'qr.findOne',
       config: {
         policies: [
-        
+          'plugin::users-permissions.isAuthenticated',
+          'api::qr.can-view-qr',
         ],
       },
     },

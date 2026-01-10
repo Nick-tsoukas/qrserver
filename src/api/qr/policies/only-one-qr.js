@@ -14,6 +14,8 @@ module.exports = async (policyContext, config, { strapi }) => {
   const specialUsers = [
     'mjc773@gmail.com',
     'nick.tsoukas101@gmail.com',
+    'info@rocksnaps.com',
+    'novamusic@aol.com',
     'partner@musicbizqr.com',
   ];
 
@@ -21,7 +23,8 @@ module.exports = async (policyContext, config, { strapi }) => {
   let qrLimit = 1;
 
   // Special users get higher limit
-  if (specialUsers.includes(user.email)) {
+  const userEmail = String(user.email || '').toLowerCase();
+  if (specialUsers.includes(userEmail)) {
     qrLimit = 10;
   }
 
