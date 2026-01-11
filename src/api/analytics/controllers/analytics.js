@@ -1,6 +1,7 @@
 "use strict";
 
 const { DateTime } = require("luxon");
+const { normalizeSignals, computePulse, fetchEntityData } = require("../services/pulse");
 
 const uidPV = "api::band-page-view.band-page-view";
 const uidLC = "api::link-click.link-click";
@@ -1177,6 +1178,73 @@ module.exports = {
       };
     } catch (err) {
       strapi.log.error("[analytics.qrDevices] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  // ============================================================
+  // MBQ PULSE ENDPOINT
+  // ============================================================
+
+  /**
+   * GET /analytics/pulse
+   * Unified pulse score and momentum for band/event/qr
+   * Params: entityType=band|event|qr, entityId, range=7d|30d|90d|365d
+   */
+  async pulse(ctx) {
+    try {
+      const entityType = String(ctx.query.entityType || "").toLowerCase();
+      const entityId = Number(ctx.query.entityId);
+      const range = String(ctx.query.range || "30d");
+
+      if (!["band", "event", "qr"].includes(entityType)) {
+        return ctx.badRequest("entityType must be band, event, or qr");
+      }
+      if (!entityId) {
+        return ctx.badRequest("entityId required");
+      }
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+
+      // Current period
+      const currentFrom = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const currentTo = now.endOf("day").toISO();
+
+      // Previous period (same length, immediately preceding)
+      const prevFrom = now.minus({ days: days * 2 - 1 }).startOf("day").toISO();
+      const prevTo = now.minus({ days }).endOf("day").toISO();
+
+      // Fetch data for both periods
+      const [currentRaw, previousRaw] = await Promise.all([
+        fetchEntityData(strapi, entityType, entityId, days, currentFrom, currentTo),
+        fetchEntityData(strapi, entityType, entityId, days, prevFrom, prevTo),
+      ]);
+
+      if (!currentRaw) {
+        return ctx.badRequest("Failed to fetch entity data");
+      }
+
+      // Normalize into unified signals
+      const currentSignals = normalizeSignals(entityType, entityId, range, currentRaw);
+      const previousSignals = previousRaw
+        ? normalizeSignals(entityType, entityId, range, previousRaw)
+        : null;
+
+      // Compute pulse
+      const pulse = computePulse(currentSignals, previousSignals);
+
+      ctx.body = {
+        ok: true,
+        entityType,
+        entityId,
+        range,
+        signals: currentSignals,
+        pulse,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.pulse] ", err);
       ctx.status = 500;
       ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
     }

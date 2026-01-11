@@ -77,5 +77,12 @@ module.exports = {
       handler: "analytics.qrDevices",
       config: { auth: false },
     },
+    // MBQ Pulse
+    {
+      method: "GET",
+      path: "/analytics/pulse",
+      handler: "analytics.pulse",
+      config: { auth: false },
+    },
   ],
 };
