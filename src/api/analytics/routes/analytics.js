@@ -84,5 +84,25 @@ module.exports = {
       handler: "analytics.pulse",
       config: { auth: false },
     },
+    // Push dry-run (dev/debug)
+    {
+      method: "GET",
+      path: "/analytics/push/dry-run",
+      handler: "analytics.pushDryRun",
+      config: { auth: false },
+    },
+    // Push opt-in
+    {
+      method: "POST",
+      path: "/push/opt-in",
+      handler: "analytics.pushOptIn",
+      config: { policies: [], middlewares: [] },
+    },
+    {
+      method: "GET",
+      path: "/push/opt-in/status",
+      handler: "analytics.pushOptInStatus",
+      config: { policies: [], middlewares: [] },
+    },
   ],
 };

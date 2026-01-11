@@ -2,6 +2,12 @@
 
 const { DateTime } = require("luxon");
 const { normalizeSignals, computePulse, fetchEntityData } = require("../services/pulse");
+const {
+  computeActivityTotals,
+  evaluateSurgePush,
+  createSurgeNotifications,
+  updateSnapshotAfterPush,
+} = require("../services/pushEligibility");
 
 const uidPV = "api::band-page-view.band-page-view";
 const uidLC = "api::link-click.link-click";
@@ -1207,6 +1213,7 @@ module.exports = {
 
       const days = Number(range.replace("d", "")) || 30;
       const now = DateTime.utc();
+      const nowJS = now.toJSDate();
 
       // Current period
       const currentFrom = now.minus({ days: days - 1 }).startOf("day").toISO();
@@ -1235,6 +1242,125 @@ module.exports = {
       // Compute pulse
       const pulse = computePulse(currentSignals, previousSignals);
 
+      // ============================================================
+      // SNAPSHOT + SURGE DETECTION (bands only)
+      // ============================================================
+      let surgeEvaluation = null;
+      
+      if (entityType === "band") {
+        try {
+          // Load previous snapshot
+          const prevSnapshots = await strapi.entityService.findMany(
+            "api::pulse-snapshot.pulse-snapshot",
+            {
+              filters: { band: entityId, rangeKey: range },
+              sort: { computedAt: "desc" },
+              limit: 1,
+            }
+          );
+          const prevSnapshot = prevSnapshots[0] || null;
+
+          // Compute activity totals
+          const totalActivity = computeActivityTotals(currentSignals);
+          const prevTotalActivity = prevSnapshot?.totalActivity || 0;
+          const absoluteIncrease = totalActivity - prevTotalActivity;
+
+          // Detect momentum change
+          const prevMomentum = prevSnapshot?.momentumState || "steady";
+          const currentMomentum = pulse.momentumState;
+          const momentumChanged = prevMomentum !== currentMomentum;
+
+          // Create or update snapshot
+          const snapshotData = {
+            band: entityId,
+            rangeKey: range,
+            pulseScore: pulse.pulseScore,
+            momentumState: currentMomentum,
+            totalActivity,
+            growthPct: pulse.drivers?.growthPct || 0,
+            absoluteIncrease,
+            computedAt: now.toISO(),
+            drivers: pulse.drivers,
+          };
+
+          // Update lastMomentumChangeAt if momentum changed
+          if (momentumChanged) {
+            snapshotData.lastMomentumChangeAt = now.toISO();
+          } else if (prevSnapshot?.lastMomentumChangeAt) {
+            snapshotData.lastMomentumChangeAt = prevSnapshot.lastMomentumChangeAt;
+          }
+
+          // Preserve surge push tracking
+          if (prevSnapshot) {
+            snapshotData.surgePushSent = prevSnapshot.surgePushSent;
+            snapshotData.lastSurgePushAt = prevSnapshot.lastSurgePushAt;
+          }
+
+          // Reset surgePushSent if momentum dropped below steady
+          if (currentMomentum === "steady" || currentMomentum === "cooling") {
+            snapshotData.surgePushSent = false;
+          }
+
+          let snapshot;
+          if (prevSnapshot) {
+            snapshot = await strapi.entityService.update(
+              "api::pulse-snapshot.pulse-snapshot",
+              prevSnapshot.id,
+              { data: snapshotData }
+            );
+          } else {
+            snapshot = await strapi.entityService.create(
+              "api::pulse-snapshot.pulse-snapshot",
+              { data: snapshotData }
+            );
+          }
+
+          // ============================================================
+          // SURGE PUSH EVALUATION
+          // ============================================================
+          // Only evaluate if transitioning INTO surging
+          if (prevMomentum !== "surging" && currentMomentum === "surging") {
+            // Get band with user
+            const band = await strapi.entityService.findOne("api::band.band", entityId, {
+              populate: ["users_permissions_user"],
+            });
+
+            if (band?.users_permissions_user) {
+              const user = band.users_permissions_user;
+
+              surgeEvaluation = evaluateSurgePush({
+                user,
+                band,
+                currentPulse: pulse,
+                currentSignals,
+                prevSnapshot,
+                now: nowJS,
+              });
+
+              // Create notifications if eligible
+              if (surgeEvaluation.eligible && surgeEvaluation.wouldSend) {
+                const notifResult = await createSurgeNotifications(strapi, {
+                  user,
+                  band,
+                  notification: surgeEvaluation.notification,
+                });
+
+                if (notifResult.created) {
+                  await updateSnapshotAfterPush(strapi, snapshot.id, now);
+                  surgeEvaluation.notificationCreated = true;
+                } else {
+                  surgeEvaluation.notificationCreated = false;
+                  surgeEvaluation.notificationSkipReason = notifResult.reason;
+                }
+              }
+            }
+          }
+        } catch (snapshotErr) {
+          strapi.log.warn("[analytics.pulse] Snapshot/surge error:", snapshotErr);
+          // Don't fail the whole request for snapshot errors
+        }
+      }
+
       ctx.body = {
         ok: true,
         entityType,
@@ -1242,9 +1368,178 @@ module.exports = {
         range,
         signals: currentSignals,
         pulse,
+        surgeEvaluation: surgeEvaluation ? {
+          eligible: surgeEvaluation.eligible,
+          wouldSend: surgeEvaluation.wouldSend,
+          notificationCreated: surgeEvaluation.notificationCreated || false,
+        } : null,
       };
     } catch (err) {
       strapi.log.error("[analytics.pulse] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  // ============================================================
+  // PUSH DRY-RUN ENDPOINT
+  // ============================================================
+
+  /**
+   * GET /analytics/push/dry-run
+   * Returns whether a push would be sent and why, plus preview copy
+   * Params: bandId, range=30d
+   */
+  async pushDryRun(ctx) {
+    try {
+      const bandId = Number(ctx.query.bandId);
+      const range = String(ctx.query.range || "30d");
+
+      if (!bandId) {
+        return ctx.badRequest("bandId required");
+      }
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+      const nowJS = now.toJSDate();
+
+      // Current period
+      const currentFrom = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const currentTo = now.endOf("day").toISO();
+
+      // Previous period
+      const prevFrom = now.minus({ days: days * 2 - 1 }).startOf("day").toISO();
+      const prevTo = now.minus({ days }).endOf("day").toISO();
+
+      // Fetch data
+      const [currentRaw, previousRaw] = await Promise.all([
+        fetchEntityData(strapi, "band", bandId, days, currentFrom, currentTo),
+        fetchEntityData(strapi, "band", bandId, days, prevFrom, prevTo),
+      ]);
+
+      if (!currentRaw) {
+        return ctx.badRequest("Failed to fetch band data");
+      }
+
+      // Normalize and compute pulse
+      const currentSignals = normalizeSignals("band", bandId, range, currentRaw);
+      const previousSignals = previousRaw
+        ? normalizeSignals("band", bandId, range, previousRaw)
+        : null;
+      const pulse = computePulse(currentSignals, previousSignals);
+
+      // Load previous snapshot
+      const prevSnapshots = await strapi.entityService.findMany(
+        "api::pulse-snapshot.pulse-snapshot",
+        {
+          filters: { band: bandId, rangeKey: range },
+          sort: { computedAt: "desc" },
+          limit: 1,
+        }
+      );
+      const prevSnapshot = prevSnapshots[0] || null;
+
+      // Get band with user
+      const band = await strapi.entityService.findOne("api::band.band", bandId, {
+        populate: ["users_permissions_user"],
+      });
+
+      if (!band) {
+        return ctx.notFound("Band not found");
+      }
+
+      const user = band.users_permissions_user;
+
+      // Evaluate surge push
+      const evaluation = evaluateSurgePush({
+        user,
+        band,
+        currentPulse: pulse,
+        currentSignals,
+        prevSnapshot,
+        now: nowJS,
+      });
+
+      ctx.body = {
+        ok: true,
+        bandId,
+        range,
+        currentMomentum: pulse.momentumState,
+        previousMomentum: prevSnapshot?.momentumState || "steady",
+        pulseScore: pulse.pulseScore,
+        evaluation: {
+          eligible: evaluation.eligible,
+          wouldSend: evaluation.wouldSend,
+          reasons: evaluation.reasons,
+          notification: evaluation.notification,
+          debugInfo: evaluation.debugInfo,
+        },
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.pushDryRun] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  // ============================================================
+  // PUSH OPT-IN ENDPOINT
+  // ============================================================
+
+  /**
+   * POST /push/opt-in
+   * Toggle push notification opt-in for authenticated user
+   */
+  async pushOptIn(ctx) {
+    try {
+      const user = ctx.state.user;
+      if (!user) {
+        return ctx.unauthorized("You must be logged in");
+      }
+
+      // Toggle the current value
+      const newValue = !user.pushOptIn;
+
+      await strapi.entityService.update(
+        "plugin::users-permissions.user",
+        user.id,
+        { data: { pushOptIn: newValue } }
+      );
+
+      ctx.body = {
+        ok: true,
+        pushOptIn: newValue,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.pushOptIn] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  /**
+   * GET /push/opt-in/status
+   * Get current push opt-in status for authenticated user
+   */
+  async pushOptInStatus(ctx) {
+    try {
+      const user = ctx.state.user;
+      if (!user) {
+        return ctx.unauthorized("You must be logged in");
+      }
+
+      // Calculate account age
+      const userCreatedAt = DateTime.fromISO(user.createdAt);
+      const accountAgeDays = Math.floor(DateTime.utc().diff(userCreatedAt, "days").days);
+
+      ctx.body = {
+        ok: true,
+        pushOptIn: user.pushOptIn || false,
+        accountAgeDays,
+        canOptIn: accountAgeDays >= 7,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.pushOptInStatus] ", err);
       ctx.status = 500;
       ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
     }

@@ -780,6 +780,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     trialEndsAt: Attribute.Date;
     gracePeriodStart: Attribute.Date;
     cancelAt: Attribute.Date;
+    pushOptIn: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -1647,6 +1648,135 @@ export interface ApiMerchOrderMerchOrder extends Schema.CollectionType {
   };
 }
 
+export interface ApiNotificationNotification extends Schema.CollectionType {
+  collectionName: 'notifications';
+  info: {
+    singularName: 'notification';
+    pluralName: 'notifications';
+    displayName: 'Notification';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    user: Attribute.Relation<
+      'api::notification.notification',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    band: Attribute.Relation<
+      'api::notification.notification',
+      'manyToOne',
+      'api::band.band'
+    >;
+    type: Attribute.Enumeration<['pulse_surge']> & Attribute.Required;
+    channel: Attribute.Enumeration<['in_app', 'push_candidate']> &
+      Attribute.Required;
+    title: Attribute.String & Attribute.Required;
+    message: Attribute.Text & Attribute.Required;
+    deepLink: Attribute.String & Attribute.DefaultTo<'/dashboard'>;
+    severity: Attribute.Enumeration<['info']> & Attribute.DefaultTo<'info'>;
+    readAt: Attribute.DateTime;
+    meta: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::notification.notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::notification.notification',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiPulseSnapshotPulseSnapshot extends Schema.CollectionType {
+  collectionName: 'pulse_snapshots';
+  info: {
+    singularName: 'pulse-snapshot';
+    pluralName: 'pulse-snapshots';
+    displayName: 'Pulse Snapshot';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::pulse-snapshot.pulse-snapshot',
+      'manyToOne',
+      'api::band.band'
+    >;
+    rangeKey: Attribute.String & Attribute.Required;
+    pulseScore: Attribute.Integer & Attribute.Required;
+    momentumState: Attribute.String & Attribute.Required;
+    totalActivity: Attribute.Integer & Attribute.DefaultTo<0>;
+    growthPct: Attribute.Float & Attribute.DefaultTo<0>;
+    absoluteIncrease: Attribute.Integer & Attribute.DefaultTo<0>;
+    computedAt: Attribute.DateTime & Attribute.Required;
+    drivers: Attribute.JSON;
+    lastMomentumChangeAt: Attribute.DateTime;
+    surgePushSent: Attribute.Boolean & Attribute.DefaultTo<false>;
+    lastSurgePushAt: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::pulse-snapshot.pulse-snapshot',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::pulse-snapshot.pulse-snapshot',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiPushDevicePushDevice extends Schema.CollectionType {
+  collectionName: 'push_devices';
+  info: {
+    singularName: 'push-device';
+    pluralName: 'push-devices';
+    displayName: 'Push Device';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    user: Attribute.Relation<
+      'api::push-device.push-device',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    token: Attribute.String & Attribute.Required & Attribute.Unique;
+    platform: Attribute.Enumeration<['web', 'ios', 'android']> &
+      Attribute.Required;
+    enabled: Attribute.Boolean & Attribute.DefaultTo<true>;
+    lastSeenAt: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::push-device.push-device',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::push-device.push-device',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiQrQr extends Schema.CollectionType {
   collectionName: 'qrs';
   info: {
@@ -2076,6 +2206,9 @@ declare module '@strapi/types' {
       'api::link-click.link-click': ApiLinkClickLinkClick;
       'api::media-play.media-play': ApiMediaPlayMediaPlay;
       'api::merch-order.merch-order': ApiMerchOrderMerchOrder;
+      'api::notification.notification': ApiNotificationNotification;
+      'api::pulse-snapshot.pulse-snapshot': ApiPulseSnapshotPulseSnapshot;
+      'api::push-device.push-device': ApiPushDevicePushDevice;
       'api::qr.qr': ApiQrQr;
       'api::scan.scan': ApiScanScan;
       'api::seo-page.seo-page': ApiSeoPageSeoPage;

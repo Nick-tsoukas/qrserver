@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notifications",
+  "info": {
+    "singularName": "notification",
+    "pluralName": "notifications",
+    "displayName": "Notification"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["pulse_surge"],
+      "required": true
+    },
+    "channel": {
+      "type": "enumeration",
+      "enum": ["in_app", "push_candidate"],
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "message": {
+      "type": "text",
+      "required": true
+    },
+    "deepLink": {
+      "type": "string",
+      "default": "/dashboard"
+    },
+    "severity": {
+      "type": "enumeration",
+      "enum": ["info"],
+      "default": "info"
+    },
+    "readAt": {
+      "type": "datetime"
+    },
+    "meta": {
+      "type": "json"
+    }
+  }
+}

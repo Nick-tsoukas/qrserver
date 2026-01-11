@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pulse_snapshots",
+  "info": {
+    "singularName": "pulse-snapshot",
+    "pluralName": "pulse-snapshots",
+    "displayName": "Pulse Snapshot"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band"
+    },
+    "rangeKey": {
+      "type": "string",
+      "required": true
+    },
+    "pulseScore": {
+      "type": "integer",
+      "required": true
+    },
+    "momentumState": {
+      "type": "string",
+      "required": true
+    },
+    "totalActivity": {
+      "type": "integer",
+      "default": 0
+    },
+    "growthPct": {
+      "type": "float",
+      "default": 0
+    },
+    "absoluteIncrease": {
+      "type": "integer",
+      "default": 0
+    },
+    "computedAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "drivers": {
+      "type": "json"
+    },
+    "lastMomentumChangeAt": {
+      "type": "datetime"
+    },
+    "surgePushSent": {
+      "type": "boolean",
+      "default": false
+    },
+    "lastSurgePushAt": {
+      "type": "datetime"
+    }
+  }
+}

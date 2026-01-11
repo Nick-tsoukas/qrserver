@@ -141,6 +141,10 @@
     },
     "cancelAt": {
       "type": "date"
+    },
+    "pushOptIn": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "push_devices",
+  "info": {
+    "singularName": "push-device",
+    "pluralName": "push-devices",
+    "displayName": "Push Device"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "token": {
+      "type": "string",
+      "unique": true,
+      "required": true
+    },
+    "platform": {
+      "type": "enumeration",
+      "enum": ["web", "ios", "android"],
+      "required": true
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "lastSeenAt": {
+      "type": "datetime"
+    }
+  }
+}
