@@ -16,12 +16,39 @@ const isTokenExpired = (expiresAt) => {
   return expMs <= nowMs + margin;
 };
 
+const handleBandGuardError = (ctx, err) => {
+  const msg = String(err?.message || "");
+  if (msg === "bandId required") {
+    ctx.status = 400;
+    ctx.body = { ok: false, error: "bandId required" };
+    return true;
+  }
+  if (msg.startsWith("band-not-found:")) {
+    const id = msg.split(":")[1] || "";
+    ctx.status = 404;
+    ctx.body = {
+      ok: false,
+      error: `Band ${id} not found in this environment`,
+    };
+    return true;
+  }
+  return false;
+};
+
 module.exports = {
   // GET /api/youtube/oauth/init?bandId=5
   async oauthInit(ctx) {
     try {
       const bandId = Number(ctx.query.bandId);
       if (!bandId) return ctx.badRequest("bandId required");
+
+      try {
+        const youtubeService = strapi.service("api::youtube.youtube");
+        await youtubeService.assertBandExists(bandId);
+      } catch (e) {
+        if (handleBandGuardError(ctx, e)) return;
+        throw e;
+      }
 
       const clientId = process.env.GOOGLE_CLIENT_ID;
       const redirectUri = process.env.GOOGLE_REDIRECT_URI;
@@ -84,6 +111,14 @@ module.exports = {
     const bandId = bandIdMatch ? Number(bandIdMatch[1]) : null;
     if (!bandId) return ctx.badRequest("bandId missing in state");
 
+    const youtubeService = strapi.service("api::youtube.youtube");
+    try {
+      await youtubeService.assertBandExists(bandId);
+    } catch (e) {
+      if (handleBandGuardError(ctx, e)) return;
+      throw e;
+    }
+
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     const redirectUri = process.env.GOOGLE_REDIRECT_URI;
@@ -127,8 +162,6 @@ module.exports = {
       const expiresAt = expiresIn
         ? new Date(Date.now() + expiresIn * 1000).toISOString()
         : null;
-
-      const youtubeService = strapi.service("api::youtube.youtube");
 
       // 2) get channels with this access token
       const channels = await youtubeService.fetchChannels(accessToken);
@@ -229,6 +262,12 @@ module.exports = {
 
     try {
       const youtubeService = strapi.service("api::youtube.youtube");
+      try {
+        await youtubeService.assertBandExists(bandId);
+      } catch (e) {
+        if (handleBandGuardError(ctx, e)) return;
+        throw e;
+      }
       const account = await youtubeService.findExternalAccount(bandId, "youtube");
 
       if (!account) return ctx.badRequest("Youtube account not found for this band");
@@ -366,6 +405,12 @@ async debugChannels(ctx) {
 
     try {
       const youtubeService = strapi.service("api::youtube.youtube");
+      try {
+        await youtubeService.assertBandExists(bandId);
+      } catch (e) {
+        if (handleBandGuardError(ctx, e)) return;
+        throw e;
+      }
       const account = await youtubeService.findExternalAccount(bandId, "youtube");
 
        strapi.log.info(
@@ -569,6 +614,12 @@ async debug(ctx) {
 
     try {
       const youtubeService = strapi.service("api::youtube.youtube");
+      try {
+        await youtubeService.assertBandExists(bandId);
+      } catch (e) {
+        if (handleBandGuardError(ctx, e)) return;
+        throw e;
+      }
 
       const removedAccount = await youtubeService.removeExternalAccount(
         bandId,
@@ -607,6 +658,12 @@ async debug(ctx) {
 
     try {
       const youtubeService = strapi.service("api::youtube.youtube");
+      try {
+        await youtubeService.assertBandExists(bandId);
+      } catch (e) {
+        if (handleBandGuardError(ctx, e)) return;
+        throw e;
+      }
       const removed = await youtubeService.removeExternalAccount(bandId, "youtube");
 
       ctx.body = { ok: true, provider: "youtube", bandId, removed };

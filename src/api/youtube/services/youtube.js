@@ -7,6 +7,20 @@ const YT_API_BASE = 'https://www.googleapis.com/youtube/v3';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 module.exports = () => ({
+  async assertBandExists(bandId) {
+    const id = Number(bandId);
+    if (!id) {
+      throw new Error('bandId required');
+    }
+    const band = await strapi.entityService.findOne('api::band.band', id, {
+      fields: ['id'],
+    });
+    if (!band) {
+      throw new Error(`band-not-found:${id}`);
+    }
+    return true;
+  },
+
   /**
    * Find existing external account for band/provider
    */
@@ -35,6 +49,7 @@ async upsertExternalAccount({
   expiresAt,
   providerClientId, // <— NEW: the client that minted these tokens
 }) {
+  await this.assertBandExists(bandId);
   const existing = await this.findExternalAccount(bandId, provider);
 
   // keep whatever raw was passed, but also stamp providerClientId inside
@@ -458,6 +473,7 @@ async syncYoutubeForBand({ bandId, accessToken, channelId }) {
    * remove account (used in purge/disconnect)
    */
   async removeExternalAccount(bandId, provider) {
+    await this.assertBandExists(bandId);
     const rows = await strapi.entityService.findMany(
       'api::band-external-account.band-external-account',
       {
