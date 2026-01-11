@@ -5,7 +5,8 @@ const { DateTime } = require("luxon");
 const uidPV = "api::band-page-view.band-page-view";
 const uidLC = "api::link-click.link-click";
 const uidMP = "api::media-play.media-play";
-const uidScan = "api::scan.scan"; // 👈 NEW
+const uidScan = "api::scan.scan";
+const uidUIEvent = "api::band-ui-event.band-ui-event";
 
 const fieldTS = "timestamp"; // explicit datetime in your schemas
 const safeInt = (n) => (Number.isFinite(n) ? n : 0);
@@ -390,6 +391,110 @@ module.exports = {
       ctx.body = { ok: true, nodes, links };
     } catch (err) {
       strapi.log.error("[analytics.transitions] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  /**
+   * GET /analytics/follows
+   * Follow analytics: opens, confirms, redirects, platform breakdown
+   */
+  async follows(ctx) {
+    try {
+      const bandId = Number(ctx.query.bandId);
+      if (!bandId) return ctx.badRequest("bandId required");
+
+      const range = String(ctx.query.range || "30d");
+      const days = Number(range.replace("d", "")) || 30;
+
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      // Fetch all follow-related UI events for this band in range
+      const rows = await strapi.entityService.findMany(uidUIEvent, {
+        filters: {
+          band: { id: bandId },
+          eventName: {
+            $in: [
+              "follow_modal_open",
+              "follow_platform_toggle",
+              "follow_confirm",
+              "follow_redirect",
+            ],
+          },
+          [fieldTS]: { $gte: from, $lte: to },
+        },
+        fields: ["id", "eventName", "payload", fieldTS, "createdAt", "updatedAt"],
+        pagination: { limit: 100000 },
+      });
+
+      // Count by event type
+      let opens = 0;
+      let confirms = 0;
+      let redirects = 0;
+      const platformCounts = {};
+
+      // Daily series bucket
+      const bucket = {};
+      for (let i = 0; i < days; i++) {
+        const d = now.minus({ days: days - 1 - i }).toISODate();
+        bucket[d] = { date: d, opens: 0, confirms: 0, redirects: 0 };
+      }
+
+      for (const row of rows) {
+        const eventName = row.eventName;
+        const iso = resolveDate(row);
+        const day = iso ? DateTime.fromISO(iso, { zone: "utc" }).toISODate() : null;
+
+        if (eventName === "follow_modal_open") {
+          opens++;
+          if (day && bucket[day]) bucket[day].opens++;
+        } else if (eventName === "follow_confirm") {
+          confirms++;
+          if (day && bucket[day]) bucket[day].confirms++;
+        } else if (eventName === "follow_redirect") {
+          redirects++;
+          if (day && bucket[day]) bucket[day].redirects++;
+
+          // Extract platformId from payload
+          const payload = row.payload || {};
+          const platformId = payload.platformId || "unknown";
+          platformCounts[platformId] = (platformCounts[platformId] || 0) + 1;
+        }
+      }
+
+      // Sort platforms by count descending
+      const platforms = Object.entries(platformCounts)
+        .map(([platformId, count]) => ({ platformId, count }))
+        .sort((a, b) => b.count - a.count);
+
+      const series = Object.values(bucket);
+
+      // Funnel conversion rates
+      const confirmRate = opens > 0 ? Math.round((confirms / opens) * 1000) / 10 : 0;
+      const redirectRate = confirms > 0 ? Math.round((redirects / confirms) * 1000) / 10 : 0;
+      const overallRate = opens > 0 ? Math.round((redirects / opens) * 1000) / 10 : 0;
+
+      ctx.body = {
+        ok: true,
+        range,
+        totals: {
+          opens,
+          confirms,
+          redirects,
+        },
+        funnel: {
+          confirmRate,
+          redirectRate,
+          overallRate,
+        },
+        platforms,
+        series,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.follows] ", err);
       ctx.status = 500;
       ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
     }

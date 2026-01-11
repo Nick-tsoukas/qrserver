@@ -20,5 +20,11 @@ module.exports = {
       handler: "analytics.transitions",
       config: { auth: false },
     },
+    {
+      method: "GET",
+      path: "/analytics/follows",
+      handler: "analytics.follows",
+      config: { auth: false },
+    },
   ],
 };

@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "band_ui_events",
+  "info": {
+    "singularName": "band-ui-event",
+    "pluralName": "band-ui-events",
+    "displayName": "Band UI Event",
+    "description": "Anonymous UI interaction events (follow modal, etc.)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band"
+    },
+    "bandSlug": {
+      "type": "string"
+    },
+    "eventName": {
+      "type": "string",
+      "required": true
+    },
+    "payload": {
+      "type": "json"
+    },
+    "timestamp": {
+      "type": "datetime"
+    }
+  }
+}

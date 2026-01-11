@@ -1250,6 +1250,44 @@ export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
   };
 }
 
+export interface ApiBandUiEventBandUiEvent extends Schema.CollectionType {
+  collectionName: 'band_ui_events';
+  info: {
+    singularName: 'band-ui-event';
+    pluralName: 'band-ui-events';
+    displayName: 'Band UI Event';
+    description: 'Anonymous UI interaction events (follow modal, etc.)';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::band-ui-event.band-ui-event',
+      'manyToOne',
+      'api::band.band'
+    >;
+    bandSlug: Attribute.String;
+    eventName: Attribute.String & Attribute.Required;
+    payload: Attribute.JSON;
+    timestamp: Attribute.DateTime;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::band-ui-event.band-ui-event',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::band-ui-event.band-ui-event',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiEventEvent extends Schema.CollectionType {
   collectionName: 'events';
   info: {
@@ -1929,6 +1967,7 @@ declare module '@strapi/types' {
       'api::band-external-metric.band-external-metric': ApiBandExternalMetricBandExternalMetric;
       'api::band-insight-daily.band-insight-daily': ApiBandInsightDailyBandInsightDaily;
       'api::band-page-view.band-page-view': ApiBandPageViewBandPageView;
+      'api::band-ui-event.band-ui-event': ApiBandUiEventBandUiEvent;
       'api::event.event': ApiEventEvent;
       'api::event-page-view.event-page-view': ApiEventPageViewEventPageView;
       'api::funtest.funtest': ApiFuntestFuntest;
