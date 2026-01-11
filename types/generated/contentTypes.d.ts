@@ -1000,6 +1000,8 @@ export interface ApiBandBand extends Schema.CollectionType {
       'oneToMany',
       'api::support-moment.support-moment'
     >;
+    layoutConfig: Attribute.JSON;
+    layoutVersion: Attribute.Integer & Attribute.DefaultTo<1>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &

@@ -403,7 +403,8 @@ module.exports = {
   async follows(ctx) {
     try {
       const bandId = Number(ctx.query.bandId);
-      if (!bandId) return ctx.badRequest("bandId required");
+      const bandSlug = ctx.query.bandSlug;
+      if (!bandId && !bandSlug) return ctx.badRequest("bandId or bandSlug required");
 
       const range = String(ctx.query.range || "30d");
       const days = Number(range.replace("d", "")) || 30;
@@ -412,23 +413,52 @@ module.exports = {
       const from = now.minus({ days: days - 1 }).startOf("day").toISO();
       const to = now.endOf("day").toISO();
 
-      // Fetch all follow-related UI events for this band in range
-      const rows = await strapi.entityService.findMany(uidUIEvent, {
-        filters: {
-          band: { id: bandId },
-          eventName: {
-            $in: [
-              "follow_modal_open",
-              "follow_platform_toggle",
-              "follow_confirm",
-              "follow_redirect",
-            ],
-          },
-          [fieldTS]: { $gte: from, $lte: to },
+      // Build filter - support both band relation and bandSlug fallback
+      const eventFilter = {
+        eventName: {
+          $in: [
+            "follow_modal_open",
+            "follow_platform_toggle",
+            "follow_confirm",
+            "follow_redirect",
+          ],
         },
-        fields: ["id", "eventName", "payload", fieldTS, "createdAt", "updatedAt"],
+      };
+
+      // Only add timestamp filter if we have valid dates
+      if (from && to) {
+        eventFilter[fieldTS] = { $gte: from, $lte: to };
+      }
+
+      // Try band relation first, fall back to bandSlug
+      if (bandId) {
+        eventFilter.band = { id: bandId };
+      }
+
+      // Fetch all follow-related UI events for this band in range
+      let rows = await strapi.entityService.findMany(uidUIEvent, {
+        filters: eventFilter,
+        fields: ["id", "eventName", "payload", fieldTS, "createdAt", "updatedAt", "bandSlug"],
         pagination: { limit: 100000 },
       });
+
+      // If no results with band relation and we have bandId, try fetching band's slug and query by that
+      if (rows.length === 0 && bandId) {
+        const band = await strapi.entityService.findOne("api::band.band", bandId, { fields: ["slug"] });
+        if (band?.slug) {
+          const slugFilter = {
+            ...eventFilter,
+            band: undefined,
+            bandSlug: band.slug,
+          };
+          delete slugFilter.band;
+          rows = await strapi.entityService.findMany(uidUIEvent, {
+            filters: slugFilter,
+            fields: ["id", "eventName", "payload", fieldTS, "createdAt", "updatedAt", "bandSlug"],
+            pagination: { limit: 100000 },
+          });
+        }
+      }
 
       // Count by event type
       let opens = 0;
@@ -492,6 +522,12 @@ module.exports = {
         },
         platforms,
         series,
+        _debug: {
+          bandId,
+          from,
+          to,
+          rowCount: rows.length,
+        },
       };
     } catch (err) {
       strapi.log.error("[analytics.follows] ", err);

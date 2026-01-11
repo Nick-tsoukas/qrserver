@@ -195,6 +195,13 @@
       "relation": "oneToMany",
       "target": "api::support-moment.support-moment",
       "mappedBy": "band"
+    },
+    "layoutConfig": {
+      "type": "json"
+    },
+    "layoutVersion": {
+      "type": "integer",
+      "default": 1
     }
   }
 }
