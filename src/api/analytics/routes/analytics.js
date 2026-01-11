@@ -52,5 +52,30 @@ module.exports = {
       handler: "analytics.eventDevices",
       config: { auth: false },
     },
+    // QR analytics
+    {
+      method: "GET",
+      path: "/analytics/qr-rollups",
+      handler: "analytics.qrRollups",
+      config: { auth: false },
+    },
+    {
+      method: "GET",
+      path: "/analytics/qr-geo",
+      handler: "analytics.qrGeo",
+      config: { auth: false },
+    },
+    {
+      method: "GET",
+      path: "/analytics/qr-sources",
+      handler: "analytics.qrSources",
+      config: { auth: false },
+    },
+    {
+      method: "GET",
+      path: "/analytics/qr-devices",
+      handler: "analytics.qrDevices",
+      config: { auth: false },
+    },
   ],
 };

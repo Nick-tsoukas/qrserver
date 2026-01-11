@@ -5,7 +5,7 @@
     "singularName": "scan",
     "pluralName": "scans",
     "displayName": "Scan",
-    "description": ""
+    "description": "QR code scan tracking with full analytics context"
   },
   "options": {
     "draftAndPublish": false
@@ -28,6 +28,114 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::band.band"
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event"
+    },
+    "entryType": {
+      "type": "enumeration",
+      "enum": ["qr", "web"],
+      "default": "qr"
+    },
+    "country": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "float"
+    },
+    "lon": {
+      "type": "float"
+    },
+    "geoSource": {
+      "type": "enumeration",
+      "enum": ["cloudflare", "none", "other"],
+      "default": "none"
+    },
+    "userAgent": {
+      "type": "text"
+    },
+    "deviceType": {
+      "type": "enumeration",
+      "enum": ["desktop", "mobile", "tablet", "unknown"],
+      "default": "unknown"
+    },
+    "os": {
+      "type": "string"
+    },
+    "browser": {
+      "type": "string"
+    },
+    "screenW": {
+      "type": "integer"
+    },
+    "screenH": {
+      "type": "integer"
+    },
+    "lang": {
+      "type": "string"
+    },
+    "tzOffset": {
+      "type": "integer"
+    },
+    "referrer": {
+      "type": "text"
+    },
+    "refDomain": {
+      "type": "string"
+    },
+    "refSource": {
+      "type": "string"
+    },
+    "refMedium": {
+      "type": "string"
+    },
+    "utmSource": {
+      "type": "string"
+    },
+    "utmMedium": {
+      "type": "string"
+    },
+    "utmCampaign": {
+      "type": "string"
+    },
+    "utmTerm": {
+      "type": "string"
+    },
+    "utmContent": {
+      "type": "string"
+    },
+    "gclid": {
+      "type": "string"
+    },
+    "fbclid": {
+      "type": "string"
+    },
+    "ttclid": {
+      "type": "string"
+    },
+    "twclid": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "visitorId": {
+      "type": "string"
+    },
+    "isBot": {
+      "type": "boolean",
+      "default": false
+    },
+    "botScore": {
+      "type": "float"
     }
   }
 }

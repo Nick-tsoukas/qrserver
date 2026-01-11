@@ -884,4 +884,301 @@ module.exports = {
       ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
     }
   },
+
+  // ============================================================
+  // QR ANALYTICS ENDPOINTS
+  // ============================================================
+
+  /**
+   * GET /analytics/qr-rollups
+   * Main rollups for QR scans: totals, sources, devices, time series
+   */
+  async qrRollups(ctx) {
+    try {
+      const qrId = Number(ctx.query.qrId);
+      const range = String(ctx.query.range || "30d");
+      if (!qrId) return ctx.badRequest("qrId required");
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      const rows = await strapi.entityService.findMany(uidScan, {
+        filters: { qr: { id: qrId }, date: { $gte: from, $lte: to } },
+        fields: [
+          "id", "date", "country", "city", "region",
+          "deviceType", "os", "browser", "refSource", "refMedium",
+          "entryType", "createdAt",
+        ],
+        pagination: { limit: 100000 },
+      });
+
+      const by = (rows, pick) =>
+        rows.reduce((m, r) => {
+          const raw = pick(r);
+          const k = (raw || "unknown").toString().toLowerCase();
+          m[k] = (m[k] || 0) + 1;
+          return m;
+        }, {});
+
+      // Sources breakdown
+      const sources = Object.entries(by(rows, (r) => r.refSource))
+        .sort((a, b) => b[1] - a[1]);
+
+      // Countries breakdown
+      const countries = Object.entries(by(rows, (r) => r.country))
+        .sort((a, b) => b[1] - a[1]);
+
+      // Device types
+      const devices = by(rows, (r) => r.deviceType);
+
+      // Browsers
+      const browsers = Object.entries(by(rows, (r) => r.browser))
+        .sort((a, b) => b[1] - a[1]);
+
+      // OS
+      const osList = Object.entries(by(rows, (r) => r.os))
+        .sort((a, b) => b[1] - a[1]);
+
+      // Entry types (qr vs web)
+      const entryTypes = Object.entries(by(rows, (r) => r.entryType))
+        .sort((a, b) => b[1] - a[1]);
+
+      // Time series (daily)
+      const seriesMap = {};
+      for (let i = 0; i < days; i++) {
+        const d = now.minus({ days: days - 1 - i }).toISODate();
+        seriesMap[d] = { date: d, scans: 0 };
+      }
+      rows.forEach((r) => {
+        const ts = resolveScanDate(r);
+        if (!ts) return;
+        const d = DateTime.fromISO(ts, { zone: "utc" }).toISODate();
+        if (seriesMap[d]) seriesMap[d].scans++;
+      });
+      const series = Object.values(seriesMap);
+
+      ctx.body = {
+        ok: true,
+        range,
+        totals: { scans: rows.length },
+        sources,
+        countries,
+        devices,
+        browsers,
+        osList,
+        entryTypes,
+        series,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.qrRollups] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  /**
+   * GET /analytics/qr-geo
+   * Geographic breakdown for QR scans
+   */
+  async qrGeo(ctx) {
+    try {
+      const qrId = Number(ctx.query.qrId);
+      const range = String(ctx.query.range || "30d");
+      if (!qrId) return ctx.badRequest("qrId required");
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      const rows = await strapi.entityService.findMany(uidScan, {
+        filters: { qr: { id: qrId }, date: { $gte: from, $lte: to } },
+        fields: ["id", "country", "region", "city", "lat", "lon"],
+        pagination: { limit: 100000 },
+      });
+
+      // Aggregate by city+region+country
+      const geoMap = {};
+      rows.forEach((r) => {
+        const key = `${r.city || "unknown"}|${r.region || ""}|${r.country || ""}`;
+        if (!geoMap[key]) {
+          geoMap[key] = {
+            city: r.city || "Unknown",
+            region: r.region || "",
+            country: r.country || "",
+            lat: r.lat,
+            lon: r.lon,
+            count: 0,
+          };
+        }
+        geoMap[key].count++;
+      });
+
+      const list = Object.values(geoMap).sort((a, b) => b.count - a.count);
+
+      // Country totals
+      const countryMap = {};
+      rows.forEach((r) => {
+        const c = r.country || "unknown";
+        countryMap[c] = (countryMap[c] || 0) + 1;
+      });
+      const countries = Object.entries(countryMap)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      ctx.body = {
+        ok: true,
+        range,
+        total: rows.length,
+        list,
+        countries,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.qrGeo] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  /**
+   * GET /analytics/qr-sources
+   * Detailed source/medium/referrer breakdown for QR scans
+   */
+  async qrSources(ctx) {
+    try {
+      const qrId = Number(ctx.query.qrId);
+      const range = String(ctx.query.range || "30d");
+      if (!qrId) return ctx.badRequest("qrId required");
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      const rows = await strapi.entityService.findMany(uidScan, {
+        filters: { qr: { id: qrId }, date: { $gte: from, $lte: to } },
+        fields: [
+          "id", "refSource", "refMedium", "refDomain",
+          "utmSource", "utmMedium", "utmCampaign", "entryType",
+        ],
+        pagination: { limit: 100000 },
+      });
+
+      const by = (rows, pick) =>
+        rows.reduce((m, r) => {
+          const raw = pick(r);
+          const k = (raw || "unknown").toString().toLowerCase();
+          m[k] = (m[k] || 0) + 1;
+          return m;
+        }, {});
+
+      const sources = Object.entries(by(rows, (r) => r.refSource))
+        .sort((a, b) => b[1] - a[1]);
+
+      const mediums = Object.entries(by(rows, (r) => r.refMedium))
+        .sort((a, b) => b[1] - a[1]);
+
+      const refDomains = Object.entries(by(rows, (r) => r.refDomain))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20);
+
+      const campaigns = Object.entries(by(rows, (r) => r.utmCampaign))
+        .filter(([k]) => k !== "unknown")
+        .sort((a, b) => b[1] - a[1]);
+
+      const entryTypes = Object.entries(by(rows, (r) => r.entryType))
+        .sort((a, b) => b[1] - a[1]);
+
+      ctx.body = {
+        ok: true,
+        range,
+        total: rows.length,
+        sources,
+        mediums,
+        refDomains,
+        campaigns,
+        entryTypes,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.qrSources] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  /**
+   * GET /analytics/qr-devices
+   * Device/browser/OS breakdown for QR scans
+   */
+  async qrDevices(ctx) {
+    try {
+      const qrId = Number(ctx.query.qrId);
+      const range = String(ctx.query.range || "30d");
+      if (!qrId) return ctx.badRequest("qrId required");
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      const rows = await strapi.entityService.findMany(uidScan, {
+        filters: { qr: { id: qrId }, date: { $gte: from, $lte: to } },
+        fields: ["id", "deviceType", "os", "browser", "screenW", "screenH"],
+        pagination: { limit: 100000 },
+      });
+
+      const by = (rows, pick) =>
+        rows.reduce((m, r) => {
+          const raw = pick(r);
+          const k = (raw || "unknown").toString().toLowerCase();
+          m[k] = (m[k] || 0) + 1;
+          return m;
+        }, {});
+
+      const deviceTypes = Object.entries(by(rows, (r) => r.deviceType))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      const osList = Object.entries(by(rows, (r) => r.os))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      const browsers = Object.entries(by(rows, (r) => r.browser))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Screen size buckets
+      const screenBuckets = rows.reduce((m, r) => {
+        if (!r.screenW) return m;
+        let bucket = "unknown";
+        if (r.screenW < 576) bucket = "xs (<576)";
+        else if (r.screenW < 768) bucket = "sm (576-767)";
+        else if (r.screenW < 992) bucket = "md (768-991)";
+        else if (r.screenW < 1200) bucket = "lg (992-1199)";
+        else bucket = "xl (1200+)";
+        m[bucket] = (m[bucket] || 0) + 1;
+        return m;
+      }, {});
+
+      const screenSizes = Object.entries(screenBuckets)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      ctx.body = {
+        ok: true,
+        range,
+        total: rows.length,
+        deviceTypes,
+        osList,
+        browsers,
+        screenSizes,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.qrDevices] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
 };

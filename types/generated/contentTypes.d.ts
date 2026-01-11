@@ -1698,7 +1698,7 @@ export interface ApiScanScan extends Schema.CollectionType {
     singularName: 'scan';
     pluralName: 'scans';
     displayName: 'Scan';
-    description: '';
+    description: 'QR code scan tracking with full analytics context';
   };
   options: {
     draftAndPublish: false;
@@ -1708,6 +1708,47 @@ export interface ApiScanScan extends Schema.CollectionType {
     custom: Attribute.JSON;
     qr: Attribute.Relation<'api::scan.scan', 'manyToOne', 'api::qr.qr'>;
     band: Attribute.Relation<'api::scan.scan', 'manyToOne', 'api::band.band'>;
+    event: Attribute.Relation<
+      'api::scan.scan',
+      'manyToOne',
+      'api::event.event'
+    >;
+    entryType: Attribute.Enumeration<['qr', 'web']> & Attribute.DefaultTo<'qr'>;
+    country: Attribute.String;
+    region: Attribute.String;
+    city: Attribute.String;
+    lat: Attribute.Float;
+    lon: Attribute.Float;
+    geoSource: Attribute.Enumeration<['cloudflare', 'none', 'other']> &
+      Attribute.DefaultTo<'none'>;
+    userAgent: Attribute.Text;
+    deviceType: Attribute.Enumeration<
+      ['desktop', 'mobile', 'tablet', 'unknown']
+    > &
+      Attribute.DefaultTo<'unknown'>;
+    os: Attribute.String;
+    browser: Attribute.String;
+    screenW: Attribute.Integer;
+    screenH: Attribute.Integer;
+    lang: Attribute.String;
+    tzOffset: Attribute.Integer;
+    referrer: Attribute.Text;
+    refDomain: Attribute.String;
+    refSource: Attribute.String;
+    refMedium: Attribute.String;
+    utmSource: Attribute.String;
+    utmMedium: Attribute.String;
+    utmCampaign: Attribute.String;
+    utmTerm: Attribute.String;
+    utmContent: Attribute.String;
+    gclid: Attribute.String;
+    fbclid: Attribute.String;
+    ttclid: Attribute.String;
+    twclid: Attribute.String;
+    sessionId: Attribute.String;
+    visitorId: Attribute.String;
+    isBot: Attribute.Boolean & Attribute.DefaultTo<false>;
+    botScore: Attribute.Float;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::scan.scan', 'oneToOne', 'admin::user'> &
