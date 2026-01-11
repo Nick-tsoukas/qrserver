@@ -5,36 +5,184 @@
     "singularName": "event-page-view",
     "pluralName": "event-page-views",
     "displayName": "Event Page View",
-    "description": ""
+    "description": "Tracks page views for events with full analytics data"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
-    "timestamp": {
-      "type": "datetime"
-    },
-    "ipAddress": {
-      "type": "string"
-    },
-    "userAgent": {
-      "type": "string"
-    },
-    "referrer": {
-      "type": "string"
-    },
-    "path": {
-      "type": "string"
-    },
-    "title": {
-      "type": "string"
-    },
     "event": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::event.event",
       "inversedBy": "event_page_views"
+    },
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band"
+    },
+    "timestamp": {
+      "type": "datetime"
+    },
+    "title": {
+      "type": "string"
+    },
+    "pageUrl": {
+      "type": "string"
+    },
+    "landingPath": {
+      "type": "string"
+    },
+    "landingQuery": {
+      "type": "text"
+    },
+    "referrer": {
+      "type": "string"
+    },
+    "refUrl": {
+      "type": "text"
+    },
+    "refDomain": {
+      "type": "string"
+    },
+    "refSource": {
+      "type": "string"
+    },
+    "refMedium": {
+      "type": "string"
+    },
+    "utmSource": {
+      "type": "string"
+    },
+    "utmMedium": {
+      "type": "string"
+    },
+    "utmCampaign": {
+      "type": "string"
+    },
+    "utmTerm": {
+      "type": "string"
+    },
+    "utmContent": {
+      "type": "string"
+    },
+    "gclid": {
+      "type": "string"
+    },
+    "fbclid": {
+      "type": "string"
+    },
+    "ttclid": {
+      "type": "string"
+    },
+    "twclid": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "lat": {
+      "type": "decimal"
+    },
+    "lon": {
+      "type": "decimal"
+    },
+    "geoSource": {
+      "type": "enumeration",
+      "enum": [
+        "override",
+        "cloudflare",
+        "geoip",
+        "external",
+        "none"
+      ]
+    },
+    "deviceType": {
+      "type": "enumeration",
+      "enum": [
+        "desktop",
+        "mobile",
+        "tablet",
+        "bot",
+        "unknown"
+      ]
+    },
+    "os": {
+      "type": "string"
+    },
+    "browser": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "protocol": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "visitorId": {
+      "type": "string"
+    },
+    "pageLoadMs": {
+      "type": "integer"
+    },
+    "screenW": {
+      "type": "integer"
+    },
+    "screenH": {
+      "type": "integer"
+    },
+    "tzOffset": {
+      "type": "integer"
+    },
+    "lang": {
+      "type": "string"
+    },
+    "botScore": {
+      "type": "decimal"
+    },
+    "sourceCategory": {
+      "type": "enumeration",
+      "enum": [
+        "direct",
+        "search",
+        "social",
+        "referral",
+        "email",
+        "ads",
+        "qr",
+        "unknown"
+      ]
+    },
+    "entryType": {
+      "type": "enumeration",
+      "enum": [
+        "web",
+        "qr"
+      ],
+      "default": "web"
+    },
+    "qrId": {
+      "type": "integer"
+    },
+    "qrScanId": {
+      "type": "integer"
     }
   }
 }

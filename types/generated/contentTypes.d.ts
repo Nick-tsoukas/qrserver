@@ -1360,26 +1360,84 @@ export interface ApiEventPageViewEventPageView extends Schema.CollectionType {
     singularName: 'event-page-view';
     pluralName: 'event-page-views';
     displayName: 'Event Page View';
-    description: '';
+    description: 'Tracks page views for events with full analytics data';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
-    timestamp: Attribute.DateTime;
-    ipAddress: Attribute.String;
-    userAgent: Attribute.String;
-    referrer: Attribute.String;
-    path: Attribute.String;
-    title: Attribute.String;
     event: Attribute.Relation<
       'api::event-page-view.event-page-view',
       'manyToOne',
       'api::event.event'
     >;
+    band: Attribute.Relation<
+      'api::event-page-view.event-page-view',
+      'manyToOne',
+      'api::band.band'
+    >;
+    timestamp: Attribute.DateTime;
+    title: Attribute.String;
+    pageUrl: Attribute.String;
+    landingPath: Attribute.String;
+    landingQuery: Attribute.Text;
+    referrer: Attribute.String;
+    refUrl: Attribute.Text;
+    refDomain: Attribute.String;
+    refSource: Attribute.String;
+    refMedium: Attribute.String;
+    utmSource: Attribute.String;
+    utmMedium: Attribute.String;
+    utmCampaign: Attribute.String;
+    utmTerm: Attribute.String;
+    utmContent: Attribute.String;
+    gclid: Attribute.String;
+    fbclid: Attribute.String;
+    ttclid: Attribute.String;
+    twclid: Attribute.String;
+    userAgent: Attribute.String;
+    path: Attribute.String;
+    city: Attribute.String;
+    region: Attribute.String;
+    country: Attribute.String;
+    lat: Attribute.Decimal;
+    lon: Attribute.Decimal;
+    geoSource: Attribute.Enumeration<
+      ['override', 'cloudflare', 'geoip', 'external', 'none']
+    >;
+    deviceType: Attribute.Enumeration<
+      ['desktop', 'mobile', 'tablet', 'bot', 'unknown']
+    >;
+    os: Attribute.String;
+    browser: Attribute.String;
+    host: Attribute.String;
+    protocol: Attribute.String;
+    sessionId: Attribute.String;
+    visitorId: Attribute.String;
+    pageLoadMs: Attribute.Integer;
+    screenW: Attribute.Integer;
+    screenH: Attribute.Integer;
+    tzOffset: Attribute.Integer;
+    lang: Attribute.String;
+    botScore: Attribute.Decimal;
+    sourceCategory: Attribute.Enumeration<
+      [
+        'direct',
+        'search',
+        'social',
+        'referral',
+        'email',
+        'ads',
+        'qr',
+        'unknown'
+      ]
+    >;
+    entryType: Attribute.Enumeration<['web', 'qr']> &
+      Attribute.DefaultTo<'web'>;
+    qrId: Attribute.Integer;
+    qrScanId: Attribute.Integer;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::event-page-view.event-page-view',
       'oneToOne',

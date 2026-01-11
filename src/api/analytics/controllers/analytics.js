@@ -535,4 +535,353 @@ module.exports = {
       ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
     }
   },
+
+  // ============================================================
+  // EVENT ANALYTICS ENDPOINTS
+  // ============================================================
+
+  /**
+   * GET /analytics/event-rollups
+   * Main rollups for event analytics: views, sources, devices, time series
+   */
+  async eventRollups(ctx) {
+    try {
+      const eventId = Number(ctx.query.eventId);
+      if (!eventId) return ctx.badRequest("eventId required");
+
+      const range = String(ctx.query.range || "30d");
+      const days = Number(range.replace("d", "")) || 30;
+
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      const uidEPV = "api::event-page-view.event-page-view";
+
+      const filters = {
+        event: { id: eventId },
+        [fieldTS]: { $gte: from, $lte: to },
+      };
+
+      // Fetch all event page views in range
+      const pvRows = await strapi.entityService.findMany(uidEPV, {
+        filters,
+        fields: [
+          "id",
+          "userAgent",
+          "refDomain",
+          "refSource",
+          "refMedium",
+          "sourceCategory",
+          "city",
+          "country",
+          "deviceType",
+          "os",
+          "browser",
+          "entryType",
+          fieldTS,
+          "createdAt",
+          "updatedAt",
+        ],
+        pagination: { limit: 100000 },
+      });
+
+      // Helper to bucket by field
+      const by = (rows, pick) =>
+        rows.reduce((m, r) => {
+          const raw = pick(r);
+          const k = (raw || "unknown").toString().toLowerCase();
+          m[k] = (m[k] || 0) + 1;
+          return m;
+        }, {});
+
+      // Source/Medium breakdowns
+      const sources = Object.entries(by(pvRows, (r) => r.refSource)).sort((a, b) => b[1] - a[1]);
+      const mediums = Object.entries(by(pvRows, (r) => r.refMedium)).sort((a, b) => b[1] - a[1]);
+      const sourceCategories = Object.entries(by(pvRows, (r) => r.sourceCategory)).sort((a, b) => b[1] - a[1]);
+      const refDomains = Object.entries(by(pvRows, (r) => r.refDomain))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+      // Device breakdown
+      const devices = pvRows.reduce(
+        (m, r) => {
+          const k = r.deviceType || "unknown";
+          m[k] = (m[k] || 0) + 1;
+          return m;
+        },
+        { desktop: 0, mobile: 0, tablet: 0, bot: 0, unknown: 0 }
+      );
+
+      // OS breakdown
+      const osList = Object.entries(by(pvRows, (r) => r.os)).sort((a, b) => b[1] - a[1]);
+
+      // Browser breakdown
+      const browsers = Object.entries(by(pvRows, (r) => r.browser)).sort((a, b) => b[1] - a[1]);
+
+      // Entry type (web vs qr)
+      const entryTypes = Object.entries(by(pvRows, (r) => r.entryType)).sort((a, b) => b[1] - a[1]);
+
+      // Country breakdown
+      const countries = Object.entries(by(pvRows, (r) => r.country))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 15);
+
+      // Time series (by day)
+      const bucket = {};
+      for (let i = 0; i < days; i++) {
+        const d = now.minus({ days: days - 1 - i }).toISODate();
+        bucket[d] = { date: d, views: 0 };
+      }
+
+      pvRows.forEach((r) => {
+        const iso = resolveDate(r);
+        if (!iso) return;
+        const d = DateTime.fromISO(iso, { zone: "utc" }).toISODate();
+        if (d && bucket[d]) bucket[d].views++;
+      });
+
+      const series = Object.values(bucket);
+
+      ctx.body = {
+        ok: true,
+        range,
+        totals: {
+          views: pvRows.length,
+        },
+        sources,
+        mediums,
+        sourceCategories,
+        refDomains,
+        devices,
+        osList,
+        browsers,
+        entryTypes,
+        countries,
+        series,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.eventRollups] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  /**
+   * GET /analytics/event-geo
+   * Geo breakdown for event analytics
+   */
+  async eventGeo(ctx) {
+    try {
+      const eventId = Number(ctx.query.eventId);
+      const range = String(ctx.query.range || "30d");
+      if (!eventId) return ctx.badRequest("eventId required");
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      const uidEPV = "api::event-page-view.event-page-view";
+
+      const rows = await strapi.entityService.findMany(uidEPV, {
+        filters: { event: { id: eventId }, [fieldTS]: { $gte: from, $lte: to } },
+        fields: ["id", "city", "region", "country", "lat", "lon"],
+        pagination: { limit: 100000 },
+      });
+
+      const map = {};
+      for (const r of rows) {
+        const city = r.city || "Unknown";
+        const key = `${city}|${r.region || ""}|${r.country || ""}`;
+        if (!map[key])
+          map[key] = {
+            city,
+            region: r.region || "",
+            country: r.country || "",
+            lat: r.lat,
+            lon: r.lon,
+            count: 0,
+          };
+        map[key].count++;
+      }
+      const list = Object.values(map).sort((a, b) => b.count - a.count).slice(0, 50);
+
+      ctx.body = { ok: true, list };
+    } catch (err) {
+      strapi.log.error("[analytics.eventGeo] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  /**
+   * GET /analytics/event-sources
+   * Detailed source/medium/referrer breakdown for events
+   */
+  async eventSources(ctx) {
+    try {
+      const eventId = Number(ctx.query.eventId);
+      const range = String(ctx.query.range || "30d");
+      if (!eventId) return ctx.badRequest("eventId required");
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      const uidEPV = "api::event-page-view.event-page-view";
+
+      const rows = await strapi.entityService.findMany(uidEPV, {
+        filters: { event: { id: eventId }, [fieldTS]: { $gte: from, $lte: to } },
+        fields: [
+          "id",
+          "refSource",
+          "refMedium",
+          "refDomain",
+          "sourceCategory",
+          "utmSource",
+          "utmMedium",
+          "utmCampaign",
+          "entryType",
+        ],
+        pagination: { limit: 100000 },
+      });
+
+      const by = (rows, pick) =>
+        rows.reduce((m, r) => {
+          const raw = pick(r);
+          const k = (raw || "unknown").toString().toLowerCase();
+          m[k] = (m[k] || 0) + 1;
+          return m;
+        }, {});
+
+      // Source breakdown
+      const sources = Object.entries(by(rows, (r) => r.refSource))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Medium breakdown
+      const mediums = Object.entries(by(rows, (r) => r.refMedium))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Category breakdown
+      const categories = Object.entries(by(rows, (r) => r.sourceCategory))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Top referrer domains
+      const domains = Object.entries(by(rows, (r) => r.refDomain))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 20);
+
+      // UTM campaigns
+      const campaigns = Object.entries(by(rows, (r) => r.utmCampaign))
+        .filter(([k]) => k !== "unknown" && k !== "")
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Entry types (web vs qr)
+      const entryTypes = Object.entries(by(rows, (r) => r.entryType))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      ctx.body = {
+        ok: true,
+        range,
+        total: rows.length,
+        sources,
+        mediums,
+        categories,
+        domains,
+        campaigns,
+        entryTypes,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.eventSources] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  /**
+   * GET /analytics/event-devices
+   * Device/browser/OS breakdown for events
+   */
+  async eventDevices(ctx) {
+    try {
+      const eventId = Number(ctx.query.eventId);
+      const range = String(ctx.query.range || "30d");
+      if (!eventId) return ctx.badRequest("eventId required");
+
+      const days = Number(range.replace("d", "")) || 30;
+      const now = DateTime.utc();
+      const from = now.minus({ days: days - 1 }).startOf("day").toISO();
+      const to = now.endOf("day").toISO();
+
+      const uidEPV = "api::event-page-view.event-page-view";
+
+      const rows = await strapi.entityService.findMany(uidEPV, {
+        filters: { event: { id: eventId }, [fieldTS]: { $gte: from, $lte: to } },
+        fields: ["id", "deviceType", "os", "browser", "screenW", "screenH"],
+        pagination: { limit: 100000 },
+      });
+
+      const by = (rows, pick) =>
+        rows.reduce((m, r) => {
+          const raw = pick(r);
+          const k = (raw || "unknown").toString().toLowerCase();
+          m[k] = (m[k] || 0) + 1;
+          return m;
+        }, {});
+
+      // Device type breakdown
+      const deviceTypes = Object.entries(by(rows, (r) => r.deviceType))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // OS breakdown
+      const osList = Object.entries(by(rows, (r) => r.os))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Browser breakdown
+      const browsers = Object.entries(by(rows, (r) => r.browser))
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      // Screen size buckets
+      const screenBuckets = rows.reduce((m, r) => {
+        if (!r.screenW) return m;
+        let bucket = "unknown";
+        if (r.screenW < 576) bucket = "xs (<576)";
+        else if (r.screenW < 768) bucket = "sm (576-767)";
+        else if (r.screenW < 992) bucket = "md (768-991)";
+        else if (r.screenW < 1200) bucket = "lg (992-1199)";
+        else bucket = "xl (1200+)";
+        m[bucket] = (m[bucket] || 0) + 1;
+        return m;
+      }, {});
+
+      const screenSizes = Object.entries(screenBuckets)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+
+      ctx.body = {
+        ok: true,
+        range,
+        total: rows.length,
+        deviceTypes,
+        osList,
+        browsers,
+        screenSizes,
+      };
+    } catch (err) {
+      strapi.log.error("[analytics.eventDevices] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
 };
