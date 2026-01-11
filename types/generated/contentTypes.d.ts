@@ -1266,9 +1266,13 @@ export interface ApiEventEvent extends Schema.CollectionType {
     image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     date: Attribute.Date;
     time: Attribute.Time;
+    doorsTime: Attribute.Time;
     link: Attribute.String;
+    ticketLabel: Attribute.String;
+    priceLine: Attribute.String;
     band: Attribute.Relation<'api::event.event', 'manyToOne', 'api::band.band'>;
     contactPhone: Attribute.String;
+    contactEmail: Attribute.String;
     ageRestriction: Attribute.String;
     users_permissions_user: Attribute.Relation<
       'api::event.event',

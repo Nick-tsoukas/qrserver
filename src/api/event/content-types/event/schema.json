@@ -33,7 +33,16 @@
     "time": {
       "type": "time"
     },
+    "doorsTime": {
+      "type": "time"
+    },
     "link": {
+      "type": "string"
+    },
+    "ticketLabel": {
+      "type": "string"
+    },
+    "priceLine": {
       "type": "string"
     },
     "band": {
@@ -43,6 +52,10 @@
       "inversedBy": "events"
     },
     "contactPhone": {
+      "type": "string",
+      "required": false
+    },
+    "contactEmail": {
       "type": "string",
       "required": false
     },
