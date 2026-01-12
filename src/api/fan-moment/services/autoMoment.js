@@ -143,7 +143,7 @@ async function evaluateBand(strapi, bandId, dryRun = false) {
     result.context = momentData.context;
 
     if (!dryRun) {
-      // Create the fan-moment record
+      // Create the fan-moment record with rich content
       await strapi.db.query('api::fan-moment.fan-moment').create({
         data: {
           band: bandId,
@@ -153,8 +153,12 @@ async function evaluateBand(strapi, bandId, dryRun = false) {
           actionType: 'AUTO',
           expiresAt: momentData.expiresAt,
           context: momentData.context,
+          triggerReason: momentData.triggerReason,
           shareTitle: momentData.shareTitle,
           shareText: momentData.shareText,
+          shareSubtitle: momentData.shareSubtitle,
+          shareEmoji: momentData.shareEmoji,
+          shareCallToAction: momentData.shareCallToAction,
         },
       });
       result.created = true;
@@ -315,53 +319,49 @@ function evaluateMomentMattered(pulseData) {
 }
 
 /**
- * Build moment data for creation
+ * Build moment data for creation using templates
  */
 function buildMomentData(band, trigger, pulseData, now) {
+  const momentTemplates = require('./momentTemplates');
   const expiresAt = now.plus({ hours: MOMENT_EXPIRY_HOURS }).toISO();
   const bandName = band.name || 'This Artist';
 
-  let shareTitle, shareText;
-
-  switch (trigger.type) {
-    case 'PULSE_SURGE':
-      shareTitle = '🔥 Fan energy is surging';
-      shareText = `${bandName} is heating up right now. Tap in and follow the vibe.`;
-      break;
-    case 'CITY_HEAT':
-      shareTitle = `📍 ${trigger.cityName} is heating up`;
-      shareText = `${bandName} is catching fire in ${trigger.cityName}. Check them out and follow.`;
-      break;
-    case 'MOMENT_MATTERED':
-    default:
-      shareTitle = '⚡ This moment mattered';
-      shareText = `Something's happening with ${bandName} right now. Jump in and follow.`;
-      break;
-  }
-
-  const context = {
-    kind: 'auto',
+  // Build template context with all available data
+  const templateContext = {
     bandName,
     bandSlug: band.slug,
-    momentType: trigger.type,
-    windowMinutes: pulseData.windowMinutes,
+    velocity: Math.round(pulseData.velocity * 100) / 100,
     recentInteractions: pulseData.recentInteractions,
     baselineInteractions: pulseData.baselineInteractions,
-    velocity: Math.round(pulseData.velocity * 100) / 100,
-    triggeredAt: now.toISO(),
+    windowMinutes: pulseData.windowMinutes,
   };
 
   // Add city-specific context for CITY_HEAT
   if (trigger.type === 'CITY_HEAT') {
-    context.cityName = trigger.cityName;
-    context.cityInteractions = trigger.cityInteractions;
-    context.cityShare = Math.round(trigger.cityShare * 100) / 100;
+    templateContext.cityName = trigger.cityName;
+    templateContext.cityInteractions = trigger.cityInteractions;
+    templateContext.cityShare = Math.round(trigger.cityShare * 100) / 100;
   }
+
+  // Generate rich share content using templates
+  const shareContent = momentTemplates.generateMomentContent(trigger.type, 'AUTO', templateContext);
+  const triggerReason = momentTemplates.getTriggerReason(trigger.type, 'AUTO', templateContext);
+
+  const context = {
+    kind: 'auto',
+    ...templateContext,
+    momentType: trigger.type,
+    triggeredAt: now.toISO(),
+  };
 
   return {
     expiresAt,
-    shareTitle,
-    shareText,
+    shareTitle: shareContent.shareTitle,
+    shareText: shareContent.shareText,
+    shareSubtitle: shareContent.shareSubtitle,
+    shareEmoji: shareContent.shareEmoji,
+    shareCallToAction: shareContent.shareCallToAction,
+    triggerReason,
     context,
   };
 }
@@ -446,8 +446,14 @@ async function getActiveAutoMoment(strapi, bandId) {
     actionType: moment.actionType,
     createdAt: moment.createdAt,
     expiresAt: moment.expiresAt,
-    shareTitle: moment.shareTitle,
-    shareText: moment.shareText,
+    triggerReason: moment.triggerReason || null,
+    share: {
+      title: moment.shareTitle,
+      subtitle: moment.shareSubtitle || null,
+      text: moment.shareText,
+      emoji: moment.shareEmoji || '✨',
+      callToAction: moment.shareCallToAction || 'Check them out',
+    },
     context: moment.context || {},
   };
 }

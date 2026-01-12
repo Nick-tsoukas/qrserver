@@ -19,6 +19,7 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
         return ctx.badRequest('Missing required fields: bandId, actionType, visitorId');
       }
 
+      const momentTemplates = require('../services/momentTemplates');
       const now = new Date();
       const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
@@ -67,11 +68,19 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
         return ctx.badRequest('Band not found');
       }
 
+      // Calculate fan position (how many fans before this one)
+      const fanPosition = await momentTemplates.calculateFanPosition(strapi, bandId, 'day');
+      
+      // Check for milestone achievements
+      const milestone = await momentTemplates.checkMilestone(strapi, bandId);
+
       // Determine moment type based on action and pulse
       let momentType = 'I_WAS_THERE';
       
-      // Upgrade to FUELED_MOMENTUM for payments or if pulse is warming/surging
+      // Upgrade to FUELED_MOMENTUM for payments, milestones, or if pulse is warming/surging
       if (actionType === 'payment') {
+        momentType = 'FUELED_MOMENTUM';
+      } else if (milestone) {
         momentType = 'FUELED_MOMENTUM';
       } else if (actionType === 'follow' && pulse) {
         const state = pulse.momentumState || pulse.state;
@@ -80,27 +89,32 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
         }
       }
 
-      // Build context
-      const momentContext = {
+      // Build rich context for template interpolation
+      const templateContext = {
         bandName: band.name || 'This Artist',
+        bandSlug: band.slug,
         city: context?.city || null,
         state: context?.state || null,
         eventName: context?.eventName || null,
         actionType,
+        fanPosition,
+        milestone: milestone?.label || null,
+        velocity: pulse?.velocity || null,
+        recentInteractions: pulse?.recentInteractions || null,
+      };
+
+      // Generate rich share content using templates
+      const shareContent = momentTemplates.generateMomentContent(momentType, actionType, templateContext);
+      const triggerReason = momentTemplates.getTriggerReason(momentType, actionType, templateContext);
+
+      // Build stored context
+      const momentContext = {
+        ...templateContext,
         landingPath: context?.landingPath || null,
         sourceCategory: context?.sourceCategory || null,
       };
 
-      // Generate share text
-      const shareTitle = momentType === 'FUELED_MOMENTUM'
-        ? `I fueled the moment for ${band.name}`
-        : `I was there for ${band.name}`;
-
-      const shareText = momentType === 'FUELED_MOMENTUM'
-        ? `Just helped fuel the momentum for ${band.name}! 🔥 #MusicBizQR`
-        : `I was part of the moment for ${band.name}! 🎵 #MusicBizQR`;
-
-      // Create the moment
+      // Create the moment with rich content
       const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
       const newMoment = await strapi.db.query('api::fan-moment.fan-moment').create({
@@ -112,8 +126,14 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
           actionType,
           expiresAt: expiresAt.toISOString(),
           context: momentContext,
-          shareTitle,
-          shareText,
+          triggerReason,
+          milestone: milestone || null,
+          fanPosition,
+          shareTitle: shareContent.shareTitle,
+          shareText: shareContent.shareText,
+          shareSubtitle: shareContent.shareSubtitle,
+          shareEmoji: shareContent.shareEmoji,
+          shareCallToAction: shareContent.shareCallToAction,
           publishedAt: now.toISOString(),
         },
       });
@@ -366,18 +386,30 @@ function formatMoment(moment) {
     id: String(moment.id),
     bandId: moment.band?.id || null,
     momentType: moment.momentType,
+    actionType: moment.actionType,
     createdAt: moment.createdAt,
     expiresAt: moment.expiresAt,
+    triggerReason: moment.triggerReason || null,
+    fanPosition: moment.fanPosition || null,
+    milestone: moment.milestone || null,
     context: {
       bandName,
+      bandSlug: moment.context?.bandSlug || moment.band?.slug || null,
       city: moment.context?.city || null,
       state: moment.context?.state || null,
       eventName: moment.context?.eventName || null,
       actionType: moment.actionType,
+      velocity: moment.context?.velocity || null,
+      recentInteractions: moment.context?.recentInteractions || null,
+      cityName: moment.context?.cityName || null,
+      cityInteractions: moment.context?.cityInteractions || null,
     },
     share: {
       title: moment.shareTitle || `I was there for ${bandName}`,
+      subtitle: moment.shareSubtitle || null,
       text: moment.shareText || `I was part of the moment for ${bandName}! 🎵`,
+      emoji: moment.shareEmoji || '✨',
+      callToAction: moment.shareCallToAction || 'Check them out',
       imageUrl: moment.shareImageUrl || null,
     },
   };

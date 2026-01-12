@@ -54,11 +54,30 @@
     "context": {
       "type": "json"
     },
+    "triggerReason": {
+      "type": "string",
+      "default": null
+    },
+    "milestone": {
+      "type": "json"
+    },
+    "fanPosition": {
+      "type": "integer"
+    },
     "shareTitle": {
       "type": "string"
     },
     "shareText": {
       "type": "text"
+    },
+    "shareSubtitle": {
+      "type": "string"
+    },
+    "shareEmoji": {
+      "type": "string"
+    },
+    "shareCallToAction": {
+      "type": "string"
     },
     "shareImageUrl": {
       "type": "string"

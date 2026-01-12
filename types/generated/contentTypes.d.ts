@@ -1544,8 +1544,14 @@ export interface ApiFanMomentFanMoment extends Schema.CollectionType {
       Attribute.Required;
     expiresAt: Attribute.DateTime & Attribute.Required;
     context: Attribute.JSON;
+    triggerReason: Attribute.String;
+    milestone: Attribute.JSON;
+    fanPosition: Attribute.Integer;
     shareTitle: Attribute.String;
     shareText: Attribute.Text;
+    shareSubtitle: Attribute.String;
+    shareEmoji: Attribute.String;
+    shareCallToAction: Attribute.String;
     shareImageUrl: Attribute.String;
     sharedAt: Attribute.DateTime;
     shareChannel: Attribute.String;
