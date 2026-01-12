@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "system_kvs",
+  "info": {
+    "singularName": "system-kv",
+    "pluralName": "system-kvs",
+    "displayName": "System KV",
+    "description": "Key-value store for system timestamps and metadata"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "value": {
+      "type": "json"
+    },
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band"
+    }
+  }
+}

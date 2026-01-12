@@ -65,5 +65,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: 'GET',
+      path: '/fan-moments/system-status',
+      handler: 'fan-moment.systemStatus',
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

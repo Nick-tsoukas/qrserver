@@ -11,6 +11,114 @@ const { createCoreController } = require('@strapi/strapi').factories;
  * @param {object} ctx - Koa context
  * @returns {object} { authorized: boolean, error?: string }
  */
+/**
+ * Upsert a system-kv record
+ */
+async function upsertSystemKv(strapi, key, value) {
+  try {
+    const existing = await strapi.db.query('api::system-kv.system-kv').findOne({
+      where: { key },
+    });
+    
+    if (existing) {
+      await strapi.db.query('api::system-kv.system-kv').update({
+        where: { id: existing.id },
+        data: { value },
+      });
+    } else {
+      await strapi.db.query('api::system-kv.system-kv').create({
+        data: { key, value },
+      });
+    }
+  } catch (err) {
+    strapi.log.error(`[upsertSystemKv] Failed to upsert key ${key}:`, err);
+  }
+}
+
+/**
+ * Generate a mini recap from last 24h activity (synthetic, not persisted)
+ */
+async function generateMiniRecap(strapi, bandId) {
+  const { DateTime } = require('luxon');
+  const now = DateTime.utc();
+  const from = now.minus({ hours: 24 }).toISO();
+  const to = now.toISO();
+
+  try {
+    // Get band info
+    const band = await strapi.entityService.findOne('api::band.band', bandId, {
+      fields: ['id', 'name', 'slug'],
+    });
+    if (!band) return null;
+
+    // Fetch page views
+    const pageViews = await strapi.entityService.findMany('api::band-page-view.band-page-view', {
+      filters: { band: { id: bandId }, timestamp: { $gte: from, $lte: to } },
+      fields: ['id', 'city', 'visitorId'],
+      pagination: { limit: 10000 },
+    }).catch(() => []);
+
+    // Fetch link clicks
+    const linkClicks = await strapi.entityService.findMany('api::link-click.link-click', {
+      filters: { band: { id: bandId }, timestamp: { $gte: from, $lte: to } },
+      fields: ['id', 'linkLabel'],
+      pagination: { limit: 10000 },
+    }).catch(() => []);
+
+    const totalInteractions = (pageViews?.length || 0) + (linkClicks?.length || 0);
+
+    // Need at least some activity for a mini recap
+    if (totalInteractions < 5) return null;
+
+    // Calculate top city
+    const cityMap = {};
+    (pageViews || []).forEach(pv => {
+      if (pv.city && pv.city !== 'Unknown') {
+        cityMap[pv.city] = (cityMap[pv.city] || 0) + 1;
+      }
+    });
+    const topCity = Object.entries(cityMap)
+      .sort((a, b) => b[1] - a[1])[0];
+
+    // Calculate top link
+    const linkMap = {};
+    (linkClicks || []).forEach(lc => {
+      if (lc.linkLabel) {
+        linkMap[lc.linkLabel] = (linkMap[lc.linkLabel] || 0) + 1;
+      }
+    });
+    const topLink = Object.entries(linkMap)
+      .sort((a, b) => b[1] - a[1])[0];
+
+    // Count unique visitors
+    const uniqueVisitors = new Set((pageViews || []).map(pv => pv.visitorId).filter(Boolean)).size;
+
+    const bandName = band.name || 'This Artist';
+
+    return {
+      id: `mini_${bandId}_${Date.now()}`,
+      momentType: 'MINI_RECAP',
+      shareTitle: `${bandName}'s last 24 hours`,
+      shareText: topCity 
+        ? `${uniqueVisitors} fans checked in, with ${topCity[0]} leading the way.`
+        : `${uniqueVisitors} fans checked in over the last 24 hours.`,
+      expiresAt: now.plus({ hours: 1 }).toISO(),
+      context: {
+        windowHours: 24,
+        totalInteractions,
+        newVisitors: uniqueVisitors,
+        topCity: topCity ? { name: topCity[0], count: topCity[1] } : null,
+        topLink: topLink ? { label: topLink[0], count: topLink[1] } : null,
+        bandName,
+        bandSlug: band.slug,
+      },
+    };
+  } catch (err) {
+    strapi.log.error('[generateMiniRecap] Error:', err);
+    return null;
+  }
+}
+
 function validateCronKey(ctx) {
   const cronKey = ctx.request.headers['x-mbq-cron-key'];
   const expectedKey = process.env.MBQ_CRON_KEY;
@@ -291,6 +399,11 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
         result.ok = true;
       }
 
+      // Record evaluation timestamp for each evaluated band
+      if (!dryRun && bandId) {
+        await upsertSystemKv(strapi, `auto_last_eval_${bandId}`, { at: new Date().toISOString() });
+      }
+
       strapi.log.info(`[CRON evaluate-auto] ok: evaluated=${result.evaluated} created=${result.created}`);
       return ctx.send(result);
     } catch (err) {
@@ -361,6 +474,11 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
         result.ok = true;
       }
 
+      // Record evaluation timestamp for each evaluated band
+      if (!dryRun && bandId) {
+        await upsertSystemKv(strapi, `recap_last_eval_${bandId}`, { at: new Date().toISOString() });
+      }
+
       strapi.log.info(`[CRON evaluate-recap] ok: evaluated=${result.evaluated} created=${result.created}`);
       return ctx.send(result);
     } catch (err) {
@@ -370,12 +488,13 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
   },
 
   /**
-   * GET /api/fan-moments/recap-active?bandId=...
+   * GET /api/fan-moments/recap-active?bandId=...&allowMini=true
    * Get active AFTER_SHOW_RECAP moment for a band
+   * If allowMini=true and no real recap, returns a synthetic mini recap
    */
   async recapActive(ctx) {
     try {
-      const { bandId } = ctx.query;
+      const { bandId, allowMini } = ctx.query;
 
       if (!bandId) {
         return ctx.badRequest('Missing required query param: bandId');
@@ -384,13 +503,106 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
       const recapMomentService = require('../services/recapMoment');
       const recap = await recapMomentService.getActiveRecap(strapi, Number(bandId));
 
+      // If we have a real recap, return it
+      if (recap) {
+        return ctx.send({
+          ok: true,
+          kind: 'real',
+          recap,
+        });
+      }
+
+      // If no real recap and allowMini is true, generate a mini recap
+      if (allowMini === 'true' || allowMini === '1') {
+        const miniRecap = await generateMiniRecap(strapi, Number(bandId));
+        if (miniRecap) {
+          return ctx.send({
+            ok: true,
+            kind: 'mini',
+            recap: miniRecap,
+          });
+        }
+      }
+
       return ctx.send({
         ok: true,
-        recap,
+        kind: null,
+        recap: null,
       });
     } catch (err) {
       strapi.log.error('[fan-moment.recapActive] Error:', err);
       return ctx.internalServerError('Failed to fetch active recap');
+    }
+  },
+
+  /**
+   * GET /api/fan-moments/system-status?bandId=...
+   * Get system status for cron visibility
+   */
+  async systemStatus(ctx) {
+    try {
+      const { bandId } = ctx.query;
+
+      if (!bandId) {
+        return ctx.badRequest('Missing required query param: bandId');
+      }
+
+      const now = new Date().toISOString();
+      const bandIdNum = Number(bandId);
+
+      // Get active auto moment
+      const autoMomentService = require('../services/autoMoment');
+      const activeAuto = await autoMomentService.getActiveAutoMoment(strapi, bandIdNum);
+
+      // Get active recap
+      const recapMomentService = require('../services/recapMoment');
+      const activeRecap = await recapMomentService.getActiveRecap(strapi, bandIdNum);
+
+      // Get last created AUTO moment
+      const lastAutoMoment = await strapi.db.query('api::fan-moment.fan-moment').findOne({
+        where: { band: bandIdNum, actionType: 'AUTO' },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      // Get last created RECAP moment
+      const lastRecapMoment = await strapi.db.query('api::fan-moment.fan-moment').findOne({
+        where: { band: bandIdNum, momentType: 'AFTER_SHOW_RECAP' },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      // Get last evaluated timestamps from system-kv
+      const autoEvalKv = await strapi.db.query('api::system-kv.system-kv').findOne({
+        where: { key: `auto_last_eval_${bandIdNum}` },
+      });
+      const recapEvalKv = await strapi.db.query('api::system-kv.system-kv').findOne({
+        where: { key: `recap_last_eval_${bandIdNum}` },
+      });
+
+      return ctx.send({
+        ok: true,
+        bandId: bandIdNum,
+        now,
+        auto: {
+          active: activeAuto ? {
+            id: activeAuto.id,
+            momentType: activeAuto.momentType,
+            expiresAt: activeAuto.expiresAt,
+          } : null,
+          lastCreatedAt: lastAutoMoment?.createdAt || null,
+          lastEvaluatedAt: autoEvalKv?.value?.at || null,
+        },
+        recap: {
+          active: activeRecap ? {
+            id: activeRecap.id,
+            expiresAt: activeRecap.expiresAt,
+          } : null,
+          lastCreatedAt: lastRecapMoment?.createdAt || null,
+          lastEvaluatedAt: recapEvalKv?.value?.at || null,
+        },
+      });
+    } catch (err) {
+      strapi.log.error('[fan-moment.systemStatus] Error:', err);
+      return ctx.internalServerError('Failed to fetch system status');
     }
   },
 }));
