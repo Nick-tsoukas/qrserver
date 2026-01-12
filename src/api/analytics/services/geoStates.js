@@ -114,17 +114,16 @@ function parseRangeDays(range) {
  * Get the appropriate UID and timestamp field for entity type and metric
  */
 function getEntityConfig(entityType, metric) {
+  // Only include metrics where the underlying model has region/country fields
   const configs = {
     band: {
       views: { uid: 'api::band-page-view.band-page-view', tsField: 'timestamp', fkField: 'band' },
       qrScans: { uid: 'api::scan.scan', tsField: 'timestamp', fkField: 'band' },
-      linkClicks: { uid: 'api::link-click.link-click', tsField: 'timestamp', fkField: 'band' },
-      follows: { uid: 'api::band-ui-event.band-ui-event', tsField: 'timestamp', fkField: 'band', eventType: 'follow' },
+      // linkClicks and follows don't have region/country fields
     },
     event: {
       views: { uid: 'api::event-page-view.event-page-view', tsField: 'timestamp', fkField: 'event' },
       qrScans: { uid: 'api::scan.scan', tsField: 'timestamp', fkField: 'event' },
-      linkClicks: { uid: 'api::link-click.link-click', tsField: 'timestamp', fkField: 'event' },
     },
     qr: {
       qrScans: { uid: 'api::scan.scan', tsField: 'timestamp', fkField: 'qr' },
