@@ -104,5 +104,12 @@ module.exports = {
       handler: "analytics.pushOptInStatus",
       config: { policies: [], middlewares: [] },
     },
+    // Geo States (USA Heat Map)
+    {
+      method: "GET",
+      path: "/analytics/geo-states",
+      handler: "analytics.geoStates",
+      config: { auth: false },
+    },
   ],
 };

@@ -8,6 +8,7 @@ const {
   createSurgeNotifications,
   updateSnapshotAfterPush,
 } = require("../services/pushEligibility");
+const { fetchGeoStateCounts } = require("../services/geoStates");
 
 const uidPV = "api::band-page-view.band-page-view";
 const uidLC = "api::link-click.link-click";
@@ -1540,6 +1541,48 @@ module.exports = {
       };
     } catch (err) {
       strapi.log.error("[analytics.pushOptInStatus] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  // ============================================================
+  // GEO STATES ENDPOINT (USA Heat Map)
+  // ============================================================
+
+  /**
+   * GET /analytics/geo-states
+   * Returns US state-level counts for heat map visualization
+   * Params: entityType=band|event|qr, entityId, range=7d|30d|365d, metric=views|qrScans|linkClicks|follows
+   */
+  async geoStates(ctx) {
+    try {
+      const entityType = String(ctx.query.entityType || "").toLowerCase();
+      const entityId = Number(ctx.query.entityId);
+      const range = String(ctx.query.range || "30d");
+      const metric = String(ctx.query.metric || "views");
+
+      if (!["band", "event", "qr"].includes(entityType)) {
+        return ctx.badRequest("entityType must be band, event, or qr");
+      }
+      if (!entityId) {
+        return ctx.badRequest("entityId required");
+      }
+
+      const result = await fetchGeoStateCounts(strapi, {
+        entityType,
+        entityId,
+        range,
+        metric,
+      });
+
+      if (result.error) {
+        return ctx.badRequest(result.error);
+      }
+
+      ctx.body = result;
+    } catch (err) {
+      strapi.log.error("[analytics.geoStates] ", err);
       ctx.status = 500;
       ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
     }
