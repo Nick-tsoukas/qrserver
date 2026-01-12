@@ -1631,6 +1631,35 @@ export interface ApiHowtovideoHowtovideo extends Schema.CollectionType {
   };
 }
 
+export interface ApiImageProxyImageProxy extends Schema.SingleType {
+  collectionName: 'image_proxies';
+  info: {
+    singularName: 'image-proxy';
+    pluralName: 'image-proxies';
+    displayName: 'Image Proxy';
+    description: 'Virtual content type for image proxy endpoint';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::image-proxy.image-proxy',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::image-proxy.image-proxy',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiLinkClickLinkClick extends Schema.CollectionType {
   collectionName: 'link_clicks';
   info: {
@@ -2317,6 +2346,7 @@ declare module '@strapi/types' {
       'api::fan-moment.fan-moment': ApiFanMomentFanMoment;
       'api::funtest.funtest': ApiFuntestFuntest;
       'api::howtovideo.howtovideo': ApiHowtovideoHowtovideo;
+      'api::image-proxy.image-proxy': ApiImageProxyImageProxy;
       'api::link-click.link-click': ApiLinkClickLinkClick;
       'api::media-play.media-play': ApiMediaPlayMediaPlay;
       'api::merch-order.merch-order': ApiMerchOrderMerchOrder;
