@@ -380,12 +380,21 @@ async function evaluateAllBands(strapi, dryRun = false) {
     // Find bands with page views in last 24 hours
     const activeBandRows = await strapi.db.query('api::band-page-view.band-page-view').findMany({
       where: { timestamp: { $gte: activityCutoff } },
-      select: ['band'],
+      select: ['id'],
+      populate: { band: { select: ['id'] } },
       limit: 10000,
     });
 
-    // Get unique band IDs
-    const bandIds = [...new Set(activeBandRows.map((r) => r.band).filter(Boolean))];
+    // Get unique band IDs (handle both direct ID and populated object)
+    const bandIds = [...new Set(
+      activeBandRows
+        .map((r) => {
+          if (typeof r.band === 'number') return r.band;
+          if (r.band?.id) return r.band.id;
+          return null;
+        })
+        .filter(Boolean)
+    )];
 
     const results = {
       evaluated: 0,
