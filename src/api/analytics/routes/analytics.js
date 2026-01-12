@@ -111,5 +111,12 @@ module.exports = {
       handler: "analytics.geoStates",
       config: { auth: false },
     },
+    // What's Hot / Momentum Prompts
+    {
+      method: "GET",
+      path: "/pulse/whats-hot",
+      handler: "analytics.whatsHot",
+      config: { auth: false },
+    },
   ],
 };

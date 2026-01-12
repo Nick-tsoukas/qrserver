@@ -2,6 +2,7 @@
 
 const { DateTime } = require("luxon");
 const { normalizeSignals, computePulse, fetchEntityData } = require("../services/pulse");
+const { fetchWhatsHot } = require("../services/whatsHot");
 const {
   computeActivityTotals,
   evaluateSurgePush,
@@ -1583,6 +1584,39 @@ module.exports = {
       ctx.body = result;
     } catch (err) {
       strapi.log.error("[analytics.geoStates] ", err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
+    }
+  },
+
+  // ============================================================
+  // WHAT'S HOT / MOMENTUM PROMPTS
+  // ============================================================
+
+  /**
+   * GET /pulse/whats-hot
+   * Returns hot summary + share-ready prompt cards for band dashboard
+   * Params: bandId, window=24h (only 24h supported in V1)
+   */
+  async whatsHot(ctx) {
+    try {
+      const bandId = Number(ctx.query.bandId);
+      // V1: enforce 24h window
+      const windowHours = 24;
+
+      if (!bandId) {
+        return ctx.badRequest("bandId required");
+      }
+
+      const result = await fetchWhatsHot(strapi, bandId, windowHours);
+
+      if (!result.ok) {
+        return ctx.badRequest(result.error || "Failed to fetch what's hot");
+      }
+
+      ctx.body = result;
+    } catch (err) {
+      strapi.log.error("[analytics.whatsHot] ", err);
       ctx.status = 500;
       ctx.body = { ok: false, error: err?.message || "Internal Server Error" };
     }
