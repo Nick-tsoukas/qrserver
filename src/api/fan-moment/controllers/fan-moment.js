@@ -6,6 +6,37 @@
 
 const { createCoreController } = require('@strapi/strapi').factories;
 
+/**
+ * Validate cron key for protected endpoints
+ * @param {object} ctx - Koa context
+ * @returns {object} { authorized: boolean, error?: string }
+ */
+function validateCronKey(ctx) {
+  const cronKey = ctx.request.headers['x-mbq-cron-key'];
+  const expectedKey = process.env.MBQ_CRON_KEY;
+  
+  // In production, MBQ_CRON_KEY must be set
+  if (!expectedKey) {
+    // Allow in dev mode (no key set), but log warning
+    if (process.env.NODE_ENV === 'production') {
+      return { authorized: false, error: 'MBQ_CRON_KEY not configured on server' };
+    }
+    // Dev mode: allow without key
+    return { authorized: true };
+  }
+  
+  // Key is set, must match
+  if (!cronKey) {
+    return { authorized: false, error: 'Missing x-mbq-cron-key header' };
+  }
+  
+  if (cronKey !== expectedKey) {
+    return { authorized: false, error: 'Invalid cron key' };
+  }
+  
+  return { authorized: true };
+}
+
 module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi }) => ({
   /**
    * POST /api/fan-moments/earn
@@ -224,22 +255,15 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
   /**
    * POST /api/fan-moments/evaluate-auto
    * Evaluate bands for auto-moment creation
-   * Protected by x-mbq-cron-key header or admin auth
+   * Protected by x-mbq-cron-key header
    */
   async evaluateAuto(ctx) {
     try {
-      // Check for cron key or admin auth
-      const cronKey = ctx.request.headers['x-mbq-cron-key'];
-      const expectedKey = process.env.MBQ_CRON_KEY;
-      
-      // Allow if cron key matches, or if no key is set (dev mode), or if user is admin
-      const isAuthorized = 
-        (expectedKey && cronKey === expectedKey) || 
-        !expectedKey ||
-        ctx.state?.user?.role?.type === 'admin';
-
-      if (!isAuthorized) {
-        return ctx.forbidden('Invalid or missing cron key');
+      // Validate cron key
+      const authResult = validateCronKey(ctx);
+      if (!authResult.authorized) {
+        strapi.log.warn('[CRON evaluate-auto] Unauthorized attempt');
+        return ctx.unauthorized(authResult.error);
       }
 
       const { bandId, dryRun = false } = ctx.request.body || {};
@@ -267,6 +291,7 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
         result.ok = true;
       }
 
+      strapi.log.info(`[CRON evaluate-auto] ok: evaluated=${result.evaluated} created=${result.created}`);
       return ctx.send(result);
     } catch (err) {
       strapi.log.error('[fan-moment.evaluateAuto] Error:', err);
@@ -302,20 +327,15 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
   /**
    * POST /api/fan-moments/evaluate-recap
    * Evaluate bands for after-show recap creation
-   * Protected by x-mbq-cron-key header or admin auth
+   * Protected by x-mbq-cron-key header
    */
   async evaluateRecap(ctx) {
     try {
-      const cronKey = ctx.request.headers['x-mbq-cron-key'];
-      const expectedKey = process.env.MBQ_CRON_KEY;
-      
-      const isAuthorized = 
-        (expectedKey && cronKey === expectedKey) || 
-        !expectedKey ||
-        ctx.state?.user?.role?.type === 'admin';
-
-      if (!isAuthorized) {
-        return ctx.forbidden('Invalid or missing cron key');
+      // Validate cron key
+      const authResult = validateCronKey(ctx);
+      if (!authResult.authorized) {
+        strapi.log.warn('[CRON evaluate-recap] Unauthorized attempt');
+        return ctx.unauthorized(authResult.error);
       }
 
       const { bandId, dryRun = false } = ctx.request.body || {};
@@ -341,6 +361,7 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
         result.ok = true;
       }
 
+      strapi.log.info(`[CRON evaluate-recap] ok: evaluated=${result.evaluated} created=${result.created}`);
       return ctx.send(result);
     } catch (err) {
       strapi.log.error('[fan-moment.evaluateRecap] Error:', err);
