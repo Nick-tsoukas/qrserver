@@ -1533,7 +1533,8 @@ export interface ApiFanMomentFanMoment extends Schema.CollectionType {
         'FUELED_MOMENTUM',
         'PULSE_SURGE',
         'CITY_HEAT',
-        'MOMENT_MATTERED'
+        'MOMENT_MATTERED',
+        'AFTER_SHOW_RECAP'
       ]
     > &
       Attribute.Required;

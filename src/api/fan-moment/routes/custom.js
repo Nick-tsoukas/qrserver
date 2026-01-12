@@ -47,5 +47,23 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: 'POST',
+      path: '/fan-moments/evaluate-recap',
+      handler: 'fan-moment.evaluateRecap',
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
+    {
+      method: 'GET',
+      path: '/fan-moments/recap-active',
+      handler: 'fan-moment.recapActive',
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

@@ -278,6 +278,80 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
       return ctx.internalServerError('Failed to fetch auto-active moment');
     }
   },
+
+  /**
+   * POST /api/fan-moments/evaluate-recap
+   * Evaluate bands for after-show recap creation
+   * Protected by x-mbq-cron-key header or admin auth
+   */
+  async evaluateRecap(ctx) {
+    try {
+      const cronKey = ctx.request.headers['x-mbq-cron-key'];
+      const expectedKey = process.env.MBQ_CRON_KEY;
+      
+      const isAuthorized = 
+        (expectedKey && cronKey === expectedKey) || 
+        !expectedKey ||
+        ctx.state?.user?.role?.type === 'admin';
+
+      if (!isAuthorized) {
+        return ctx.forbidden('Invalid or missing cron key');
+      }
+
+      const { bandId, dryRun = false } = ctx.request.body || {};
+      const recapMomentService = require('../services/recapMoment');
+
+      let result;
+
+      if (bandId) {
+        const evalResult = await recapMomentService.evaluateBand(strapi, Number(bandId), dryRun);
+        result = {
+          ok: true,
+          evaluated: 1,
+          created: evalResult.created ? 1 : 0,
+          createdMoments: evalResult.created ? [{
+            bandId: evalResult.bandId,
+            momentType: evalResult.momentType,
+            context: evalResult.context,
+          }] : [],
+          details: evalResult,
+        };
+      } else {
+        result = await recapMomentService.evaluateAllBands(strapi, dryRun);
+        result.ok = true;
+      }
+
+      return ctx.send(result);
+    } catch (err) {
+      strapi.log.error('[fan-moment.evaluateRecap] Error:', err);
+      return ctx.internalServerError('Failed to evaluate recaps');
+    }
+  },
+
+  /**
+   * GET /api/fan-moments/recap-active?bandId=...
+   * Get active AFTER_SHOW_RECAP moment for a band
+   */
+  async recapActive(ctx) {
+    try {
+      const { bandId } = ctx.query;
+
+      if (!bandId) {
+        return ctx.badRequest('Missing required query param: bandId');
+      }
+
+      const recapMomentService = require('../services/recapMoment');
+      const recap = await recapMomentService.getActiveRecap(strapi, Number(bandId));
+
+      return ctx.send({
+        ok: true,
+        recap,
+      });
+    } catch (err) {
+      strapi.log.error('[fan-moment.recapActive] Error:', err);
+      return ctx.internalServerError('Failed to fetch active recap');
+    }
+  },
 }));
 
 /**

@@ -1,0 +1,15 @@
+{
+  "kind": "singleType",
+  "collectionName": "image_proxies",
+  "info": {
+    "singularName": "image-proxy",
+    "pluralName": "image-proxies",
+    "displayName": "Image Proxy",
+    "description": "Virtual content type for image proxy endpoint"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {}
+}
