@@ -200,6 +200,84 @@ module.exports = createCoreController('api::fan-moment.fan-moment', ({ strapi })
       return ctx.internalServerError('Failed to record share');
     }
   },
+
+  /**
+   * POST /api/fan-moments/evaluate-auto
+   * Evaluate bands for auto-moment creation
+   * Protected by x-mbq-cron-key header or admin auth
+   */
+  async evaluateAuto(ctx) {
+    try {
+      // Check for cron key or admin auth
+      const cronKey = ctx.request.headers['x-mbq-cron-key'];
+      const expectedKey = process.env.MBQ_CRON_KEY;
+      
+      // Allow if cron key matches, or if no key is set (dev mode), or if user is admin
+      const isAuthorized = 
+        (expectedKey && cronKey === expectedKey) || 
+        !expectedKey ||
+        ctx.state?.user?.role?.type === 'admin';
+
+      if (!isAuthorized) {
+        return ctx.forbidden('Invalid or missing cron key');
+      }
+
+      const { bandId, dryRun = false } = ctx.request.body || {};
+      const autoMomentService = require('../services/autoMoment');
+
+      let result;
+
+      if (bandId) {
+        // Evaluate single band
+        const evalResult = await autoMomentService.evaluateBand(strapi, Number(bandId), dryRun);
+        result = {
+          ok: true,
+          evaluated: 1,
+          created: evalResult.created ? 1 : 0,
+          createdMoments: evalResult.created ? [{
+            bandId: evalResult.bandId,
+            momentType: evalResult.momentType,
+            context: evalResult.context,
+          }] : [],
+          details: evalResult,
+        };
+      } else {
+        // Evaluate all bands with recent activity
+        result = await autoMomentService.evaluateAllBands(strapi, dryRun);
+        result.ok = true;
+      }
+
+      return ctx.send(result);
+    } catch (err) {
+      strapi.log.error('[fan-moment.evaluateAuto] Error:', err);
+      return ctx.internalServerError('Failed to evaluate auto-moments');
+    }
+  },
+
+  /**
+   * GET /api/fan-moments/auto-active?bandId=...
+   * Get active AUTO moment for a band (band-facing)
+   */
+  async autoActive(ctx) {
+    try {
+      const { bandId } = ctx.query;
+
+      if (!bandId) {
+        return ctx.badRequest('Missing required query param: bandId');
+      }
+
+      const autoMomentService = require('../services/autoMoment');
+      const moment = await autoMomentService.getActiveAutoMoment(strapi, Number(bandId));
+
+      return ctx.send({
+        ok: true,
+        moment,
+      });
+    } catch (err) {
+      strapi.log.error('[fan-moment.autoActive] Error:', err);
+      return ctx.internalServerError('Failed to fetch auto-active moment');
+    }
+  },
 }));
 
 /**

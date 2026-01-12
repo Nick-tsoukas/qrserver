@@ -29,5 +29,23 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: 'POST',
+      path: '/fan-moments/evaluate-auto',
+      handler: 'fan-moment.evaluateAuto',
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
+    {
+      method: 'GET',
+      path: '/fan-moments/auto-active',
+      handler: 'fan-moment.autoActive',
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

@@ -1525,12 +1525,20 @@ export interface ApiFanMomentFanMoment extends Schema.CollectionType {
       'manyToOne',
       'api::band.band'
     >;
-    visitorId: Attribute.String & Attribute.Required;
+    visitorId: Attribute.String;
     sessionId: Attribute.String;
-    momentType: Attribute.Enumeration<['I_WAS_THERE', 'FUELED_MOMENTUM']> &
+    momentType: Attribute.Enumeration<
+      [
+        'I_WAS_THERE',
+        'FUELED_MOMENTUM',
+        'PULSE_SURGE',
+        'CITY_HEAT',
+        'MOMENT_MATTERED'
+      ]
+    > &
       Attribute.Required;
     actionType: Attribute.Enumeration<
-      ['qr_scan', 'follow', 'payment', 'link_click', 'event_view']
+      ['qr_scan', 'follow', 'payment', 'link_click', 'event_view', 'AUTO']
     > &
       Attribute.Required;
     expiresAt: Attribute.DateTime & Attribute.Required;
