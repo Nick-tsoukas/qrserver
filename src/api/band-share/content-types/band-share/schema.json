@@ -1,0 +1,59 @@
+{
+  "kind": "collectionType",
+  "collectionName": "band_shares",
+  "info": {
+    "singularName": "band-share",
+    "pluralName": "band-shares",
+    "displayName": "Band Share",
+    "description": "Tracks band share events (independent of earned moments)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "required": true
+    },
+    "visitorId": {
+      "type": "string",
+      "required": true
+    },
+    "sessionId": {
+      "type": "string",
+      "required": true
+    },
+    "shareChannel": {
+      "type": "enumeration",
+      "enum": [
+        "WEB_SHARE",
+        "COPY",
+        "DOWNLOAD",
+        "COPY_LINK",
+        "COPY_CAPTION",
+        "DOWNLOAD_IMAGE",
+        "INSTAGRAM_KIT",
+        "FACEBOOK_SHARE",
+        "OTHER"
+      ]
+    },
+    "placement": {
+      "type": "enumeration",
+      "enum": [
+        "FOOTER",
+        "FAN_MOMENT_SECTION"
+      ],
+      "required": true
+    },
+    "sharedAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "context": {
+      "type": "json"
+    }
+  }
+}

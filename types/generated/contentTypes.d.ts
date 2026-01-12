@@ -1253,6 +1253,60 @@ export interface ApiBandPageViewBandPageView extends Schema.CollectionType {
   };
 }
 
+export interface ApiBandShareBandShare extends Schema.CollectionType {
+  collectionName: 'band_shares';
+  info: {
+    singularName: 'band-share';
+    pluralName: 'band-shares';
+    displayName: 'Band Share';
+    description: 'Tracks band share events (independent of earned moments)';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::band-share.band-share',
+      'manyToOne',
+      'api::band.band'
+    > &
+      Attribute.Required;
+    visitorId: Attribute.String & Attribute.Required;
+    sessionId: Attribute.String & Attribute.Required;
+    shareChannel: Attribute.Enumeration<
+      [
+        'WEB_SHARE',
+        'COPY',
+        'DOWNLOAD',
+        'COPY_LINK',
+        'COPY_CAPTION',
+        'DOWNLOAD_IMAGE',
+        'INSTAGRAM_KIT',
+        'FACEBOOK_SHARE',
+        'OTHER'
+      ]
+    >;
+    placement: Attribute.Enumeration<['FOOTER', 'FAN_MOMENT_SECTION']> &
+      Attribute.Required;
+    sharedAt: Attribute.DateTime & Attribute.Required;
+    context: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::band-share.band-share',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::band-share.band-share',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiBandUiEventBandUiEvent extends Schema.CollectionType {
   collectionName: 'band_ui_events';
   info: {
@@ -1447,6 +1501,55 @@ export interface ApiEventPageViewEventPageView extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::event-page-view.event-page-view',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiFanMomentFanMoment extends Schema.CollectionType {
+  collectionName: 'fan_moments';
+  info: {
+    singularName: 'fan-moment';
+    pluralName: 'fan-moments';
+    displayName: 'Fan Moment';
+    description: 'Shareable fan participation moments';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    band: Attribute.Relation<
+      'api::fan-moment.fan-moment',
+      'manyToOne',
+      'api::band.band'
+    >;
+    visitorId: Attribute.String & Attribute.Required;
+    sessionId: Attribute.String;
+    momentType: Attribute.Enumeration<['I_WAS_THERE', 'FUELED_MOMENTUM']> &
+      Attribute.Required;
+    actionType: Attribute.Enumeration<
+      ['qr_scan', 'follow', 'payment', 'link_click', 'event_view']
+    > &
+      Attribute.Required;
+    expiresAt: Attribute.DateTime & Attribute.Required;
+    context: Attribute.JSON;
+    shareTitle: Attribute.String;
+    shareText: Attribute.Text;
+    shareImageUrl: Attribute.String;
+    sharedAt: Attribute.DateTime;
+    shareChannel: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::fan-moment.fan-moment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::fan-moment.fan-moment',
       'oneToOne',
       'admin::user'
     > &
@@ -2198,9 +2301,11 @@ declare module '@strapi/types' {
       'api::band-external-metric.band-external-metric': ApiBandExternalMetricBandExternalMetric;
       'api::band-insight-daily.band-insight-daily': ApiBandInsightDailyBandInsightDaily;
       'api::band-page-view.band-page-view': ApiBandPageViewBandPageView;
+      'api::band-share.band-share': ApiBandShareBandShare;
       'api::band-ui-event.band-ui-event': ApiBandUiEventBandUiEvent;
       'api::event.event': ApiEventEvent;
       'api::event-page-view.event-page-view': ApiEventPageViewEventPageView;
+      'api::fan-moment.fan-moment': ApiFanMomentFanMoment;
       'api::funtest.funtest': ApiFuntestFuntest;
       'api::howtovideo.howtovideo': ApiHowtovideoHowtovideo;
       'api::link-click.link-click': ApiLinkClickLinkClick;

@@ -1,0 +1,69 @@
+{
+  "kind": "collectionType",
+  "collectionName": "fan_moments",
+  "info": {
+    "singularName": "fan-moment",
+    "pluralName": "fan-moments",
+    "displayName": "Fan Moment",
+    "description": "Shareable fan participation moments"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "band": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::band.band"
+    },
+    "visitorId": {
+      "type": "string",
+      "required": true
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "momentType": {
+      "type": "enumeration",
+      "enum": [
+        "I_WAS_THERE",
+        "FUELED_MOMENTUM"
+      ],
+      "required": true
+    },
+    "actionType": {
+      "type": "enumeration",
+      "enum": [
+        "qr_scan",
+        "follow",
+        "payment",
+        "link_click",
+        "event_view"
+      ],
+      "required": true
+    },
+    "expiresAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "context": {
+      "type": "json"
+    },
+    "shareTitle": {
+      "type": "string"
+    },
+    "shareText": {
+      "type": "text"
+    },
+    "shareImageUrl": {
+      "type": "string"
+    },
+    "sharedAt": {
+      "type": "datetime"
+    },
+    "shareChannel": {
+      "type": "string"
+    }
+  }
+}
