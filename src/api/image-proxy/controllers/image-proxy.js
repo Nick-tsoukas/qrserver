@@ -15,6 +15,9 @@ module.exports = createCoreController('api::image-proxy.image-proxy', ({ strapi 
       'res.cloudinary.com',
       'cloudinary.com',
       'images.unsplash.com',
+      's3.amazonaws.com',
+      's3.us-east-1.amazonaws.com',
+      'qrcode101.s3.us-east-1.amazonaws.com',
       'localhost',
     ];
 
