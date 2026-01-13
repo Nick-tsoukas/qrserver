@@ -1259,7 +1259,7 @@ export interface ApiBandShareBandShare extends Schema.CollectionType {
     singularName: 'band-share';
     pluralName: 'band-shares';
     displayName: 'Band Share';
-    description: 'Tracks band share events (independent of earned moments)';
+    description: 'Tracks band share events including shareable cards';
   };
   options: {
     draftAndPublish: false;
@@ -1271,8 +1271,8 @@ export interface ApiBandShareBandShare extends Schema.CollectionType {
       'api::band.band'
     > &
       Attribute.Required;
-    visitorId: Attribute.String & Attribute.Required;
-    sessionId: Attribute.String & Attribute.Required;
+    visitorId: Attribute.String;
+    sessionId: Attribute.String;
     shareChannel: Attribute.Enumeration<
       [
         'WEB_SHARE',
@@ -1286,9 +1286,16 @@ export interface ApiBandShareBandShare extends Schema.CollectionType {
         'OTHER'
       ]
     >;
-    placement: Attribute.Enumeration<['FOOTER', 'FAN_MOMENT_SECTION']> &
+    placement: Attribute.Enumeration<
+      ['FOOTER', 'FAN_MOMENT_SECTION', 'DASHBOARD', 'DRAWER']
+    > &
       Attribute.Required;
     sharedAt: Attribute.DateTime & Attribute.Required;
+    shareableId: Attribute.String;
+    cardType: Attribute.String;
+    window: Attribute.String;
+    accent: Attribute.String;
+    captionStyle: Attribute.Enumeration<['hype', 'grateful', 'tease']>;
     context: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
