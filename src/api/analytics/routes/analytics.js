@@ -136,7 +136,7 @@ module.exports = {
     {
       method: "GET",
       path: "/image-proxy",
-      handler: "imageProxy.proxy",
+      handler: "analytics.imageProxy",
       config: { auth: false },
     },
   ],
