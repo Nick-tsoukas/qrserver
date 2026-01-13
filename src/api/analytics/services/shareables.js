@@ -105,6 +105,11 @@ const THRESHOLDS = {
   },
   MILESTONE_DROP: {
     milestones: [50, 100, 250, 500, 1000],  // Interaction milestones
+    thresholds: {
+      interactions: [50, 100, 250, 500, 1000],
+      visitors: [25, 50, 100, 250, 500],
+      cities: [5, 10, 25, 50],
+    },
   },
 };
 
