@@ -198,15 +198,27 @@ async function evaluateShareables(strapi, options) {
 
   scoredCards.sort((a, b) => b.score - a.score);
 
-  // Apply cooldowns BEFORE recommended selection
-  const { cards: cooledCards, cooldownInfo } = await applyCooldowns(strapi, bandId, scoredCards);
+  // Apply cooldowns BEFORE recommended selection (with fallback if cooldowns fail)
+  let cooledCards = scoredCards;
+  let cooldownInfo = [];
+  
+  try {
+    const cooldownResult = await applyCooldowns(strapi, bandId, scoredCards);
+    cooledCards = cooldownResult.cards;
+    cooldownInfo = cooldownResult.cooldownInfo;
+  } catch (cooldownErr) {
+    strapi.log.warn('[shareables] Cooldown check failed, using all cards:', cooldownErr.message);
+    // Continue without cooldowns if they fail
+  }
 
   // Build recommended list (max 3 with strict variety) from cooled cards
   const recommended = buildRecommended(cooledCards, 3);
 
-  // Record emitted cards for cooldown tracking (recommended only)
+  // Record emitted cards for cooldown tracking (recommended only) - non-blocking
   if (recommended.length > 0) {
-    await recordEmittedCards(strapi, bandId, recommended);
+    recordEmittedCards(strapi, bandId, recommended).catch(err => {
+      strapi.log.warn('[shareables] Failed to record emitted cards:', err.message);
+    });
   }
 
   const result = {
