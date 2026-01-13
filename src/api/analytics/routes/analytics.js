@@ -118,5 +118,12 @@ module.exports = {
       handler: "analytics.whatsHot",
       config: { auth: false },
     },
+    // Shareables v1 - Unified Evaluator
+    {
+      method: "GET",
+      path: "/pulse/shareables",
+      handler: "shareables.getShareables",
+      config: { auth: false },
+    },
   ],
 };
