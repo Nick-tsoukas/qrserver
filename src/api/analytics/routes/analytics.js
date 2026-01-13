@@ -132,5 +132,12 @@ module.exports = {
       handler: "shareables.trackShare",
       config: { auth: false },
     },
+    // Image proxy for CORS-restricted images (S3, etc.)
+    {
+      method: "GET",
+      path: "/image-proxy",
+      handler: "imageProxy.proxy",
+      config: { auth: false },
+    },
   ],
 };
