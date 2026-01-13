@@ -15,5 +15,14 @@ module.exports = {
         policies: [],
       },
     },
+    {
+      method: 'POST',
+      path: '/scans/backfill',
+      handler: 'scan.backfill',
+      config: {
+        auth: false,
+        policies: [],
+      },
+    },
   ],
 };

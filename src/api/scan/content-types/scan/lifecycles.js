@@ -89,12 +89,20 @@ module.exports = {
   async beforeCreate(event) {
     const { data } = event.params;
 
+    strapi.log.info('[scan.lifecycle] beforeCreate called with:', JSON.stringify({
+      hasUserAgent: !!data.userAgent,
+      deviceType: data.deviceType,
+      refSource: data.refSource,
+      country: data.country,
+    }));
+
     // Parse user agent if not already parsed
     if (data.userAgent && !data.deviceType) {
       const parsed = parseUserAgent(data.userAgent);
       data.deviceType = parsed.deviceType;
       data.os = data.os || parsed.os;
       data.browser = data.browser || parsed.browser;
+      strapi.log.info('[scan.lifecycle] Parsed UA:', JSON.stringify(parsed));
     }
 
     // Extract refDomain from referrer
@@ -107,6 +115,7 @@ module.exports = {
       const classified = classifySource(data.refDomain, data.utmSource, data.utmMedium);
       data.refSource = data.refSource || classified.refSource;
       data.refMedium = data.refMedium || classified.refMedium;
+      strapi.log.info('[scan.lifecycle] Classified source:', JSON.stringify(classified));
     }
 
     // Auto-link event from QR if QR has an event relation
