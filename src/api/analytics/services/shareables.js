@@ -36,18 +36,23 @@ const WINDOW_LABELS = {
   '30d': 'Last 30d',
 };
 
-// Base scores by card type (rarity/prestige)
+// ============================================================
+// BASE SCORES (V1 — Per Prompt Spec)
+// ============================================================
+// Each card type has a base score + conditional bonuses
+// Final score determines ranking and recommended set
+
 const BASE_SCORES = {
-  [CARD_TYPES.MILESTONE_DROP]: 90,
-  [CARD_TYPES.AFTER_SHOW_ENERGY]: 85,
-  [CARD_TYPES.NEW_CITY_UNLOCKED]: 82,
-  [CARD_TYPES.MOMENTUM_SURGE]: 80,
-  [CARD_TYPES.CITY_CLAIM]: 78,
-  [CARD_TYPES.SHARE_CHAIN]: 74,
-  [CARD_TYPES.PLATFORM_PULL]: 72,
-  [CARD_TYPES.RETURNING_FANS]: 70,
-  [CARD_TYPES.ENGAGED_SESSIONS]: 68,
-  [CARD_TYPES.PEAK_HOUR]: 66,
+  [CARD_TYPES.MILESTONE_DROP]: 90,      // Fixed 90 (achievement)
+  [CARD_TYPES.MOMENTUM_SURGE]: 65,      // +20 if ≥100%, +10 if interactions ≥30
+  [CARD_TYPES.CITY_CLAIM]: 60,          // +20 if sharePct ≥60, +10 if interactions ≥50
+  [CARD_TYPES.AFTER_SHOW_ENERGY]: 60,   // +15 if ≥50 interactions, +10 if shares >0
+  [CARD_TYPES.RETURNING_FANS]: 55,      // +20 if ≥40%
+  [CARD_TYPES.PEAK_HOUR]: 55,           // +15 if ≥20 hits, +10 if growthPct >0
+  [CARD_TYPES.PLATFORM_PULL]: 55,       // +15 if ≥25 clicks
+  [CARD_TYPES.ENGAGED_SESSIONS]: 55,    // +15 if ≥2:30
+  [CARD_TYPES.NEW_CITY_UNLOCKED]: 50,   // +15 if ≥2 cities, +10 if city count ≥5
+  [CARD_TYPES.SHARE_CHAIN]: 50,         // +10 per share beyond 3, cap 85
 };
 
 // Category families for diversity
@@ -59,53 +64,46 @@ const CATEGORY_FAMILIES = {
   achievement: [CARD_TYPES.MILESTONE_DROP],
 };
 
-// Thresholds (v1 defaults - tune later)
+// ============================================================
+// THRESHOLDS (V1 — Stricter, Earned Cards Only)
+// ============================================================
+// If a card appears, the band should instantly understand WHY.
+// No random cards. No filler. No marketing fluff.
+
 const THRESHOLDS = {
   CITY_CLAIM: {
-    minCityCount: 6,
-    minVisitors: 3,
-    minInteractions: 10,
-    minSharePct: 50,
-    altMinCount: 10,
+    minCityCount: 15,        // Must have 15+ fans from top city
+    minSharePct: 40,         // Top city must be 40%+ of traffic
   },
   MOMENTUM_SURGE: {
-    minGrowthPct: 80,
-    minInteractions: 8,
+    minGrowthPct: 40,        // Must have 40%+ growth vs previous window
+    minInteractions: 10,     // Minimum baseline activity
   },
   AFTER_SHOW_ENERGY: {
-    minPeakCount: 6,
-    peakMultiplier: 2,
-    nightHours: [19, 20, 21, 22, 23, 0, 1],
+    minInteractions: 25,     // Must have 25+ total interactions
+    spikeWindowHours: 3,     // Spike detected in 3h window
+    nightHours: [19, 20, 21, 22, 23, 0, 1, 2],
   },
   NEW_CITY_UNLOCKED: {
-    minCityCount: 3,
+    minNewCities: 1,         // At least 1 new city vs previous window
   },
   RETURNING_FANS: {
-    minReturningRate: 25,
-    minInteractions: 12,
+    minReturningPct: 25,     // 25%+ returning visitors
   },
   SHARE_CHAIN: {
-    minShares: 2,
+    minShares: 3,            // Must have 3+ shares
   },
   ENGAGED_SESSIONS: {
-    minAvgTime: 60,
-    minInteractions: 10,
-    minEngagedSessions: 5,
+    minAvgDuration: 90,      // 90 seconds average session
   },
   PLATFORM_PULL: {
-    minClicks: 5,
-    minSharePct: 45,
+    minClicks: 10,           // 10+ clicks on a single platform
   },
   PEAK_HOUR: {
-    minPeakCount: 5,
-    peakMultiplier: 1.8,
+    minPeakCount: 10,        // 10+ hits in peak hour
   },
   MILESTONE_DROP: {
-    thresholds: {
-      interactions: [50, 100, 250, 500, 1000, 2500, 5000],
-      visitors: [25, 50, 100, 250, 500],
-      cities: [5, 10, 25, 50],
-    },
+    milestones: [50, 100, 250, 500, 1000],  // Interaction milestones
   },
 };
 
@@ -186,31 +184,54 @@ async function evaluateShareables(strapi, options) {
     }
   }
 
-  // Score and sort cards
-  const scoredCards = allCards.map(card => ({
-    ...card,
-    score: computeScore(card, featuresByWindow),
-  }));
+  // Score and sort cards (with breakdown for debug)
+  const isDev = dev || process.env.NODE_ENV === 'development';
+  const scoredCards = allCards.map(card => {
+    const scoreResult = computeScore(card, featuresByWindow, isDev);
+    return {
+      ...card,
+      score: isDev ? scoreResult.score : scoreResult,
+      _scoreBreakdown: isDev ? scoreResult.breakdown : undefined,
+    };
+  });
 
   scoredCards.sort((a, b) => b.score - a.score);
 
-  // Build recommended list (top 4 with diversity)
-  const recommended = buildRecommended(scoredCards, 4);
+  // Build recommended list (max 3 with strict variety)
+  const recommended = buildRecommended(scoredCards, 3);
 
   const result = {
     ok: true,
     bandId,
     generatedAt: new Date().toISOString(),
-    recommended,
-    cards: scoredCards,
+    recommended: recommended.map(c => {
+      const { _scoreBreakdown, ...card } = c;
+      return card;
+    }),
+    cards: scoredCards.map(c => {
+      const { _scoreBreakdown, ...card } = c;
+      return card;
+    }),
   };
 
-  // Add debug info if requested
-  if (dev || process.env.NODE_ENV === 'development') {
+  // Add enhanced debug info if requested
+  if (isDev) {
     result.debug = {
-      features: featuresByWindow,
-      reasons: debugReasons,
       timing: Date.now() - startTime,
+      metricsSnapshot: featuresByWindow,
+      eligibilityReasons: debugReasons,
+      scoreBreakdowns: scoredCards.map(c => ({
+        id: c.id,
+        type: c.type,
+        score: c.score,
+        breakdown: c._scoreBreakdown,
+      })),
+      recommendedIds: recommended.map(c => c.id),
+      skippedCards: debugReasons.filter(r => !r.triggered).map(r => ({
+        type: r.type,
+        window: r.window,
+        reason: r.reason,
+      })),
     };
   }
 
@@ -510,23 +531,43 @@ function computeFeatures(current, previous, windowKey) {
 // ============================================================
 
 function makeCityClaim(featuresByWindow, bandContext, debugReasons) {
-  // Prefer 24h window
   const preferredWindows = ['24h', '7d', '2h'];
+  const { minCityCount, minSharePct } = THRESHOLDS.CITY_CLAIM;
   
   for (const windowKey of preferredWindows) {
     const f = featuresByWindow[windowKey];
-    if (!f || !f.topCity) continue;
+    if (!f || !f.topCity) {
+      debugReasons.push({
+        type: CARD_TYPES.CITY_CLAIM,
+        window: windowKey,
+        triggered: false,
+        reason: 'No top city data',
+      });
+      continue;
+    }
 
-    const { minCityCount, minVisitors, minInteractions, minSharePct, altMinCount } = THRESHOLDS.CITY_CLAIM;
-    
     const cityCount = f.topCity.count;
-    const visitors = f.uniqueVisitors || f.totalInteractions;
     const sharePct = f.topCity.sharePct;
 
-    // Check thresholds
-    if (cityCount < minCityCount) continue;
-    if (visitors < minVisitors && f.totalInteractions < minInteractions) continue;
-    if (sharePct < minSharePct && cityCount < altMinCount) continue;
+    // Eligibility: topCity.count ≥ 15 AND sharePct ≥ 40%
+    if (cityCount < minCityCount) {
+      debugReasons.push({
+        type: CARD_TYPES.CITY_CLAIM,
+        window: windowKey,
+        triggered: false,
+        reason: `City count ${cityCount} < ${minCityCount} required`,
+      });
+      continue;
+    }
+    if (sharePct < minSharePct) {
+      debugReasons.push({
+        type: CARD_TYPES.CITY_CLAIM,
+        window: windowKey,
+        triggered: false,
+        reason: `Share ${sharePct}% < ${minSharePct}% required`,
+      });
+      continue;
+    }
 
     const cityTitle = titleCase(f.topCity.name);
 
@@ -534,7 +575,7 @@ function makeCityClaim(featuresByWindow, bandContext, debugReasons) {
       type: CARD_TYPES.CITY_CLAIM,
       window: windowKey,
       triggered: true,
-      reason: `City ${cityTitle} has ${cityCount} fans (${sharePct}% share)`,
+      reason: `✓ City ${cityTitle}: ${cityCount} fans (${sharePct}% share)`,
     });
 
     return {
@@ -544,7 +585,7 @@ function makeCityClaim(featuresByWindow, bandContext, debugReasons) {
       windowLabel: f.windowLabel,
       headline: `📍 ${cityTitle.toUpperCase()} IS HEATING UP`,
       hero: `${cityCount} FANS`,
-      proof: sharePct >= 30 ? `${sharePct}% OF TRAFFIC • ${f.windowLabel.toUpperCase()}` : `TOP CITY • ${f.windowLabel.toUpperCase()}`,
+      proof: `${sharePct}% OF TRAFFIC • ${f.windowLabel.toUpperCase()}`,
       microCaption: {
         hype: `${cityTitle} is showing love 🔥`,
         grateful: `${cityTitle}, thank you for the love 🙏`,
@@ -612,20 +653,46 @@ function makeMomentumSurge(featuresByWindow, bandContext, debugReasons) {
 
 function makeAfterShowEnergy(featuresByWindow, bandContext, debugReasons) {
   const f = featuresByWindow['24h'];
-  if (!f || !f.peakHour) return null;
+  const { minInteractions, nightHours } = THRESHOLDS.AFTER_SHOW_ENERGY;
 
-  const { minPeakCount, peakMultiplier, nightHours } = THRESHOLDS.AFTER_SHOW_ENERGY;
+  if (!f) {
+    debugReasons.push({
+      type: CARD_TYPES.AFTER_SHOW_ENERGY,
+      window: '24h',
+      triggered: false,
+      reason: 'No 24h data',
+    });
+    return null;
+  }
 
-  // Check if peak is during night hours (show time)
-  if (!nightHours.includes(f.peakHour.hour)) return null;
-  if (f.peakHour.count < minPeakCount) return null;
-  if (f.medianHourly > 0 && f.peakHour.count < f.medianHourly * peakMultiplier) return null;
+  // Eligibility: totalInteractions ≥ 25 AND spike in night hours
+  if (f.totalInteractions < minInteractions) {
+    debugReasons.push({
+      type: CARD_TYPES.AFTER_SHOW_ENERGY,
+      window: '24h',
+      triggered: false,
+      reason: `Interactions ${f.totalInteractions} < ${minInteractions} required`,
+    });
+    return null;
+  }
+
+  if (!f.peakHour || !nightHours.includes(f.peakHour.hour)) {
+    debugReasons.push({
+      type: CARD_TYPES.AFTER_SHOW_ENERGY,
+      window: '24h',
+      triggered: false,
+      reason: f.peakHour 
+        ? `Peak hour ${f.peakHour.hour} not in night hours` 
+        : 'No peak hour detected',
+    });
+    return null;
+  }
 
   debugReasons.push({
     type: CARD_TYPES.AFTER_SHOW_ENERGY,
     window: '24h',
     triggered: true,
-    reason: `Peak at ${f.peakHour.hour}:00 with ${f.peakHour.count} hits (median: ${f.medianHourly})`,
+    reason: `✓ ${f.totalInteractions} interactions, peak at ${formatHour(f.peakHour.hour)}`,
   });
 
   return {
@@ -697,21 +764,36 @@ function makeNewCityUnlocked(featuresByWindow, bandContext, debugReasons) {
 
 function makeReturningFans(featuresByWindow, bandContext, debugReasons) {
   const preferredWindows = ['24h', '7d'];
+  const { minReturningPct } = THRESHOLDS.RETURNING_FANS;
   
   for (const windowKey of preferredWindows) {
     const f = featuresByWindow[windowKey];
-    if (!f || f.returningRate === null) continue;
+    if (!f || f.returningRate === null) {
+      debugReasons.push({
+        type: CARD_TYPES.RETURNING_FANS,
+        window: windowKey,
+        triggered: false,
+        reason: 'No returning rate data',
+      });
+      continue;
+    }
 
-    const { minReturningRate, minInteractions } = THRESHOLDS.RETURNING_FANS;
-
-    if (f.returningRate < minReturningRate) continue;
-    if (f.totalInteractions < minInteractions) continue;
+    // Eligibility: returningVisitorsPct ≥ 25%
+    if (f.returningRate < minReturningPct) {
+      debugReasons.push({
+        type: CARD_TYPES.RETURNING_FANS,
+        window: windowKey,
+        triggered: false,
+        reason: `Returning ${f.returningRate}% < ${minReturningPct}% required`,
+      });
+      continue;
+    }
 
     debugReasons.push({
       type: CARD_TYPES.RETURNING_FANS,
       window: windowKey,
       triggered: true,
-      reason: `${f.returningRate}% returning rate with ${f.totalInteractions} interactions`,
+      reason: `✓ ${f.returningRate}% returning visitors`,
     });
 
     return {
@@ -740,21 +822,28 @@ function makeReturningFans(featuresByWindow, bandContext, debugReasons) {
 
 function makeShareChain(featuresByWindow, bandContext, debugReasons) {
   const preferredWindows = ['24h', '7d'];
+  const { minShares } = THRESHOLDS.SHARE_CHAIN;
   
   for (const windowKey of preferredWindows) {
     const f = featuresByWindow[windowKey];
     if (!f) continue;
 
-    const { minShares } = THRESHOLDS.SHARE_CHAIN;
-
-    if (f.sharesCount < minShares) continue;
-    if (f.sharesCount <= f.prevSharesCount) continue;
+    // Eligibility: sharesCount ≥ 3
+    if (f.sharesCount < minShares) {
+      debugReasons.push({
+        type: CARD_TYPES.SHARE_CHAIN,
+        window: windowKey,
+        triggered: false,
+        reason: `Shares ${f.sharesCount} < ${minShares} required`,
+      });
+      continue;
+    }
 
     debugReasons.push({
       type: CARD_TYPES.SHARE_CHAIN,
       window: windowKey,
       triggered: true,
-      reason: `${f.sharesCount} shares (prev: ${f.prevSharesCount})`,
+      reason: `✓ ${f.sharesCount} shares`,
     });
 
     return {
@@ -784,29 +873,30 @@ function makeShareChain(featuresByWindow, bandContext, debugReasons) {
 
 function makeEngagedSessions(featuresByWindow, bandContext, debugReasons) {
   const preferredWindows = ['24h', '7d'];
+  const { minAvgDuration } = THRESHOLDS.ENGAGED_SESSIONS;
   
   for (const windowKey of preferredWindows) {
     const f = featuresByWindow[windowKey];
     if (!f) continue;
 
-    const { minAvgTime, minInteractions, minEngagedSessions } = THRESHOLDS.ENGAGED_SESSIONS;
-
-    // Check either avg time or engaged sessions
-    const hasAvgTime = f.avgTimeOnPageSec !== null && f.avgTimeOnPageSec >= minAvgTime;
-    const hasEngaged = f.engagedSessions !== null && f.engagedSessions >= minEngagedSessions;
-
-    if (!hasAvgTime && !hasEngaged) continue;
-    if (f.totalInteractions < minInteractions) continue;
-
-    const heroText = hasAvgTime
-      ? `AVG ${formatMinSec(f.avgTimeOnPageSec)}`
-      : `${f.engagedSessions} DEEP SESSIONS`;
+    // Eligibility: avgSessionDuration ≥ 90 seconds
+    if (f.avgTimeOnPageSec === null || f.avgTimeOnPageSec < minAvgDuration) {
+      debugReasons.push({
+        type: CARD_TYPES.ENGAGED_SESSIONS,
+        window: windowKey,
+        triggered: false,
+        reason: f.avgTimeOnPageSec === null 
+          ? 'No session duration data' 
+          : `Avg ${f.avgTimeOnPageSec}s < ${minAvgDuration}s required`,
+      });
+      continue;
+    }
 
     debugReasons.push({
       type: CARD_TYPES.ENGAGED_SESSIONS,
       window: windowKey,
       triggered: true,
-      reason: hasAvgTime ? `Avg time ${f.avgTimeOnPageSec}s` : `${f.engagedSessions} engaged sessions`,
+      reason: `✓ Avg session ${formatMinSec(f.avgTimeOnPageSec)}`,
     });
 
     return {
@@ -815,7 +905,7 @@ function makeEngagedSessions(featuresByWindow, bandContext, debugReasons) {
       window: windowKey,
       windowLabel: f.windowLabel,
       headline: `🧠 THEY STAYED FOR IT`,
-      hero: heroText,
+      hero: `AVG ${formatMinSec(f.avgTimeOnPageSec)}`,
       proof: `REAL ATTENTION • ${f.windowLabel.toUpperCase()}`,
       microCaption: {
         hype: `They didn't just click — they stayed 🔥`,
@@ -825,7 +915,6 @@ function makeEngagedSessions(featuresByWindow, bandContext, debugReasons) {
       accent: ACCENTS[CARD_TYPES.ENGAGED_SESSIONS],
       context: {
         avgTimeOnPageSec: f.avgTimeOnPageSec,
-        engagedSessions: f.engagedSessions,
         window: windowKey,
       },
     };
@@ -836,15 +925,30 @@ function makeEngagedSessions(featuresByWindow, bandContext, debugReasons) {
 
 function makePlatformPull(featuresByWindow, bandContext, debugReasons) {
   const preferredWindows = ['24h', '7d'];
+  const { minClicks } = THRESHOLDS.PLATFORM_PULL;
   
   for (const windowKey of preferredWindows) {
     const f = featuresByWindow[windowKey];
-    if (!f || !f.topPlatform) continue;
+    if (!f || !f.topPlatform) {
+      debugReasons.push({
+        type: CARD_TYPES.PLATFORM_PULL,
+        window: windowKey,
+        triggered: false,
+        reason: 'No platform click data',
+      });
+      continue;
+    }
 
-    const { minClicks, minSharePct } = THRESHOLDS.PLATFORM_PULL;
-
-    if (f.topPlatform.count < minClicks) continue;
-    if (f.topPlatform.sharePct < minSharePct) continue;
+    // Eligibility: any platformClicks ≥ 10
+    if (f.topPlatform.count < minClicks) {
+      debugReasons.push({
+        type: CARD_TYPES.PLATFORM_PULL,
+        window: windowKey,
+        triggered: false,
+        reason: `${titleCase(f.topPlatform.name)} clicks ${f.topPlatform.count} < ${minClicks} required`,
+      });
+      continue;
+    }
 
     const platformName = titleCase(f.topPlatform.name);
 
@@ -852,7 +956,7 @@ function makePlatformPull(featuresByWindow, bandContext, debugReasons) {
       type: CARD_TYPES.PLATFORM_PULL,
       window: windowKey,
       triggered: true,
-      reason: `${platformName} has ${f.topPlatform.count} clicks (${f.topPlatform.sharePct}% share)`,
+      reason: `✓ ${platformName}: ${f.topPlatform.count} clicks`,
     });
 
     return {
@@ -883,22 +987,46 @@ function makePlatformPull(featuresByWindow, bandContext, debugReasons) {
 
 function makePeakHour(featuresByWindow, bandContext, debugReasons) {
   const f = featuresByWindow['24h'];
-  if (!f || !f.peakHour) return null;
+  const { minPeakCount } = THRESHOLDS.PEAK_HOUR;
 
-  const { minPeakCount, peakMultiplier } = THRESHOLDS.PEAK_HOUR;
+  if (!f || !f.peakHour) {
+    debugReasons.push({
+      type: CARD_TYPES.PEAK_HOUR,
+      window: '24h',
+      triggered: false,
+      reason: 'No peak hour data',
+    });
+    return null;
+  }
 
-  if (f.peakHour.count < minPeakCount) return null;
-  if (f.medianHourly > 0 && f.peakHour.count < f.medianHourly * peakMultiplier) return null;
+  // Eligibility: peakHour.count ≥ 10
+  if (f.peakHour.count < minPeakCount) {
+    debugReasons.push({
+      type: CARD_TYPES.PEAK_HOUR,
+      window: '24h',
+      triggered: false,
+      reason: `Peak count ${f.peakHour.count} < ${minPeakCount} required`,
+    });
+    return null;
+  }
 
-  // Don't duplicate with AFTER_SHOW_ENERGY
+  // Don't duplicate with AFTER_SHOW_ENERGY (night hours)
   const nightHours = THRESHOLDS.AFTER_SHOW_ENERGY.nightHours;
-  if (nightHours.includes(f.peakHour.hour)) return null;
+  if (nightHours.includes(f.peakHour.hour)) {
+    debugReasons.push({
+      type: CARD_TYPES.PEAK_HOUR,
+      window: '24h',
+      triggered: false,
+      reason: `Peak hour ${f.peakHour.hour} is night hour (use AFTER_SHOW_ENERGY instead)`,
+    });
+    return null;
+  }
 
   debugReasons.push({
     type: CARD_TYPES.PEAK_HOUR,
     window: '24h',
     triggered: true,
-    reason: `Peak at ${f.peakHour.hour}:00 with ${f.peakHour.count} hits`,
+    reason: `✓ Peak at ${formatHour(f.peakHour.hour)}: ${f.peakHour.count} hits`,
   });
 
   return {
@@ -966,52 +1094,139 @@ function makeMilestoneDrop(featuresByWindow, bandContext, debugReasons) {
 // SCORING & RECOMMENDED
 // ============================================================
 
-function computeScore(card, featuresByWindow) {
-  let score = BASE_SCORES[card.type] || 50;
+/**
+ * Compute score for a card based on type-specific rules
+ * Returns { score, breakdown } for debug purposes
+ */
+function computeScore(card, featuresByWindow, debug = false) {
   const f = featuresByWindow[card.window];
+  const ctx = card.context || {};
+  let score = BASE_SCORES[card.type] || 50;
+  const breakdown = { base: score, bonuses: [] };
 
-  // Freshness bonus
-  if (card.window === '2h' || card.window === '24h') {
-    score += 5;
+  switch (card.type) {
+    case CARD_TYPES.CITY_CLAIM:
+      // +20 if sharePct ≥60, +10 if totalInteractions ≥50, cap 95
+      if (ctx.sharePct >= 60) {
+        score += 20;
+        breakdown.bonuses.push('+20 (sharePct ≥60)');
+      }
+      if (f && f.totalInteractions >= 50) {
+        score += 10;
+        breakdown.bonuses.push('+10 (interactions ≥50)');
+      }
+      score = Math.min(score, 95);
+      break;
+
+    case CARD_TYPES.MOMENTUM_SURGE:
+      // +20 if ≥100%, +10 if interactions ≥30
+      if (ctx.growthPct >= 100) {
+        score += 20;
+        breakdown.bonuses.push('+20 (growth ≥100%)');
+      }
+      if (f && f.totalInteractions >= 30) {
+        score += 10;
+        breakdown.bonuses.push('+10 (interactions ≥30)');
+      }
+      break;
+
+    case CARD_TYPES.AFTER_SHOW_ENERGY:
+      // +15 if ≥50 interactions, +10 if sharesCount >0
+      if (ctx.totalInteractions >= 50) {
+        score += 15;
+        breakdown.bonuses.push('+15 (interactions ≥50)');
+      }
+      if (f && f.sharesCount > 0) {
+        score += 10;
+        breakdown.bonuses.push('+10 (has shares)');
+      }
+      break;
+
+    case CARD_TYPES.PEAK_HOUR:
+      // +15 if ≥20 hits, +10 if growthPct >0
+      if (ctx.peakHour && ctx.peakHour.count >= 20) {
+        score += 15;
+        breakdown.bonuses.push('+15 (peak ≥20)');
+      }
+      if (f && f.growthPct > 0) {
+        score += 10;
+        breakdown.bonuses.push('+10 (positive growth)');
+      }
+      break;
+
+    case CARD_TYPES.NEW_CITY_UNLOCKED:
+      // +15 if ≥2 new cities, +10 if total cities ≥5
+      if (ctx.newCityCount >= 2) {
+        score += 15;
+        breakdown.bonuses.push('+15 (≥2 new cities)');
+      }
+      if (f && f.uniqueCities >= 5) {
+        score += 10;
+        breakdown.bonuses.push('+10 (total cities ≥5)');
+      }
+      break;
+
+    case CARD_TYPES.RETURNING_FANS:
+      // +20 if ≥40%
+      if (ctx.returningRate >= 40) {
+        score += 20;
+        breakdown.bonuses.push('+20 (returning ≥40%)');
+      }
+      break;
+
+    case CARD_TYPES.SHARE_CHAIN:
+      // +10 per share beyond 3, cap 85
+      const extraShares = Math.max(0, (ctx.sharesCount || 0) - 3);
+      const shareBonus = Math.min(extraShares * 10, 35);
+      if (shareBonus > 0) {
+        score += shareBonus;
+        breakdown.bonuses.push(`+${shareBonus} (${extraShares} extra shares)`);
+      }
+      score = Math.min(score, 85);
+      break;
+
+    case CARD_TYPES.ENGAGED_SESSIONS:
+      // +15 if ≥2:30 (150 seconds)
+      if (ctx.avgTimeOnPageSec >= 150) {
+        score += 15;
+        breakdown.bonuses.push('+15 (avg ≥2:30)');
+      }
+      break;
+
+    case CARD_TYPES.PLATFORM_PULL:
+      // +15 if ≥25 clicks
+      if (ctx.count >= 25) {
+        score += 15;
+        breakdown.bonuses.push('+15 (clicks ≥25)');
+      }
+      break;
+
+    case CARD_TYPES.MILESTONE_DROP:
+      // Fixed 90
+      score = 90;
+      breakdown.base = 90;
+      break;
   }
 
-  // Magnitude bonuses
-  if (card.context) {
-    // Growth bonus
-    if (card.context.growthPct) {
-      score += Math.min(10, Math.floor(card.context.growthPct / 20));
-    }
-
-    // City share bonus
-    if (card.context.sharePct && card.context.sharePct >= 70) {
-      score += 5;
-    }
-
-    // Shares bonus
-    if (card.context.sharesCount) {
-      score += Math.min(5, card.context.sharesCount);
-    }
-
-    // Milestone tier bonus
-    if (card.context.milestone) {
-      const milestoneValue = parseInt(card.context.milestone) || 0;
-      if (milestoneValue >= 1000) score += 5;
-      else if (milestoneValue >= 500) score += 3;
-      else if (milestoneValue >= 250) score += 2;
-    }
+  breakdown.final = Math.max(0, Math.min(100, score));
+  
+  if (debug) {
+    return { score: breakdown.final, breakdown };
   }
-
-  // Low sample penalty
-  if (f && f.totalInteractions < 8) {
-    score -= 10;
-  }
-
-  return Math.max(0, Math.min(100, score));
+  return breakdown.final;
 }
 
-function buildRecommended(scoredCards, maxCount = 4) {
+/**
+ * Build recommended set with strict variety enforcement
+ * Rules:
+ * - Max 3 cards total
+ * - Max 1 per family (geo, growth, engagement, distribution, achievement)
+ * - Sort by score DESC
+ * - If fewer qualify, return fewer (no padding)
+ */
+function buildRecommended(scoredCards, maxCount = 3) {
   const recommended = [];
-  const familyCounts = {};
+  const familyUsed = {};
 
   for (const card of scoredCards) {
     if (recommended.length >= maxCount) break;
@@ -1025,14 +1240,16 @@ function buildRecommended(scoredCards, maxCount = 4) {
       }
     }
 
-    // Check diversity (max 2 per family)
-    if (cardFamily) {
-      const count = familyCounts[cardFamily] || 0;
-      if (count >= 2) continue;
-      familyCounts[cardFamily] = count + 1;
+    // Enforce strict variety: max 1 per family
+    if (cardFamily && familyUsed[cardFamily]) {
+      continue;
     }
 
+    // Add to recommended
     recommended.push(card);
+    if (cardFamily) {
+      familyUsed[cardFamily] = true;
+    }
   }
 
   return recommended;
