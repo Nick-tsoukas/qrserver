@@ -11,6 +11,7 @@
  */
 
 const { DateTime } = require('luxon');
+const { applyCooldowns, recordEmittedCards } = require('./cooldowns');
 
 // ============================================================
 // CONSTANTS & CONFIGURATION
@@ -197,8 +198,16 @@ async function evaluateShareables(strapi, options) {
 
   scoredCards.sort((a, b) => b.score - a.score);
 
-  // Build recommended list (max 3 with strict variety)
-  const recommended = buildRecommended(scoredCards, 3);
+  // Apply cooldowns BEFORE recommended selection
+  const { cards: cooledCards, cooldownInfo } = await applyCooldowns(strapi, bandId, scoredCards);
+
+  // Build recommended list (max 3 with strict variety) from cooled cards
+  const recommended = buildRecommended(cooledCards, 3);
+
+  // Record emitted cards for cooldown tracking (recommended only)
+  if (recommended.length > 0) {
+    await recordEmittedCards(strapi, bandId, recommended);
+  }
 
   const result = {
     ok: true,
@@ -208,7 +217,7 @@ async function evaluateShareables(strapi, options) {
       const { _scoreBreakdown, ...card } = c;
       return card;
     }),
-    cards: scoredCards.map(c => {
+    cards: cooledCards.map(c => {
       const { _scoreBreakdown, ...card } = c;
       return card;
     }),
@@ -220,6 +229,7 @@ async function evaluateShareables(strapi, options) {
       timing: Date.now() - startTime,
       metricsSnapshot: featuresByWindow,
       eligibilityReasons: debugReasons,
+      cooldownInfo,
       scoreBreakdowns: scoredCards.map(c => ({
         id: c.id,
         type: c.type,
@@ -231,6 +241,11 @@ async function evaluateShareables(strapi, options) {
         type: r.type,
         window: r.window,
         reason: r.reason,
+      })),
+      suppressedByCooldown: cooldownInfo.filter(c => c.onCooldown).map(c => ({
+        cardId: c.cardId,
+        type: c.type,
+        reason: c.reason,
       })),
     };
   }

@@ -5,7 +5,7 @@
     "singularName": "band-share",
     "pluralName": "band-shares",
     "displayName": "Band Share",
-    "description": "Tracks band share events (independent of earned moments)"
+    "description": "Tracks band share events including shareable cards"
   },
   "options": {
     "draftAndPublish": false
@@ -19,12 +19,10 @@
       "required": true
     },
     "visitorId": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "sessionId": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "shareChannel": {
       "type": "enumeration",
@@ -44,13 +42,35 @@
       "type": "enumeration",
       "enum": [
         "FOOTER",
-        "FAN_MOMENT_SECTION"
+        "FAN_MOMENT_SECTION",
+        "DASHBOARD",
+        "DRAWER"
       ],
       "required": true
     },
     "sharedAt": {
       "type": "datetime",
       "required": true
+    },
+    "shareableId": {
+      "type": "string"
+    },
+    "cardType": {
+      "type": "string"
+    },
+    "window": {
+      "type": "string"
+    },
+    "accent": {
+      "type": "string"
+    },
+    "captionStyle": {
+      "type": "enumeration",
+      "enum": [
+        "hype",
+        "grateful",
+        "tease"
+      ]
     },
     "context": {
       "type": "json"

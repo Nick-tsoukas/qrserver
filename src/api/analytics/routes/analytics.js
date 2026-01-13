@@ -125,5 +125,12 @@ module.exports = {
       handler: "shareables.getShareables",
       config: { auth: false },
     },
+    // Shareables v1 - Share Tracking
+    {
+      method: "POST",
+      path: "/pulse/shareables/track",
+      handler: "shareables.trackShare",
+      config: { auth: false },
+    },
   ],
 };
