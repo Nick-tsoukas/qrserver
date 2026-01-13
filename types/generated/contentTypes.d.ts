@@ -2237,6 +2237,42 @@ export interface ApiSupportMomentSupportMoment extends Schema.CollectionType {
   };
 }
 
+export interface ApiSystemKvSystemKv extends Schema.CollectionType {
+  collectionName: 'system_kvs';
+  info: {
+    singularName: 'system-kv';
+    pluralName: 'system-kvs';
+    displayName: 'System KV';
+    description: 'Key-value store for system timestamps and metadata';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    key: Attribute.String & Attribute.Required & Attribute.Unique;
+    value: Attribute.JSON;
+    band: Attribute.Relation<
+      'api::system-kv.system-kv',
+      'manyToOne',
+      'api::band.band'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::system-kv.system-kv',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::system-kv.system-kv',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiTourTour extends Schema.CollectionType {
   collectionName: 'tours';
   info: {
@@ -2365,6 +2401,7 @@ declare module '@strapi/types' {
       'api::socialpage.socialpage': ApiSocialpageSocialpage;
       'api::stream.stream': ApiStreamStream;
       'api::support-moment.support-moment': ApiSupportMomentSupportMoment;
+      'api::system-kv.system-kv': ApiSystemKvSystemKv;
       'api::tour.tour': ApiTourTour;
       'api::video.video': ApiVideoVideo;
     }
