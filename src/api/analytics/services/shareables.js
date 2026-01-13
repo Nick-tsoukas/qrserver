@@ -461,9 +461,9 @@ async function fetchShares(strapi, bandId, from, to) {
     return await strapi.entityService.findMany('api::band-share.band-share', {
       filters: {
         band: { id: bandId },
-        timestamp: { $gte: from, $lte: to },
+        sharedAt: { $gte: from, $lte: to },
       },
-      fields: ['id', 'timestamp'],
+      fields: ['id', 'sharedAt'],
       pagination: { limit: 100000 },
     }) || [];
   } catch (err) {
