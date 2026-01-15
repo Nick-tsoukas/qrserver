@@ -208,6 +208,11 @@
       "enum": ["default", "compact", "bold"],
       "default": "default"
     },
+    "buttonStyle": {
+      "type": "enumeration",
+      "enum": ["classic", "modern"],
+      "default": "classic"
+    },
     "newReleaseDate": {
       "type": "date"
     },
