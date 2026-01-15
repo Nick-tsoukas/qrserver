@@ -1003,6 +1003,18 @@ export interface ApiBandBand extends Schema.CollectionType {
     >;
     layoutConfig: Attribute.JSON;
     layoutVersion: Attribute.Integer & Attribute.DefaultTo<1>;
+    pageStyle: Attribute.Enumeration<['default', 'compact', 'bold']> &
+      Attribute.DefaultTo<'default'>;
+    newReleaseDate: Attribute.Date;
+    nowBannerOverride: Attribute.Enumeration<
+      [
+        'SHOW_TONIGHT',
+        'ON_TOUR',
+        'NEW_RELEASE',
+        'POST_SHOW_THANKS',
+        'QUIET_DEFAULT'
+      ]
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &

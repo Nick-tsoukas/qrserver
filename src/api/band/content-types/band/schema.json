@@ -202,6 +202,19 @@
     "layoutVersion": {
       "type": "integer",
       "default": 1
+    },
+    "pageStyle": {
+      "type": "enumeration",
+      "enum": ["default", "compact", "bold"],
+      "default": "default"
+    },
+    "newReleaseDate": {
+      "type": "date"
+    },
+    "nowBannerOverride": {
+      "type": "enumeration",
+      "enum": ["SHOW_TONIGHT", "ON_TOUR", "NEW_RELEASE", "POST_SHOW_THANKS", "QUIET_DEFAULT"],
+      "default": null
     }
   }
 }
