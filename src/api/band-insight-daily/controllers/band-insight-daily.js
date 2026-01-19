@@ -84,4 +84,22 @@ async insights(ctx) {
     ctx.body = { ok: true, count: results.length, results };
   },
 
+  // GET /muse/insights?bandId=1 - V2 insights with confidence, why, actions
+  async insightsV2(ctx) {
+    const bandId = Number(ctx.query.bandId || ctx.query.band_id);
+    const days = Number(ctx.query.days || 30);
+    if (!bandId) return ctx.badRequest('Missing bandId');
+
+    try {
+      const result = await strapi
+        .service('api::band-insight-daily.band-insight-daily')
+        .generateInsightsV2({ bandId, days });
+      ctx.body = result;
+    } catch (err) {
+      strapi.log.error('[insightsV2] error', err);
+      ctx.status = 500;
+      ctx.body = { ok: false, error: String(err?.message || err) };
+    }
+  },
+
 }));

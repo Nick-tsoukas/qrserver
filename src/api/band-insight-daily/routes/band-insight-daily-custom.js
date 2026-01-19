@@ -26,5 +26,11 @@ module.exports = {
       handler: "band-insight-daily.backfill",
       config: { auth: false },
     },
+    {
+      method: "GET",
+      path: "/muse/insights",
+      handler: "band-insight-daily.insightsV2",
+      config: { auth: false },
+    },
   ],
 };

@@ -1,5 +1,6 @@
 "use strict";
 const { createCoreService } = require("@strapi/strapi").factories;
+const { generateInsights } = require('./insights-engine');
 
 module.exports = createCoreService("api::band-insight-daily.band-insight-daily", ({ strapi }) => ({
   async computeDay({ bandId, day }) {
@@ -218,6 +219,91 @@ const mpRows = await strapi.db.query(UID_MP).findMany({
   }
 
   return insights.slice(0, 5);
+},
+
+/**
+ * Generate V2 insights using the new insights engine
+ * Returns structured insights with confidence, why, and recommended actions
+ */
+async generateInsightsV2({ bandId, days = 30 }) {
+  // 1) Fetch recent daily rows
+  const dailyRows = await strapi.entityService.findMany(
+    'api::band-insight-daily.band-insight-daily',
+    {
+      filters: { band: { id: bandId } },
+      sort: ['date:desc'],
+      pagination: { limit: days },
+    }
+  );
+
+  // 2) Fetch upcoming events for tour state insights
+  let events = [];
+  try {
+    const now = new Date();
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const twoWeeksAhead = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    
+    events = await strapi.entityService.findMany(
+      'api::event.event',
+      {
+        filters: {
+          band: { id: bandId },
+          date: { $gte: twoWeeksAgo.toISOString(), $lte: twoWeeksAhead.toISOString() },
+        },
+        sort: ['date:asc'],
+        pagination: { limit: 10 },
+      }
+    );
+  } catch (e) {
+    // Events table might not exist or have different schema
+    strapi.log.warn('[generateInsightsV2] Could not fetch events:', e.message);
+  }
+
+  // 3) Fetch share data if available
+  let shareData = null;
+  try {
+    const shares = await strapi.entityService.findMany(
+      'api::band-share.band-share',
+      {
+        filters: { band: { id: bandId } },
+        sort: ['createdAt:desc'],
+        pagination: { limit: 100 },
+      }
+    );
+    
+    if (shares && shares.length) {
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+      
+      shareData = {
+        shares7: shares.filter(s => new Date(s.createdAt) >= sevenDaysAgo).length,
+        sharesPrev7: shares.filter(s => {
+          const d = new Date(s.createdAt);
+          return d >= fourteenDaysAgo && d < sevenDaysAgo;
+        }).length,
+      };
+    }
+  } catch (e) {
+    // Share table might not exist
+    strapi.log.warn('[generateInsightsV2] Could not fetch shares:', e.message);
+  }
+
+  // 4) Generate insights using the engine
+  const insights = await generateInsights({
+    bandId,
+    dailyRows,
+    events,
+    shareData,
+  });
+
+  return {
+    ok: true,
+    bandId,
+    count: insights.length,
+    insights,
+    generatedAt: new Date().toISOString(),
+  };
 }
 
 }));
