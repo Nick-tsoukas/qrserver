@@ -1,0 +1,1791 @@
+{
+  "generatedAt": "2026-01-19T04:39:45.832Z",
+  "public": [
+    {
+      "id": 15,
+      "action": "plugin::users-permissions.auth.register",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for authentication flow",
+      "risk": "LOW"
+    },
+    {
+      "id": 73,
+      "action": "plugin::users-permissions.auth.connect",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for authentication flow",
+      "risk": "LOW"
+    },
+    {
+      "id": 74,
+      "action": "plugin::users-permissions.user.create",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Create operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 75,
+      "action": "plugin::users-permissions.user.me",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 76,
+      "action": "plugin::users-permissions.user.find",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "User/role enumeration risk",
+      "risk": "HIGH"
+    },
+    {
+      "id": 77,
+      "action": "plugin::users-permissions.auth.callback",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for authentication flow",
+      "risk": "LOW"
+    },
+    {
+      "id": 78,
+      "action": "plugin::users-permissions.auth.sendEmailConfirmation",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for authentication flow",
+      "risk": "LOW"
+    },
+    {
+      "id": 79,
+      "action": "plugin::users-permissions.auth.emailConfirmation",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for authentication flow",
+      "risk": "LOW"
+    },
+    {
+      "id": 80,
+      "action": "plugin::users-permissions.auth.changePassword",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 81,
+      "action": "plugin::users-permissions.auth.forgotPassword",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for authentication flow",
+      "risk": "LOW"
+    },
+    {
+      "id": 82,
+      "action": "plugin::users-permissions.auth.resetPassword",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for authentication flow",
+      "risk": "LOW"
+    },
+    {
+      "id": 83,
+      "action": "plugin::users-permissions.user.findOne",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "User/role enumeration risk",
+      "risk": "HIGH"
+    },
+    {
+      "id": 86,
+      "action": "api::band.band.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for public band/event/article pages",
+      "risk": "LOW"
+    },
+    {
+      "id": 87,
+      "action": "api::album.album.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 88,
+      "action": "api::album.album.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 89,
+      "action": "api::event.event.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for public band/event/article pages",
+      "risk": "LOW"
+    },
+    {
+      "id": 90,
+      "action": "api::event.event.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for public band/event/article pages",
+      "risk": "LOW"
+    },
+    {
+      "id": 91,
+      "action": "api::qr.qr.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 92,
+      "action": "api::qr.qr.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 93,
+      "action": "api::socialpage.socialpage.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 94,
+      "action": "api::socialpage.socialpage.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 95,
+      "action": "api::stream.stream.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 96,
+      "action": "api::stream.stream.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 97,
+      "action": "api::tour.tour.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 98,
+      "action": "api::tour.tour.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 99,
+      "action": "plugin::upload.content-api.find",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Upload should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 100,
+      "action": "plugin::upload.content-api.findOne",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Upload should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 106,
+      "action": "api::video.video.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 107,
+      "action": "api::video.video.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 110,
+      "action": "api::scan.scan.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 111,
+      "action": "api::scan.scan.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 117,
+      "action": "api::scan.scan.create",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Analytics tracking endpoint - needs rate limiting",
+      "risk": "LOW"
+    },
+    {
+      "id": 126,
+      "action": "api::link-click.link-click.getBandClicks",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 127,
+      "action": "api::link-click.link-click.trackClick",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 134,
+      "action": "api::band.band.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for public band/event/article pages",
+      "risk": "LOW"
+    },
+    {
+      "id": 135,
+      "action": "api::qr.qr.update",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Update operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 136,
+      "action": "api::stripe.stripe.createCheckoutSession",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Create operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 137,
+      "action": "api::stripe.stripe.confirmPayment",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 138,
+      "action": "api::stripe.stripe.createCustomer",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Create operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 140,
+      "action": "api::stripe.stripe.testRoute",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 142,
+      "action": "api::band.band.findBySlug",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 150,
+      "action": "api::scan.scan.update",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Update operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 152,
+      "action": "api::media-play.media-play.track",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Analytics tracking endpoint - needs rate limiting",
+      "risk": "LOW"
+    },
+    {
+      "id": 154,
+      "action": "api::media-play.media-play.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 155,
+      "action": "api::media-play.media-play.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 169,
+      "action": "api::stripe.stripe.subscriptionStatus",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 170,
+      "action": "api::subscription.subscription.webhook",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 171,
+      "action": "api::subscription.subscription.register",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 172,
+      "action": "api::subscription.subscription.subscriptionStatus",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 177,
+      "action": "api::band-page-view.band-page-view.create",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Create operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 178,
+      "action": "api::band-page-view.band-page-view.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 179,
+      "action": "api::band-page-view.band-page-view.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 183,
+      "action": "api::event-page-view.event-page-view.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 184,
+      "action": "api::event-page-view.event-page-view.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 185,
+      "action": "api::event-page-view.event-page-view.create",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Create operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 190,
+      "action": "api::seo-page.seo-page.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for public band/event/article pages",
+      "risk": "LOW"
+    },
+    {
+      "id": 191,
+      "action": "api::seo-page.seo-page.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for public band/event/article pages",
+      "risk": "LOW"
+    },
+    {
+      "id": 192,
+      "action": "api::stripe.stripe.confirmSocial",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 198,
+      "action": "api::howtovideo.howtovideo.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for public band/event/article pages",
+      "risk": "LOW"
+    },
+    {
+      "id": 199,
+      "action": "api::howtovideo.howtovideo.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for public band/event/article pages",
+      "risk": "LOW"
+    },
+    {
+      "id": 205,
+      "action": "api::band-insight-daily.band-insight-daily.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 206,
+      "action": "api::band-insight-daily.band-insight-daily.compute",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 207,
+      "action": "api::band-insight-daily.band-insight-daily.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 216,
+      "action": "api::band-insight-daily.band-insight-daily.create",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Create operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 217,
+      "action": "api::band-insight-daily.band-insight-daily.delete",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Delete operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 218,
+      "action": "api::band-insight-daily.band-insight-daily.update",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Update operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 219,
+      "action": "api::analytics.analytics.rollups",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 220,
+      "action": "api::analytics.analytics.geo",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 221,
+      "action": "api::analytics.analytics.transitions",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 225,
+      "action": "api::muse.muse.run",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 226,
+      "action": "api::muse.muse.backfill",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 230,
+      "action": "api::band-insight-daily.band-insight-daily.debug",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 231,
+      "action": "api::band-insight-daily.band-insight-daily.backfill",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 244,
+      "action": "api::youtube.youtube.debugSync",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 245,
+      "action": "api::youtube.youtube.disconnect",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 246,
+      "action": "api::youtube.youtube.oauthInit",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 247,
+      "action": "api::youtube.youtube.selectChannel",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 248,
+      "action": "api::youtube.youtube.oauthCallback",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 249,
+      "action": "api::youtube.youtube.purge",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 250,
+      "action": "api::youtube.youtube.sync",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 259,
+      "action": "api::band.payments.onboard",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 261,
+      "action": "api::stripe.connect-webhook.handle",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 272,
+      "action": "api::band-ui-event.band-ui-event.track",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Analytics tracking endpoint - needs rate limiting",
+      "risk": "LOW"
+    },
+    {
+      "id": 273,
+      "action": "api::event-page-view.event-page-view.track",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Analytics tracking endpoint - needs rate limiting",
+      "risk": "LOW"
+    },
+    {
+      "id": 274,
+      "action": "api::scan.scan.track",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 284,
+      "action": "api::band-share.band-share.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 285,
+      "action": "api::band-share.band-share.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 286,
+      "action": "api::pulse-snapshot.pulse-snapshot.find",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 287,
+      "action": "api::pulse-snapshot.pulse-snapshot.findOne",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Read operation - verify if content should be public",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 288,
+      "action": "api::pulse-snapshot.pulse-snapshot.create",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Create operation should not be public",
+      "risk": "HIGH"
+    },
+    {
+      "id": 289,
+      "action": "api::pulse-snapshot.pulse-snapshot.update",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "Update operation should not be public",
+      "risk": "HIGH"
+    }
+  ],
+  "authenticated": [
+    {
+      "id": 23,
+      "action": "plugin::users-permissions.auth.register",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 24,
+      "action": "plugin::users-permissions.auth.connect",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 25,
+      "action": "plugin::users-permissions.auth.callback",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 26,
+      "action": "plugin::users-permissions.auth.changePassword",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for user account management",
+      "risk": "LOW"
+    },
+    {
+      "id": 27,
+      "action": "plugin::users-permissions.auth.emailConfirmation",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 28,
+      "action": "plugin::users-permissions.auth.resetPassword",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 29,
+      "action": "plugin::users-permissions.auth.forgotPassword",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 30,
+      "action": "plugin::users-permissions.user.me",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for user account management",
+      "risk": "LOW"
+    },
+    {
+      "id": 31,
+      "action": "plugin::users-permissions.user.update",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Required for user account management",
+      "risk": "LOW"
+    },
+    {
+      "id": 32,
+      "action": "api::album.album.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 33,
+      "action": "api::album.album.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 34,
+      "action": "api::album.album.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 35,
+      "action": "api::album.album.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 36,
+      "action": "api::album.album.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 38,
+      "action": "api::band.band.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 42,
+      "action": "api::event.event.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 43,
+      "action": "api::event.event.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 44,
+      "action": "api::event.event.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 45,
+      "action": "api::event.event.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 46,
+      "action": "api::event.event.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 47,
+      "action": "api::qr.qr.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 48,
+      "action": "api::qr.qr.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 49,
+      "action": "api::qr.qr.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 50,
+      "action": "api::qr.qr.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 51,
+      "action": "api::qr.qr.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 52,
+      "action": "api::socialpage.socialpage.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 53,
+      "action": "api::socialpage.socialpage.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 54,
+      "action": "api::socialpage.socialpage.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 55,
+      "action": "api::socialpage.socialpage.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 56,
+      "action": "api::socialpage.socialpage.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 57,
+      "action": "api::stream.stream.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 58,
+      "action": "api::stream.stream.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 59,
+      "action": "api::stream.stream.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 60,
+      "action": "api::stream.stream.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 61,
+      "action": "api::stream.stream.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 62,
+      "action": "api::tour.tour.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 63,
+      "action": "api::tour.tour.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 64,
+      "action": "api::tour.tour.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 65,
+      "action": "api::tour.tour.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 66,
+      "action": "api::tour.tour.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 67,
+      "action": "plugin::upload.content-api.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 68,
+      "action": "plugin::upload.content-api.upload",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 69,
+      "action": "plugin::upload.content-api.destroy",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 70,
+      "action": "plugin::upload.content-api.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 84,
+      "action": "plugin::users-permissions.user.find",
+      "enabled": true,
+      "decision": "REMOVE",
+      "reason": "User enumeration - not needed for normal users",
+      "risk": "HIGH"
+    },
+    {
+      "id": 101,
+      "action": "api::video.video.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 102,
+      "action": "api::video.video.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 103,
+      "action": "api::video.video.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 104,
+      "action": "api::video.video.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 105,
+      "action": "api::video.video.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 112,
+      "action": "api::scan.scan.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 113,
+      "action": "api::scan.scan.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 114,
+      "action": "api::scan.scan.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 115,
+      "action": "api::scan.scan.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 116,
+      "action": "api::scan.scan.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 128,
+      "action": "api::link-click.link-click.getBandClicks",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 129,
+      "action": "api::link-click.link-click.trackClick",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 130,
+      "action": "api::band.band.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 131,
+      "action": "api::band.band.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 132,
+      "action": "api::band.band.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 133,
+      "action": "api::band.band.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 144,
+      "action": "api::band.band.findBySlug",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 145,
+      "action": "api::stripe.stripe.confirmPayment",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 146,
+      "action": "api::stripe.stripe.createCheckoutSession",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 147,
+      "action": "api::stripe.stripe.testRoute",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 148,
+      "action": "api::stripe.stripe.createCustomer",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 151,
+      "action": "api::auth.email-confirmation.confirmEmail",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 153,
+      "action": "api::media-play.media-play.track",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 156,
+      "action": "api::media-play.media-play.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 157,
+      "action": "api::media-play.media-play.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 162,
+      "action": "api::stripe.stripe.subscriptionStatus",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 163,
+      "action": "api::stripe.stripe.getBillingInfo",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 164,
+      "action": "api::stripe.stripe.createBillingPortalSession",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 165,
+      "action": "api::subscription.subscription.register",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 166,
+      "action": "api::subscription.subscription.webhook",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 167,
+      "action": "api::subscription.subscription.subscriptionStatus",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 168,
+      "action": "api::subscription.subscription.createBillingPortalSession",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 180,
+      "action": "api::band-page-view.band-page-view.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 181,
+      "action": "api::band-page-view.band-page-view.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 182,
+      "action": "api::band-page-view.band-page-view.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 186,
+      "action": "api::event-page-view.event-page-view.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 187,
+      "action": "api::event-page-view.event-page-view.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 188,
+      "action": "api::event-page-view.event-page-view.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 193,
+      "action": "api::stripe.stripe.confirmSocial",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 196,
+      "action": "api::howtovideo.howtovideo.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 197,
+      "action": "api::howtovideo.howtovideo.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 200,
+      "action": "api::howtovideo.howtovideo.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 201,
+      "action": "api::howtovideo.howtovideo.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 202,
+      "action": "api::howtovideo.howtovideo.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 209,
+      "action": "api::band-insight-daily.band-insight-daily.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 210,
+      "action": "api::band-insight-daily.band-insight-daily.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 211,
+      "action": "api::band-insight-daily.band-insight-daily.compute",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 212,
+      "action": "api::band-insight-daily.band-insight-daily.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 213,
+      "action": "api::band-insight-daily.band-insight-daily.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 214,
+      "action": "api::band-insight-daily.band-insight-daily.muse",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 215,
+      "action": "api::band-insight-daily.band-insight-daily.delete",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Delete operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 222,
+      "action": "api::analytics.analytics.rollups",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 223,
+      "action": "api::analytics.analytics.geo",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 224,
+      "action": "api::analytics.analytics.transitions",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 227,
+      "action": "api::muse.muse.run",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 228,
+      "action": "api::muse.muse.backfill",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 232,
+      "action": "api::band-insight-daily.band-insight-daily.backfill",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 233,
+      "action": "api::band-insight-daily.band-insight-daily.debug",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 235,
+      "action": "api::muse.muse.aggregate",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 236,
+      "action": "api::band-external-account.band-external-account.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 237,
+      "action": "api::band-external-account.band-external-account.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 238,
+      "action": "api::band-external-account.band-external-account.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 239,
+      "action": "api::band-external-account.band-external-account.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 240,
+      "action": "api::band-external-metric.band-external-metric.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 241,
+      "action": "api::band-external-metric.band-external-metric.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 242,
+      "action": "api::band-external-metric.band-external-metric.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 243,
+      "action": "api::band-external-metric.band-external-metric.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 251,
+      "action": "api::youtube.youtube.debugSync",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 252,
+      "action": "api::youtube.youtube.disconnect",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 253,
+      "action": "api::youtube.youtube.oauthInit",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 254,
+      "action": "api::youtube.youtube.selectChannel",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 255,
+      "action": "api::youtube.youtube.oauthCallback",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 256,
+      "action": "api::youtube.youtube.purge",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 257,
+      "action": "api::youtube.youtube.sync",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 258,
+      "action": "api::youtube.youtube.debug",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 260,
+      "action": "api::band.payments.onboard",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 265,
+      "action": "api::band.payments.summary",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 266,
+      "action": "api::event-page-view.event-page-view.track",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 267,
+      "action": "api::support-moment.support-moment.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 268,
+      "action": "api::support-moment.support-moment.findOne",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 269,
+      "action": "api::support-moment.support-moment.update",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Update operation - verify ownership check exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 270,
+      "action": "api::support-moment.support-moment.summary",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 271,
+      "action": "api::support-moment.support-moment.find",
+      "enabled": true,
+      "decision": "KEEP",
+      "reason": "Read operation for authenticated users",
+      "risk": "LOW"
+    },
+    {
+      "id": 280,
+      "action": "api::band.checkout.create",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Create operation - verify validation exists",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 281,
+      "action": "api::band-external-metric.band-external-metric.latest",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 282,
+      "action": "api::band-external-metric.band-external-metric.upsert",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    },
+    {
+      "id": 283,
+      "action": "api::band-ui-event.band-ui-event.track",
+      "enabled": true,
+      "decision": "REVIEW",
+      "reason": "Unknown action - needs manual review",
+      "risk": "MEDIUM"
+    }
+  ]
+}

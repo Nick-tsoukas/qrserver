@@ -1,0 +1,1051 @@
+{
+  "generatedAt": "2026-01-19T04:41:01.517Z",
+  "roles": {
+    "public": {
+      "id": 2,
+      "name": "Public",
+      "type": "public"
+    },
+    "authenticated": {
+      "id": 1,
+      "name": "Authenticated",
+      "type": "authenticated"
+    }
+  },
+  "permissions": {
+    "public": [
+      {
+        "id": 15,
+        "action": "plugin::users-permissions.auth.register",
+        "enabled": true
+      },
+      {
+        "id": 73,
+        "action": "plugin::users-permissions.auth.connect",
+        "enabled": true
+      },
+      {
+        "id": 75,
+        "action": "plugin::users-permissions.user.me",
+        "enabled": true
+      },
+      {
+        "id": 77,
+        "action": "plugin::users-permissions.auth.callback",
+        "enabled": true
+      },
+      {
+        "id": 78,
+        "action": "plugin::users-permissions.auth.sendEmailConfirmation",
+        "enabled": true
+      },
+      {
+        "id": 79,
+        "action": "plugin::users-permissions.auth.emailConfirmation",
+        "enabled": true
+      },
+      {
+        "id": 80,
+        "action": "plugin::users-permissions.auth.changePassword",
+        "enabled": true
+      },
+      {
+        "id": 81,
+        "action": "plugin::users-permissions.auth.forgotPassword",
+        "enabled": true
+      },
+      {
+        "id": 82,
+        "action": "plugin::users-permissions.auth.resetPassword",
+        "enabled": true
+      },
+      {
+        "id": 86,
+        "action": "api::band.band.findOne",
+        "enabled": true
+      },
+      {
+        "id": 87,
+        "action": "api::album.album.findOne",
+        "enabled": true
+      },
+      {
+        "id": 88,
+        "action": "api::album.album.find",
+        "enabled": true
+      },
+      {
+        "id": 89,
+        "action": "api::event.event.findOne",
+        "enabled": true
+      },
+      {
+        "id": 90,
+        "action": "api::event.event.find",
+        "enabled": true
+      },
+      {
+        "id": 91,
+        "action": "api::qr.qr.findOne",
+        "enabled": true
+      },
+      {
+        "id": 92,
+        "action": "api::qr.qr.find",
+        "enabled": true
+      },
+      {
+        "id": 93,
+        "action": "api::socialpage.socialpage.findOne",
+        "enabled": true
+      },
+      {
+        "id": 94,
+        "action": "api::socialpage.socialpage.find",
+        "enabled": true
+      },
+      {
+        "id": 95,
+        "action": "api::stream.stream.findOne",
+        "enabled": true
+      },
+      {
+        "id": 96,
+        "action": "api::stream.stream.find",
+        "enabled": true
+      },
+      {
+        "id": 97,
+        "action": "api::tour.tour.findOne",
+        "enabled": true
+      },
+      {
+        "id": 98,
+        "action": "api::tour.tour.find",
+        "enabled": true
+      },
+      {
+        "id": 106,
+        "action": "api::video.video.findOne",
+        "enabled": true
+      },
+      {
+        "id": 107,
+        "action": "api::video.video.find",
+        "enabled": true
+      },
+      {
+        "id": 110,
+        "action": "api::scan.scan.findOne",
+        "enabled": true
+      },
+      {
+        "id": 111,
+        "action": "api::scan.scan.find",
+        "enabled": true
+      },
+      {
+        "id": 117,
+        "action": "api::scan.scan.create",
+        "enabled": true
+      },
+      {
+        "id": 126,
+        "action": "api::link-click.link-click.getBandClicks",
+        "enabled": true
+      },
+      {
+        "id": 127,
+        "action": "api::link-click.link-click.trackClick",
+        "enabled": true
+      },
+      {
+        "id": 134,
+        "action": "api::band.band.find",
+        "enabled": true
+      },
+      {
+        "id": 137,
+        "action": "api::stripe.stripe.confirmPayment",
+        "enabled": true
+      },
+      {
+        "id": 140,
+        "action": "api::stripe.stripe.testRoute",
+        "enabled": true
+      },
+      {
+        "id": 142,
+        "action": "api::band.band.findBySlug",
+        "enabled": true
+      },
+      {
+        "id": 152,
+        "action": "api::media-play.media-play.track",
+        "enabled": true
+      },
+      {
+        "id": 154,
+        "action": "api::media-play.media-play.findOne",
+        "enabled": true
+      },
+      {
+        "id": 155,
+        "action": "api::media-play.media-play.find",
+        "enabled": true
+      },
+      {
+        "id": 169,
+        "action": "api::stripe.stripe.subscriptionStatus",
+        "enabled": true
+      },
+      {
+        "id": 170,
+        "action": "api::subscription.subscription.webhook",
+        "enabled": true
+      },
+      {
+        "id": 171,
+        "action": "api::subscription.subscription.register",
+        "enabled": true
+      },
+      {
+        "id": 172,
+        "action": "api::subscription.subscription.subscriptionStatus",
+        "enabled": true
+      },
+      {
+        "id": 178,
+        "action": "api::band-page-view.band-page-view.find",
+        "enabled": true
+      },
+      {
+        "id": 179,
+        "action": "api::band-page-view.band-page-view.findOne",
+        "enabled": true
+      },
+      {
+        "id": 183,
+        "action": "api::event-page-view.event-page-view.find",
+        "enabled": true
+      },
+      {
+        "id": 184,
+        "action": "api::event-page-view.event-page-view.findOne",
+        "enabled": true
+      },
+      {
+        "id": 190,
+        "action": "api::seo-page.seo-page.find",
+        "enabled": true
+      },
+      {
+        "id": 191,
+        "action": "api::seo-page.seo-page.findOne",
+        "enabled": true
+      },
+      {
+        "id": 192,
+        "action": "api::stripe.stripe.confirmSocial",
+        "enabled": true
+      },
+      {
+        "id": 198,
+        "action": "api::howtovideo.howtovideo.findOne",
+        "enabled": true
+      },
+      {
+        "id": 199,
+        "action": "api::howtovideo.howtovideo.find",
+        "enabled": true
+      },
+      {
+        "id": 205,
+        "action": "api::band-insight-daily.band-insight-daily.find",
+        "enabled": true
+      },
+      {
+        "id": 206,
+        "action": "api::band-insight-daily.band-insight-daily.compute",
+        "enabled": true
+      },
+      {
+        "id": 207,
+        "action": "api::band-insight-daily.band-insight-daily.findOne",
+        "enabled": true
+      },
+      {
+        "id": 219,
+        "action": "api::analytics.analytics.rollups",
+        "enabled": true
+      },
+      {
+        "id": 220,
+        "action": "api::analytics.analytics.geo",
+        "enabled": true
+      },
+      {
+        "id": 221,
+        "action": "api::analytics.analytics.transitions",
+        "enabled": true
+      },
+      {
+        "id": 225,
+        "action": "api::muse.muse.run",
+        "enabled": true
+      },
+      {
+        "id": 226,
+        "action": "api::muse.muse.backfill",
+        "enabled": true
+      },
+      {
+        "id": 230,
+        "action": "api::band-insight-daily.band-insight-daily.debug",
+        "enabled": true
+      },
+      {
+        "id": 231,
+        "action": "api::band-insight-daily.band-insight-daily.backfill",
+        "enabled": true
+      },
+      {
+        "id": 244,
+        "action": "api::youtube.youtube.debugSync",
+        "enabled": true
+      },
+      {
+        "id": 245,
+        "action": "api::youtube.youtube.disconnect",
+        "enabled": true
+      },
+      {
+        "id": 246,
+        "action": "api::youtube.youtube.oauthInit",
+        "enabled": true
+      },
+      {
+        "id": 247,
+        "action": "api::youtube.youtube.selectChannel",
+        "enabled": true
+      },
+      {
+        "id": 248,
+        "action": "api::youtube.youtube.oauthCallback",
+        "enabled": true
+      },
+      {
+        "id": 249,
+        "action": "api::youtube.youtube.purge",
+        "enabled": true
+      },
+      {
+        "id": 250,
+        "action": "api::youtube.youtube.sync",
+        "enabled": true
+      },
+      {
+        "id": 259,
+        "action": "api::band.payments.onboard",
+        "enabled": true
+      },
+      {
+        "id": 261,
+        "action": "api::stripe.connect-webhook.handle",
+        "enabled": true
+      },
+      {
+        "id": 272,
+        "action": "api::band-ui-event.band-ui-event.track",
+        "enabled": true
+      },
+      {
+        "id": 273,
+        "action": "api::event-page-view.event-page-view.track",
+        "enabled": true
+      },
+      {
+        "id": 274,
+        "action": "api::scan.scan.track",
+        "enabled": true
+      },
+      {
+        "id": 284,
+        "action": "api::band-share.band-share.find",
+        "enabled": true
+      },
+      {
+        "id": 285,
+        "action": "api::band-share.band-share.findOne",
+        "enabled": true
+      },
+      {
+        "id": 286,
+        "action": "api::pulse-snapshot.pulse-snapshot.find",
+        "enabled": true
+      },
+      {
+        "id": 287,
+        "action": "api::pulse-snapshot.pulse-snapshot.findOne",
+        "enabled": true
+      }
+    ],
+    "authenticated": [
+      {
+        "id": 23,
+        "action": "plugin::users-permissions.auth.register",
+        "enabled": true
+      },
+      {
+        "id": 24,
+        "action": "plugin::users-permissions.auth.connect",
+        "enabled": true
+      },
+      {
+        "id": 25,
+        "action": "plugin::users-permissions.auth.callback",
+        "enabled": true
+      },
+      {
+        "id": 26,
+        "action": "plugin::users-permissions.auth.changePassword",
+        "enabled": true
+      },
+      {
+        "id": 27,
+        "action": "plugin::users-permissions.auth.emailConfirmation",
+        "enabled": true
+      },
+      {
+        "id": 28,
+        "action": "plugin::users-permissions.auth.resetPassword",
+        "enabled": true
+      },
+      {
+        "id": 29,
+        "action": "plugin::users-permissions.auth.forgotPassword",
+        "enabled": true
+      },
+      {
+        "id": 30,
+        "action": "plugin::users-permissions.user.me",
+        "enabled": true
+      },
+      {
+        "id": 31,
+        "action": "plugin::users-permissions.user.update",
+        "enabled": true
+      },
+      {
+        "id": 32,
+        "action": "api::album.album.delete",
+        "enabled": true
+      },
+      {
+        "id": 33,
+        "action": "api::album.album.findOne",
+        "enabled": true
+      },
+      {
+        "id": 34,
+        "action": "api::album.album.create",
+        "enabled": true
+      },
+      {
+        "id": 35,
+        "action": "api::album.album.find",
+        "enabled": true
+      },
+      {
+        "id": 36,
+        "action": "api::album.album.update",
+        "enabled": true
+      },
+      {
+        "id": 38,
+        "action": "api::band.band.findOne",
+        "enabled": true
+      },
+      {
+        "id": 42,
+        "action": "api::event.event.delete",
+        "enabled": true
+      },
+      {
+        "id": 43,
+        "action": "api::event.event.findOne",
+        "enabled": true
+      },
+      {
+        "id": 44,
+        "action": "api::event.event.create",
+        "enabled": true
+      },
+      {
+        "id": 45,
+        "action": "api::event.event.find",
+        "enabled": true
+      },
+      {
+        "id": 46,
+        "action": "api::event.event.update",
+        "enabled": true
+      },
+      {
+        "id": 47,
+        "action": "api::qr.qr.delete",
+        "enabled": true
+      },
+      {
+        "id": 48,
+        "action": "api::qr.qr.findOne",
+        "enabled": true
+      },
+      {
+        "id": 49,
+        "action": "api::qr.qr.create",
+        "enabled": true
+      },
+      {
+        "id": 50,
+        "action": "api::qr.qr.find",
+        "enabled": true
+      },
+      {
+        "id": 51,
+        "action": "api::qr.qr.update",
+        "enabled": true
+      },
+      {
+        "id": 52,
+        "action": "api::socialpage.socialpage.delete",
+        "enabled": true
+      },
+      {
+        "id": 53,
+        "action": "api::socialpage.socialpage.findOne",
+        "enabled": true
+      },
+      {
+        "id": 54,
+        "action": "api::socialpage.socialpage.create",
+        "enabled": true
+      },
+      {
+        "id": 55,
+        "action": "api::socialpage.socialpage.find",
+        "enabled": true
+      },
+      {
+        "id": 56,
+        "action": "api::socialpage.socialpage.update",
+        "enabled": true
+      },
+      {
+        "id": 57,
+        "action": "api::stream.stream.delete",
+        "enabled": true
+      },
+      {
+        "id": 58,
+        "action": "api::stream.stream.findOne",
+        "enabled": true
+      },
+      {
+        "id": 59,
+        "action": "api::stream.stream.create",
+        "enabled": true
+      },
+      {
+        "id": 60,
+        "action": "api::stream.stream.find",
+        "enabled": true
+      },
+      {
+        "id": 61,
+        "action": "api::stream.stream.update",
+        "enabled": true
+      },
+      {
+        "id": 62,
+        "action": "api::tour.tour.delete",
+        "enabled": true
+      },
+      {
+        "id": 63,
+        "action": "api::tour.tour.findOne",
+        "enabled": true
+      },
+      {
+        "id": 64,
+        "action": "api::tour.tour.create",
+        "enabled": true
+      },
+      {
+        "id": 65,
+        "action": "api::tour.tour.find",
+        "enabled": true
+      },
+      {
+        "id": 66,
+        "action": "api::tour.tour.update",
+        "enabled": true
+      },
+      {
+        "id": 67,
+        "action": "plugin::upload.content-api.find",
+        "enabled": true
+      },
+      {
+        "id": 68,
+        "action": "plugin::upload.content-api.upload",
+        "enabled": true
+      },
+      {
+        "id": 69,
+        "action": "plugin::upload.content-api.destroy",
+        "enabled": true
+      },
+      {
+        "id": 70,
+        "action": "plugin::upload.content-api.findOne",
+        "enabled": true
+      },
+      {
+        "id": 101,
+        "action": "api::video.video.findOne",
+        "enabled": true
+      },
+      {
+        "id": 102,
+        "action": "api::video.video.delete",
+        "enabled": true
+      },
+      {
+        "id": 103,
+        "action": "api::video.video.create",
+        "enabled": true
+      },
+      {
+        "id": 104,
+        "action": "api::video.video.find",
+        "enabled": true
+      },
+      {
+        "id": 105,
+        "action": "api::video.video.update",
+        "enabled": true
+      },
+      {
+        "id": 112,
+        "action": "api::scan.scan.findOne",
+        "enabled": true
+      },
+      {
+        "id": 113,
+        "action": "api::scan.scan.delete",
+        "enabled": true
+      },
+      {
+        "id": 114,
+        "action": "api::scan.scan.create",
+        "enabled": true
+      },
+      {
+        "id": 115,
+        "action": "api::scan.scan.find",
+        "enabled": true
+      },
+      {
+        "id": 116,
+        "action": "api::scan.scan.update",
+        "enabled": true
+      },
+      {
+        "id": 128,
+        "action": "api::link-click.link-click.getBandClicks",
+        "enabled": true
+      },
+      {
+        "id": 129,
+        "action": "api::link-click.link-click.trackClick",
+        "enabled": true
+      },
+      {
+        "id": 130,
+        "action": "api::band.band.delete",
+        "enabled": true
+      },
+      {
+        "id": 131,
+        "action": "api::band.band.create",
+        "enabled": true
+      },
+      {
+        "id": 132,
+        "action": "api::band.band.find",
+        "enabled": true
+      },
+      {
+        "id": 133,
+        "action": "api::band.band.update",
+        "enabled": true
+      },
+      {
+        "id": 144,
+        "action": "api::band.band.findBySlug",
+        "enabled": true
+      },
+      {
+        "id": 145,
+        "action": "api::stripe.stripe.confirmPayment",
+        "enabled": true
+      },
+      {
+        "id": 146,
+        "action": "api::stripe.stripe.createCheckoutSession",
+        "enabled": true
+      },
+      {
+        "id": 147,
+        "action": "api::stripe.stripe.testRoute",
+        "enabled": true
+      },
+      {
+        "id": 148,
+        "action": "api::stripe.stripe.createCustomer",
+        "enabled": true
+      },
+      {
+        "id": 151,
+        "action": "api::auth.email-confirmation.confirmEmail",
+        "enabled": true
+      },
+      {
+        "id": 153,
+        "action": "api::media-play.media-play.track",
+        "enabled": true
+      },
+      {
+        "id": 156,
+        "action": "api::media-play.media-play.findOne",
+        "enabled": true
+      },
+      {
+        "id": 157,
+        "action": "api::media-play.media-play.find",
+        "enabled": true
+      },
+      {
+        "id": 162,
+        "action": "api::stripe.stripe.subscriptionStatus",
+        "enabled": true
+      },
+      {
+        "id": 163,
+        "action": "api::stripe.stripe.getBillingInfo",
+        "enabled": true
+      },
+      {
+        "id": 164,
+        "action": "api::stripe.stripe.createBillingPortalSession",
+        "enabled": true
+      },
+      {
+        "id": 165,
+        "action": "api::subscription.subscription.register",
+        "enabled": true
+      },
+      {
+        "id": 166,
+        "action": "api::subscription.subscription.webhook",
+        "enabled": true
+      },
+      {
+        "id": 167,
+        "action": "api::subscription.subscription.subscriptionStatus",
+        "enabled": true
+      },
+      {
+        "id": 168,
+        "action": "api::subscription.subscription.createBillingPortalSession",
+        "enabled": true
+      },
+      {
+        "id": 180,
+        "action": "api::band-page-view.band-page-view.create",
+        "enabled": true
+      },
+      {
+        "id": 181,
+        "action": "api::band-page-view.band-page-view.find",
+        "enabled": true
+      },
+      {
+        "id": 182,
+        "action": "api::band-page-view.band-page-view.findOne",
+        "enabled": true
+      },
+      {
+        "id": 186,
+        "action": "api::event-page-view.event-page-view.findOne",
+        "enabled": true
+      },
+      {
+        "id": 187,
+        "action": "api::event-page-view.event-page-view.find",
+        "enabled": true
+      },
+      {
+        "id": 188,
+        "action": "api::event-page-view.event-page-view.create",
+        "enabled": true
+      },
+      {
+        "id": 193,
+        "action": "api::stripe.stripe.confirmSocial",
+        "enabled": true
+      },
+      {
+        "id": 196,
+        "action": "api::howtovideo.howtovideo.find",
+        "enabled": true
+      },
+      {
+        "id": 197,
+        "action": "api::howtovideo.howtovideo.findOne",
+        "enabled": true
+      },
+      {
+        "id": 200,
+        "action": "api::howtovideo.howtovideo.create",
+        "enabled": true
+      },
+      {
+        "id": 201,
+        "action": "api::howtovideo.howtovideo.update",
+        "enabled": true
+      },
+      {
+        "id": 202,
+        "action": "api::howtovideo.howtovideo.delete",
+        "enabled": true
+      },
+      {
+        "id": 209,
+        "action": "api::band-insight-daily.band-insight-daily.find",
+        "enabled": true
+      },
+      {
+        "id": 210,
+        "action": "api::band-insight-daily.band-insight-daily.create",
+        "enabled": true
+      },
+      {
+        "id": 211,
+        "action": "api::band-insight-daily.band-insight-daily.compute",
+        "enabled": true
+      },
+      {
+        "id": 212,
+        "action": "api::band-insight-daily.band-insight-daily.findOne",
+        "enabled": true
+      },
+      {
+        "id": 213,
+        "action": "api::band-insight-daily.band-insight-daily.update",
+        "enabled": true
+      },
+      {
+        "id": 214,
+        "action": "api::band-insight-daily.band-insight-daily.muse",
+        "enabled": true
+      },
+      {
+        "id": 215,
+        "action": "api::band-insight-daily.band-insight-daily.delete",
+        "enabled": true
+      },
+      {
+        "id": 222,
+        "action": "api::analytics.analytics.rollups",
+        "enabled": true
+      },
+      {
+        "id": 223,
+        "action": "api::analytics.analytics.geo",
+        "enabled": true
+      },
+      {
+        "id": 224,
+        "action": "api::analytics.analytics.transitions",
+        "enabled": true
+      },
+      {
+        "id": 227,
+        "action": "api::muse.muse.run",
+        "enabled": true
+      },
+      {
+        "id": 228,
+        "action": "api::muse.muse.backfill",
+        "enabled": true
+      },
+      {
+        "id": 232,
+        "action": "api::band-insight-daily.band-insight-daily.backfill",
+        "enabled": true
+      },
+      {
+        "id": 233,
+        "action": "api::band-insight-daily.band-insight-daily.debug",
+        "enabled": true
+      },
+      {
+        "id": 235,
+        "action": "api::muse.muse.aggregate",
+        "enabled": true
+      },
+      {
+        "id": 236,
+        "action": "api::band-external-account.band-external-account.find",
+        "enabled": true
+      },
+      {
+        "id": 237,
+        "action": "api::band-external-account.band-external-account.findOne",
+        "enabled": true
+      },
+      {
+        "id": 238,
+        "action": "api::band-external-account.band-external-account.update",
+        "enabled": true
+      },
+      {
+        "id": 239,
+        "action": "api::band-external-account.band-external-account.create",
+        "enabled": true
+      },
+      {
+        "id": 240,
+        "action": "api::band-external-metric.band-external-metric.create",
+        "enabled": true
+      },
+      {
+        "id": 241,
+        "action": "api::band-external-metric.band-external-metric.find",
+        "enabled": true
+      },
+      {
+        "id": 242,
+        "action": "api::band-external-metric.band-external-metric.findOne",
+        "enabled": true
+      },
+      {
+        "id": 243,
+        "action": "api::band-external-metric.band-external-metric.update",
+        "enabled": true
+      },
+      {
+        "id": 251,
+        "action": "api::youtube.youtube.debugSync",
+        "enabled": true
+      },
+      {
+        "id": 252,
+        "action": "api::youtube.youtube.disconnect",
+        "enabled": true
+      },
+      {
+        "id": 253,
+        "action": "api::youtube.youtube.oauthInit",
+        "enabled": true
+      },
+      {
+        "id": 254,
+        "action": "api::youtube.youtube.selectChannel",
+        "enabled": true
+      },
+      {
+        "id": 255,
+        "action": "api::youtube.youtube.oauthCallback",
+        "enabled": true
+      },
+      {
+        "id": 256,
+        "action": "api::youtube.youtube.purge",
+        "enabled": true
+      },
+      {
+        "id": 257,
+        "action": "api::youtube.youtube.sync",
+        "enabled": true
+      },
+      {
+        "id": 258,
+        "action": "api::youtube.youtube.debug",
+        "enabled": true
+      },
+      {
+        "id": 260,
+        "action": "api::band.payments.onboard",
+        "enabled": true
+      },
+      {
+        "id": 265,
+        "action": "api::band.payments.summary",
+        "enabled": true
+      },
+      {
+        "id": 266,
+        "action": "api::event-page-view.event-page-view.track",
+        "enabled": true
+      },
+      {
+        "id": 267,
+        "action": "api::support-moment.support-moment.create",
+        "enabled": true
+      },
+      {
+        "id": 268,
+        "action": "api::support-moment.support-moment.findOne",
+        "enabled": true
+      },
+      {
+        "id": 269,
+        "action": "api::support-moment.support-moment.update",
+        "enabled": true
+      },
+      {
+        "id": 270,
+        "action": "api::support-moment.support-moment.summary",
+        "enabled": true
+      },
+      {
+        "id": 271,
+        "action": "api::support-moment.support-moment.find",
+        "enabled": true
+      },
+      {
+        "id": 280,
+        "action": "api::band.checkout.create",
+        "enabled": true
+      },
+      {
+        "id": 281,
+        "action": "api::band-external-metric.band-external-metric.latest",
+        "enabled": true
+      },
+      {
+        "id": 282,
+        "action": "api::band-external-metric.band-external-metric.upsert",
+        "enabled": true
+      },
+      {
+        "id": 283,
+        "action": "api::band-ui-event.band-ui-event.track",
+        "enabled": true
+      }
+    ]
+  }
+}

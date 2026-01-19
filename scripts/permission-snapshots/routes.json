@@ -1,0 +1,3380 @@
+{
+  "routes": [
+    {
+      "scope": "api::album",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/albums",
+      "handler": "album.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::album",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/albums",
+      "handler": "album.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::album",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/albums/:id",
+      "handler": "album.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::album",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/albums/:id",
+      "handler": "album.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::album",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/albums/:id",
+      "handler": "album.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/event-devices",
+      "handler": "analytics.eventDevices",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/event-geo",
+      "handler": "analytics.eventGeo",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/event-rollups",
+      "handler": "analytics.eventRollups",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/event-sources",
+      "handler": "analytics.eventSources",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/follows",
+      "handler": "analytics.follows",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/geo",
+      "handler": "analytics.geo",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/geo-states",
+      "handler": "analytics.geoStates",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/pulse",
+      "handler": "analytics.pulse",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/push/dry-run",
+      "handler": "analytics.pushDryRun",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/qr-devices",
+      "handler": "analytics.qrDevices",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/qr-geo",
+      "handler": "analytics.qrGeo",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/qr-rollups",
+      "handler": "analytics.qrRollups",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/qr-sources",
+      "handler": "analytics.qrSources",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/rollups",
+      "handler": "analytics.rollups",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/analytics/transitions",
+      "handler": "analytics.transitions",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/image-proxy",
+      "handler": "analytics.imageProxy",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/pulse/shareables",
+      "handler": "shareables.getShareables",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "POST",
+      "path": "/pulse/shareables/track",
+      "handler": "shareables.trackShare",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/pulse/whats-hot",
+      "handler": "analytics.whatsHot",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "POST",
+      "path": "/push/opt-in",
+      "handler": "analytics.pushOptIn",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::analytics",
+      "routeKey": "analytics",
+      "method": "GET",
+      "path": "/push/opt-in/status",
+      "handler": "analytics.pushOptInStatus",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::auth",
+      "routeKey": "email-confirmation",
+      "method": "GET",
+      "path": "/auth/confirm-email",
+      "handler": "email-confirmation.confirmEmail",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "band",
+      "method": "GET",
+      "path": "/bands",
+      "handler": "band.find",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "band",
+      "method": "POST",
+      "path": "/bands",
+      "handler": "band.create",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "global::subscription-active",
+          "api::band.only-one-band"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "global::subscription-active",
+        "api::band.only-one-band"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "band",
+      "method": "GET",
+      "path": "/bands/:id",
+      "handler": "band.findOne",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "band",
+      "method": "PUT",
+      "path": "/bands/:id",
+      "handler": "band.update",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "global::subscription-active",
+          "api::band.owns-band"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "global::subscription-active",
+        "api::band.owns-band"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "band",
+      "method": "DELETE",
+      "path": "/bands/:id",
+      "handler": "band.delete",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "global::subscription-active",
+          "api::band.owns-band"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "global::subscription-active",
+        "api::band.owns-band"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "live-signals",
+      "method": "GET",
+      "path": "/bands/:id/live-signals",
+      "handler": "live-signals.getLiveSignals",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "checkout",
+      "method": "POST",
+      "path": "/bands/:id/payments/checkout",
+      "handler": "checkout.create",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "payments",
+      "method": "POST",
+      "path": "/bands/:id/payments/onboard",
+      "handler": "payments.onboard",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "api::band.owns-band"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "api::band.owns-band"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "payments",
+      "method": "GET",
+      "path": "/bands/:id/payments/summary",
+      "handler": "payments.summary",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "api::band.owns-band"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "api::band.owns-band"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band",
+      "routeKey": "band",
+      "method": "GET",
+      "path": "/bands/slug/:slug",
+      "handler": "band.findBySlug",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-account",
+      "routeKey": "band-external-account",
+      "method": "GET",
+      "path": "/band-external-accounts",
+      "handler": "band-external-account.find",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-account",
+      "routeKey": "band-external-account",
+      "method": "POST",
+      "path": "/band-external-accounts",
+      "handler": "band-external-account.create",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-account",
+      "routeKey": "band-external-account",
+      "method": "GET",
+      "path": "/band-external-accounts/:id",
+      "handler": "band-external-account.findOne",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-account",
+      "routeKey": "band-external-account",
+      "method": "PUT",
+      "path": "/band-external-accounts/:id",
+      "handler": "band-external-account.update",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-account",
+      "routeKey": "band-external-account",
+      "method": "DELETE",
+      "path": "/band-external-accounts/:id",
+      "handler": "band-external-account.delete",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-metric",
+      "routeKey": "band-external-metric",
+      "method": "GET",
+      "path": "/band-external-metrics",
+      "handler": "band-external-metric.find",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-metric",
+      "routeKey": "band-external-metric",
+      "method": "POST",
+      "path": "/band-external-metrics",
+      "handler": "band-external-metric.create",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-metric",
+      "routeKey": "band-external-metric",
+      "method": "GET",
+      "path": "/band-external-metrics/:id",
+      "handler": "band-external-metric.findOne",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-metric",
+      "routeKey": "band-external-metric",
+      "method": "PUT",
+      "path": "/band-external-metrics/:id",
+      "handler": "band-external-metric.update",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-metric",
+      "routeKey": "band-external-metric",
+      "method": "DELETE",
+      "path": "/band-external-metrics/:id",
+      "handler": "band-external-metric.delete",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-metric",
+      "routeKey": "band-external-metric",
+      "method": "GET",
+      "path": "/band-external-metrics/latest",
+      "handler": "band-external-metric.latest",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-external-metric",
+      "routeKey": "band-external-metric",
+      "method": "POST",
+      "path": "/band-external-metrics/upsert",
+      "handler": "band-external-metric.upsert",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/band-insights-daily",
+      "handler": "band-insight-daily.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/band-insights-daily",
+      "handler": "band-insight-daily.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/band-insights-daily/:id",
+      "handler": "band-insight-daily.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/band-insights-daily/:id",
+      "handler": "band-insight-daily.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/band-insights-daily/:id",
+      "handler": "band-insight-daily.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "band-insight-daily-custom",
+      "method": "GET",
+      "path": "/band-insights-daily/compute",
+      "handler": "band-insight-daily.compute",
+      "config": {
+        "auth": false,
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "band-insight-daily-custom",
+      "method": "GET",
+      "path": "/band-insights-daily/debug",
+      "handler": "band-insight-daily.debug",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "band-insight-daily-custom",
+      "method": "GET",
+      "path": "/muse",
+      "handler": "band-insight-daily.muse",
+      "config": {
+        "auth": false,
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-insight-daily",
+      "routeKey": "band-insight-daily-custom",
+      "method": "GET",
+      "path": "/muse/backfill",
+      "handler": "band-insight-daily.backfill",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-page-view",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/band-page-views",
+      "handler": "band-page-view.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-page-view",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/band-page-views",
+      "handler": "band-page-view.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-page-view",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/band-page-views/:id",
+      "handler": "band-page-view.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-page-view",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/band-page-views/:id",
+      "handler": "band-page-view.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-page-view",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/band-page-views/:id",
+      "handler": "band-page-view.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-share",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/band-shares",
+      "handler": "band-share.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-share",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/band-shares",
+      "handler": "band-share.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-share",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/band-shares/:id",
+      "handler": "band-share.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-share",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/band-shares/:id",
+      "handler": "band-share.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-share",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/band-shares/:id",
+      "handler": "band-share.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-share",
+      "routeKey": "custom",
+      "method": "POST",
+      "path": "/band-shares/record",
+      "handler": "band-share.record",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::band-ui-event",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/band-ui-events",
+      "handler": "band-ui-event.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-ui-event",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/band-ui-events",
+      "handler": "band-ui-event.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-ui-event",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/band-ui-events/:id",
+      "handler": "band-ui-event.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-ui-event",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/band-ui-events/:id",
+      "handler": "band-ui-event.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-ui-event",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/band-ui-events/:id",
+      "handler": "band-ui-event.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::band-ui-event",
+      "routeKey": "band-ui-event",
+      "method": "POST",
+      "path": "/band-ui-events/track",
+      "handler": "band-ui-event.track",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/events",
+      "handler": "event.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/events",
+      "handler": "event.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/events/:id",
+      "handler": "event.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/events/:id",
+      "handler": "event.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/events/:id",
+      "handler": "event.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event-page-view",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/event-page-views",
+      "handler": "event-page-view.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event-page-view",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/event-page-views",
+      "handler": "event-page-view.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event-page-view",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/event-page-views/:id",
+      "handler": "event-page-view.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event-page-view",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/event-page-views/:id",
+      "handler": "event-page-view.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event-page-view",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/event-page-views/:id",
+      "handler": "event-page-view.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::event-page-view",
+      "routeKey": "custom-routes",
+      "method": "POST",
+      "path": "/event-page-views/track",
+      "handler": "event-page-view.track",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/fan-moments",
+      "handler": "fan-moment.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/fan-moments",
+      "handler": "fan-moment.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/fan-moments/:id",
+      "handler": "fan-moment.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/fan-moments/:id",
+      "handler": "fan-moment.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/fan-moments/:id",
+      "handler": "fan-moment.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "custom",
+      "method": "GET",
+      "path": "/fan-moments/active",
+      "handler": "fan-moment.active",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "custom",
+      "method": "GET",
+      "path": "/fan-moments/auto-active",
+      "handler": "fan-moment.autoActive",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "custom",
+      "method": "POST",
+      "path": "/fan-moments/earn",
+      "handler": "fan-moment.earn",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "custom",
+      "method": "POST",
+      "path": "/fan-moments/evaluate-auto",
+      "handler": "fan-moment.evaluateAuto",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "custom",
+      "method": "POST",
+      "path": "/fan-moments/evaluate-recap",
+      "handler": "fan-moment.evaluateRecap",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "custom",
+      "method": "GET",
+      "path": "/fan-moments/recap-active",
+      "handler": "fan-moment.recapActive",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "custom",
+      "method": "POST",
+      "path": "/fan-moments/shared",
+      "handler": "fan-moment.shared",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::fan-moment",
+      "routeKey": "custom",
+      "method": "GET",
+      "path": "/fan-moments/system-status",
+      "handler": "fan-moment.systemStatus",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::funtest",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/funtests",
+      "handler": "funtest.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::funtest",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/funtests",
+      "handler": "funtest.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::funtest",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/funtests/:id",
+      "handler": "funtest.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::funtest",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/funtests/:id",
+      "handler": "funtest.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::funtest",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/funtests/:id",
+      "handler": "funtest.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::howtovideo",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/howtovideos",
+      "handler": "howtovideo.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::howtovideo",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/howtovideos",
+      "handler": "howtovideo.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::howtovideo",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/howtovideos/:id",
+      "handler": "howtovideo.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::howtovideo",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/howtovideos/:id",
+      "handler": "howtovideo.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::howtovideo",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/howtovideos/:id",
+      "handler": "howtovideo.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::image-proxy",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/image-proxies",
+      "handler": "image-proxy.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::image-proxy",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/image-proxies",
+      "handler": "image-proxy.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::image-proxy",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/image-proxies/:id",
+      "handler": "image-proxy.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::image-proxy",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/image-proxies/:id",
+      "handler": "image-proxy.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::image-proxy",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/image-proxies/:id",
+      "handler": "image-proxy.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::image-proxy",
+      "routeKey": "image-proxy",
+      "method": "GET",
+      "path": "/image-proxy",
+      "handler": "image-proxy.proxy",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::link-click",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/link-clicks",
+      "handler": "link-click.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::link-click",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/link-clicks",
+      "handler": "link-click.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::link-click",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/link-clicks/:id",
+      "handler": "link-click.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::link-click",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/link-clicks/:id",
+      "handler": "link-click.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::link-click",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/link-clicks/:id",
+      "handler": "link-click.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::link-click",
+      "routeKey": "link-click",
+      "method": "GET",
+      "path": "/link-clicks/band/:bandId",
+      "handler": "link-click.getBandClicks",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::link-click",
+      "routeKey": "link-click",
+      "method": "POST",
+      "path": "/link-clicks/track",
+      "handler": "link-click.trackClick",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::media-play",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/media-plays",
+      "handler": "media-play.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::media-play",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/media-plays/:id",
+      "handler": "media-play.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::media-play",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/media-plays/:id",
+      "handler": "media-play.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::media-play",
+      "routeKey": "media-play",
+      "method": "GET",
+      "path": "/media-plays",
+      "handler": "api::media-play.media-play.find",
+      "config": {
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::media-play",
+      "routeKey": "media-play",
+      "method": "GET",
+      "path": "/media-plays/:id",
+      "handler": "api::media-play.media-play.findOne",
+      "config": {
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::media-play",
+      "routeKey": "custom-media-play",
+      "method": "POST",
+      "path": "/media-plays/track",
+      "handler": "media-play.track",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::media-play",
+      "routeKey": "media-play",
+      "method": "POST",
+      "path": "/media-plays/track",
+      "handler": "api::media-play.media-play.track",
+      "config": {
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::merch-concierge",
+      "routeKey": "merch-concierge",
+      "method": "POST",
+      "path": "/merch-concierge/create-checkout",
+      "handler": "merch-concierge.createCheckout",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::merch-concierge",
+      "routeKey": "merch-concierge",
+      "method": "GET",
+      "path": "/merch-concierge/order/:orderCode",
+      "handler": "merch-concierge.getOrder",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::merch-order",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/merch-orders",
+      "handler": "merch-order.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::merch-order",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/merch-orders",
+      "handler": "merch-order.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::merch-order",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/merch-orders/:id",
+      "handler": "merch-order.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::merch-order",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/merch-orders/:id",
+      "handler": "merch-order.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::merch-order",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/merch-orders/:id",
+      "handler": "merch-order.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::muse",
+      "routeKey": "muse",
+      "method": "GET",
+      "path": "/muse/aggregate",
+      "handler": "muse.aggregate",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::muse",
+      "routeKey": "muse",
+      "method": "POST",
+      "path": "/muse/backfill",
+      "handler": "muse.backfill",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::muse",
+      "routeKey": "muse",
+      "method": "POST",
+      "path": "/muse/run",
+      "handler": "muse.run",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::notification",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/notifications",
+      "handler": "notification.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::notification",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/notifications/:id",
+      "handler": "notification.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::notification",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/notifications/:id",
+      "handler": "notification.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::notification",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/notifications/:id",
+      "handler": "notification.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::notification",
+      "routeKey": "notification",
+      "method": "GET",
+      "path": "/notifications",
+      "handler": "notification.find",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::notification",
+      "routeKey": "notification",
+      "method": "POST",
+      "path": "/notifications/:id/read",
+      "handler": "notification.markRead",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::notification",
+      "routeKey": "notification",
+      "method": "GET",
+      "path": "/notifications/unread-count",
+      "handler": "notification.unreadCount",
+      "config": {
+        "policies": [],
+        "middlewares": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::pulse-snapshot",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/pulse-snapshots",
+      "handler": "pulse-snapshot.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::pulse-snapshot",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/pulse-snapshots",
+      "handler": "pulse-snapshot.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::pulse-snapshot",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/pulse-snapshots/:id",
+      "handler": "pulse-snapshot.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::pulse-snapshot",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/pulse-snapshots/:id",
+      "handler": "pulse-snapshot.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::pulse-snapshot",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/pulse-snapshots/:id",
+      "handler": "pulse-snapshot.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::push-device",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/push-devices",
+      "handler": "push-device.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::push-device",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/push-devices",
+      "handler": "push-device.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::push-device",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/push-devices/:id",
+      "handler": "push-device.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::push-device",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/push-devices/:id",
+      "handler": "push-device.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::push-device",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/push-devices/:id",
+      "handler": "push-device.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::qr",
+      "routeKey": "qr",
+      "method": "GET",
+      "path": "/qrs",
+      "handler": "qr.find",
+      "config": {
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::qr",
+      "routeKey": "qr",
+      "method": "POST",
+      "path": "/qrs",
+      "handler": "qr.create",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "global::subscription-active",
+          "api::qr.only-one-qr"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "global::subscription-active",
+        "api::qr.only-one-qr"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::qr",
+      "routeKey": "qr",
+      "method": "GET",
+      "path": "/qrs/:id",
+      "handler": "qr.findOne",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "api::qr.can-view-qr"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "api::qr.can-view-qr"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::qr",
+      "routeKey": "qr",
+      "method": "PUT",
+      "path": "/qrs/:id",
+      "handler": "qr.update",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "global::subscription-active",
+          "api::qr.owns-qr"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "global::subscription-active",
+        "api::qr.owns-qr"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::qr",
+      "routeKey": "qr",
+      "method": "DELETE",
+      "path": "/qrs/:id",
+      "handler": "qr.delete",
+      "config": {
+        "policies": [
+          "plugin::users-permissions.isAuthenticated",
+          "global::subscription-active",
+          "api::qr.owns-qr"
+        ]
+      },
+      "policies": [
+        "plugin::users-permissions.isAuthenticated",
+        "global::subscription-active",
+        "api::qr.owns-qr"
+      ],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::scan",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/scans",
+      "handler": "scan.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::scan",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/scans",
+      "handler": "scan.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::scan",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/scans/:id",
+      "handler": "scan.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::scan",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/scans/:id",
+      "handler": "scan.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::scan",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/scans/:id",
+      "handler": "scan.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::scan",
+      "routeKey": "custom-routes",
+      "method": "POST",
+      "path": "/scans/backfill",
+      "handler": "scan.backfill",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::scan",
+      "routeKey": "custom-routes",
+      "method": "POST",
+      "path": "/scans/track",
+      "handler": "scan.track",
+      "config": {
+        "auth": false,
+        "policies": []
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::seo-page",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/seo-pages",
+      "handler": "seo-page.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::seo-page",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/seo-pages",
+      "handler": "seo-page.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::seo-page",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/seo-pages/:id",
+      "handler": "seo-page.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::seo-page",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/seo-pages/:id",
+      "handler": "seo-page.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::seo-page",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/seo-pages/:id",
+      "handler": "seo-page.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::socialpage",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/socialpages",
+      "handler": "socialpage.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::socialpage",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/socialpages",
+      "handler": "socialpage.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::socialpage",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/socialpages/:id",
+      "handler": "socialpage.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::socialpage",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/socialpages/:id",
+      "handler": "socialpage.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::socialpage",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/socialpages/:id",
+      "handler": "socialpage.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stream",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/streams",
+      "handler": "stream.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stream",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/streams",
+      "handler": "stream.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stream",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/streams/:id",
+      "handler": "stream.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stream",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/streams/:id",
+      "handler": "stream.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stream",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/streams/:id",
+      "handler": "stream.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "stripe",
+      "method": "GET",
+      "path": "/stripe/billing",
+      "handler": "stripe.getBillingInfo",
+      "config": {
+        "auth": {
+          "scope": []
+        }
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": {
+        "scope": []
+      },
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "stripe",
+      "method": "POST",
+      "path": "/stripe/confirm-payment",
+      "handler": "stripe.confirmPayment",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "stripe",
+      "method": "POST",
+      "path": "/stripe/confirm-social",
+      "handler": "stripe.confirmSocial",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "connect-webhook",
+      "method": "POST",
+      "path": "/stripe/connect/webhook",
+      "handler": "connect-webhook.handle",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "stripe",
+      "method": "POST",
+      "path": "/stripe/create-billing-portal-session",
+      "handler": "stripe.createBillingPortalSession",
+      "config": {
+        "auth": {
+          "enabled": true
+        }
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": {
+        "enabled": true
+      },
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "stripe",
+      "method": "POST",
+      "path": "/stripe/create-checkout-session",
+      "handler": "stripe.createCheckoutSession",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "stripe",
+      "method": "POST",
+      "path": "/stripe/create-customer",
+      "handler": "stripe.createCustomer",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "stripe",
+      "method": "GET",
+      "path": "/stripe/subscription-status",
+      "handler": "stripe.subscriptionStatus",
+      "config": {
+        "auth": {
+          "enabled": true
+        }
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": {
+        "enabled": true
+      },
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::stripe",
+      "routeKey": "stripe",
+      "method": "GET",
+      "path": "/stripe/test",
+      "handler": "stripe.testRoute",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::subscription",
+      "routeKey": "subscription",
+      "method": "POST",
+      "path": "/stripe/create-billing-portal-session",
+      "handler": "api::subscription.subscription.createBillingPortalSession",
+      "config": {
+        "auth": {
+          "scope": []
+        }
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": {
+        "scope": []
+      },
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::subscription",
+      "routeKey": "subscription",
+      "method": "POST",
+      "path": "/stripe/register",
+      "handler": "api::subscription.subscription.register",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::subscription",
+      "routeKey": "subscription",
+      "method": "GET",
+      "path": "/stripe/subscription-status",
+      "handler": "api::subscription.subscription.subscriptionStatus",
+      "config": {
+        "auth": {
+          "scope": []
+        }
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": {
+        "scope": []
+      },
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::subscription",
+      "routeKey": "webhook",
+      "method": "POST",
+      "path": "/stripe/webhook",
+      "handler": "api::subscription.subscription.webhook",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::subscription",
+      "routeKey": "webhook",
+      "method": "POST",
+      "path": "/webhooks/stripe",
+      "handler": "api::subscription.subscription.webhook",
+      "config": {
+        "auth": false,
+        "prefix": ""
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::support-moment",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/support-moments",
+      "handler": "support-moment.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::support-moment",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/support-moments",
+      "handler": "support-moment.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::support-moment",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/support-moments/:id",
+      "handler": "support-moment.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::support-moment",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/support-moments/:id",
+      "handler": "support-moment.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::support-moment",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/support-moments/:id",
+      "handler": "support-moment.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::support-moment",
+      "routeKey": "summary",
+      "method": "GET",
+      "path": "/support-moments/:id/summary",
+      "handler": "support-moment.summary",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::system-kv",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/system-kvs",
+      "handler": "system-kv.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::system-kv",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/system-kvs",
+      "handler": "system-kv.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::system-kv",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/system-kvs/:id",
+      "handler": "system-kv.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::system-kv",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/system-kvs/:id",
+      "handler": "system-kv.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::system-kv",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/system-kvs/:id",
+      "handler": "system-kv.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::test-email",
+      "routeKey": "test-email",
+      "method": "GET",
+      "path": "/test-email",
+      "handler": "test-email.send",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::tour",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/tours",
+      "handler": "tour.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::tour",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/tours",
+      "handler": "tour.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::tour",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/tours/:id",
+      "handler": "tour.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::tour",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/tours/:id",
+      "handler": "tour.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::tour",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/tours/:id",
+      "handler": "tour.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::video",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/videos",
+      "handler": "video.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::video",
+      "routeKey": "default",
+      "method": "POST",
+      "path": "/api/videos",
+      "handler": "video.create",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::video",
+      "routeKey": "default",
+      "method": "GET",
+      "path": "/api/videos/:id",
+      "handler": "video.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::video",
+      "routeKey": "default",
+      "method": "PUT",
+      "path": "/api/videos/:id",
+      "handler": "video.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::video",
+      "routeKey": "default",
+      "method": "DELETE",
+      "path": "/api/videos/:id",
+      "handler": "video.delete",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "GET",
+      "path": "/youtube/debug",
+      "handler": "youtube.debug",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "GET",
+      "path": "/youtube/debug/channels",
+      "handler": "youtube.debugChannels",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "GET",
+      "path": "/youtube/debug/env",
+      "handler": "youtube.debugEnv",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "GET",
+      "path": "/youtube/debug/refresh",
+      "handler": "youtube.debugRefresh",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "GET",
+      "path": "/youtube/debug/sync",
+      "handler": "youtube.debugSync",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "GET",
+      "path": "/youtube/debug/tokeninfo",
+      "handler": "youtube.debugTokenInfo",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "POST",
+      "path": "/youtube/disconnect",
+      "handler": "youtube.disconnect",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "POST",
+      "path": "/youtube/oauth/callback",
+      "handler": "youtube.oauthCallback",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "GET",
+      "path": "/youtube/oauth/init",
+      "handler": "youtube.oauthInit",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "POST",
+      "path": "/youtube/purge",
+      "handler": "youtube.purge",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "POST",
+      "path": "/youtube/select-channel",
+      "handler": "youtube.selectChannel",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "POST",
+      "path": "/youtube/sync",
+      "handler": "youtube.sync",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "api::youtube",
+      "routeKey": "youtube",
+      "method": "GET",
+      "path": "/youtube/sync",
+      "handler": "youtube.sync",
+      "config": {
+        "auth": false
+      },
+      "policies": [],
+      "middlewares": [],
+      "auth": false,
+      "isPublicByConfig": true
+    },
+    {
+      "scope": "plugin::upload",
+      "routeKey": "upload",
+      "method": "POST",
+      "path": "/api/upload",
+      "handler": "content-api.upload",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::upload",
+      "routeKey": "upload",
+      "method": "GET",
+      "path": "/api/upload/files",
+      "handler": "content-api.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::upload",
+      "routeKey": "upload",
+      "method": "GET",
+      "path": "/api/upload/files/:id",
+      "handler": "content-api.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::upload",
+      "routeKey": "upload",
+      "method": "DELETE",
+      "path": "/api/upload/files/:id",
+      "handler": "content-api.destroy",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "GET",
+      "path": "/api/auth/:provider/callback",
+      "handler": "auth.callback",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "POST",
+      "path": "/api/auth/change-password",
+      "handler": "auth.changePassword",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "GET",
+      "path": "/api/auth/email-confirmation",
+      "handler": "auth.emailConfirmation",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "POST",
+      "path": "/api/auth/forgot-password",
+      "handler": "auth.forgotPassword",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "POST",
+      "path": "/api/auth/local",
+      "handler": "auth.callback",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "POST",
+      "path": "/api/auth/local/register",
+      "handler": "auth.register",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "handler": "auth.resetPassword",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "POST",
+      "path": "/api/auth/send-email-confirmation",
+      "handler": "auth.sendEmailConfirmation",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "GET",
+      "path": "/api/users",
+      "handler": "user.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "GET",
+      "path": "/api/users-permissions/roles",
+      "handler": "role.find",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "GET",
+      "path": "/api/users-permissions/roles/:id",
+      "handler": "role.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "GET",
+      "path": "/api/users/:id",
+      "handler": "user.findOne",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "PUT",
+      "path": "/api/users/:id",
+      "handler": "user.update",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "DELETE",
+      "path": "/api/users/:id",
+      "handler": "user.destroy",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    },
+    {
+      "scope": "plugin::users-permissions",
+      "routeKey": "users-permissions",
+      "method": "GET",
+      "path": "/api/users/me",
+      "handler": "user.me",
+      "config": {},
+      "policies": [],
+      "middlewares": [],
+      "isPublicByConfig": false
+    }
+  ],
+  "contentTypes": [
+    {
+      "uid": "api::album.album",
+      "singularName": "album",
+      "pluralName": "albums",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::band.band",
+      "singularName": "band",
+      "pluralName": "bands",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::band-external-account.band-external-account",
+      "singularName": "band-external-account",
+      "pluralName": "band-external-accounts",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::band-external-metric.band-external-metric",
+      "singularName": "band-external-metric",
+      "pluralName": "band-external-metrics",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::band-insight-daily.band-insight-daily",
+      "singularName": "band-insight-daily",
+      "pluralName": "band-insights-daily",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::band-page-view.band-page-view",
+      "singularName": "band-page-view",
+      "pluralName": "band-page-views",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::band-share.band-share",
+      "singularName": "band-share",
+      "pluralName": "band-shares",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::band-ui-event.band-ui-event",
+      "singularName": "band-ui-event",
+      "pluralName": "band-ui-events",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::event.event",
+      "singularName": "event",
+      "pluralName": "events",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::event-page-view.event-page-view",
+      "singularName": "event-page-view",
+      "pluralName": "event-page-views",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::fan-moment.fan-moment",
+      "singularName": "fan-moment",
+      "pluralName": "fan-moments",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::funtest.funtest",
+      "singularName": "funtest",
+      "pluralName": "funtests",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::howtovideo.howtovideo",
+      "singularName": "howtovideo",
+      "pluralName": "howtovideos",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::image-proxy.image-proxy",
+      "singularName": "image-proxy",
+      "pluralName": "image-proxies",
+      "kind": "singleType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::link-click.link-click",
+      "singularName": "link-click",
+      "pluralName": "link-clicks",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::media-play.media-play",
+      "singularName": "media-play",
+      "pluralName": "media-plays",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::merch-order.merch-order",
+      "singularName": "merch-order",
+      "pluralName": "merch-orders",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::notification.notification",
+      "singularName": "notification",
+      "pluralName": "notifications",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::pulse-snapshot.pulse-snapshot",
+      "singularName": "pulse-snapshot",
+      "pluralName": "pulse-snapshots",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::push-device.push-device",
+      "singularName": "push-device",
+      "pluralName": "push-devices",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::qr.qr",
+      "singularName": "qr",
+      "pluralName": "qrs",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::scan.scan",
+      "singularName": "scan",
+      "pluralName": "scans",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::seo-page.seo-page",
+      "singularName": "seo-page",
+      "pluralName": "seo-pages",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::socialpage.socialpage",
+      "singularName": "socialpage",
+      "pluralName": "socialpages",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::stream.stream",
+      "singularName": "stream",
+      "pluralName": "streams",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::support-moment.support-moment",
+      "singularName": "support-moment",
+      "pluralName": "support-moments",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::system-kv.system-kv",
+      "singularName": "system-kv",
+      "pluralName": "system-kvs",
+      "kind": "collectionType",
+      "draftAndPublish": false
+    },
+    {
+      "uid": "api::tour.tour",
+      "singularName": "tour",
+      "pluralName": "tours",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    },
+    {
+      "uid": "api::video.video",
+      "singularName": "video",
+      "pluralName": "videos",
+      "kind": "collectionType",
+      "draftAndPublish": true
+    }
+  ],
+  "generatedAt": "2026-01-19T04:37:43.572Z"
+}

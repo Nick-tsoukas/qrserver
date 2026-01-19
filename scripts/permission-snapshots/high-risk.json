@@ -1,0 +1,180 @@
+{
+  "public": [
+    {
+      "action": "plugin::users-permissions.user.create",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "plugin::users-permissions.user.find",
+      "risk": "MEDIUM",
+      "reason": "User/role enumeration possible",
+      "enabled": true
+    },
+    {
+      "action": "plugin::users-permissions.user.findOne",
+      "risk": "MEDIUM",
+      "reason": "User/role enumeration possible",
+      "enabled": true
+    },
+    {
+      "action": "plugin::upload.content-api.find",
+      "risk": "HIGH",
+      "reason": "Upload exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "plugin::upload.content-api.findOne",
+      "risk": "HIGH",
+      "reason": "Upload exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::scan.scan.create",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::qr.qr.update",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::stripe.stripe.createCheckoutSession",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::stripe.stripe.createCustomer",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::scan.scan.update",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::band-page-view.band-page-view.create",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::event-page-view.event-page-view.create",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::band-insight-daily.band-insight-daily.create",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::band-insight-daily.band-insight-daily.delete",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::band-insight-daily.band-insight-daily.update",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::pulse-snapshot.pulse-snapshot.create",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    },
+    {
+      "action": "api::pulse-snapshot.pulse-snapshot.update",
+      "risk": "HIGH",
+      "reason": "Write operation exposed to public",
+      "enabled": true
+    }
+  ],
+  "authenticated": [
+    {
+      "action": "api::album.album.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::event.event.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::qr.qr.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::socialpage.socialpage.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::stream.stream.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::tour.tour.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "plugin::users-permissions.user.find",
+      "risk": "MEDIUM",
+      "reason": "User/role enumeration - usually should be restricted",
+      "enabled": true
+    },
+    {
+      "action": "api::video.video.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::scan.scan.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::band.band.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::howtovideo.howtovideo.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    },
+    {
+      "action": "api::band-insight-daily.band-insight-daily.delete",
+      "risk": "MEDIUM",
+      "reason": "Delete operation - verify ownership checks exist",
+      "enabled": true
+    }
+  ]
+}
