@@ -1,14 +1,18 @@
-# MBQ Muse Insights System
+# MBQ Muse Insights System — ELITE v2
 
-> AI-powered analytics insights for bands. Generates actionable, trustworthy insights from fan engagement data.
+> Comprehensive documentation for the Muse Insights analytics engine
+> **Version:** ELITE v2 (Recompute on Every Request)
 
 ## Overview
 
-The Muse Insights system analyzes band analytics data and generates structured insights with:
-- **Severity levels** (critical, warning, good, info)
-- **Confidence scores** (0-100%)
-- **Explanations** ("why we think this")
-- **Recommended actions** (suggestions + navigation links)
+The Muse Insights system provides AI-powered analytics insights for bands on the MBQ platform. It analyzes traffic patterns, engagement metrics, geographic data, and tour schedules to generate actionable recommendations.
+
+**Key Features:**
+- **Always Recomputes** — Every dashboard view triggers fresh computation (no stale cache)
+- **Rollups + Today Partial** — Uses pre-aggregated rollups for speed, merges live "today" data for freshness
+- **Elite Thresholds** — Insights must be EARNED (higher volume requirements)
+- **Max 7 Insights** — Ranked by impact score, deduplicated by category
+- **Graceful Degradation** — Returns "insufficient data" insight when data is missing
 
 ## Architecture
 
@@ -43,35 +47,48 @@ The Muse Insights system analyzes band analytics data and generates structured i
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Insight Shape
+## Insight Shape (ELITE v2)
 
 Every insight follows this structure:
 
 ```javascript
 {
   key: 'traffic_momentum_week',      // Unique identifier
+  category: 'growth',                // growth|engagement|cities|platforms|share|tour|audience|source
   title: 'Traffic Growing',          // Short headline
   summary: 'Your page traffic is up 25% this week.',  // One-liner
   severity: 'good',                  // critical | warning | good | info
   confidence: 75,                    // 0-100 (how sure we are)
+  window: '7d',                      // Time period analyzed (7d|30d|24h|72h)
   why: [                             // Explanations
     'This week: 150 page views',
     'Last week: 120 page views',
     'Change: +25%'
   ],
-  recommendedActions: [              // What to do about it
-    { label: 'Capitalize with a post', route: null, type: 'suggestion' },
-    { label: 'Check traffic sources', route: '/analytics/{bandId}', type: 'navigate' }
-  ],
-  dataWindow: '7d',                  // Time period analyzed
-  metricsSnapshot: {                 // Raw data for debugging
+  metrics: {                         // Raw data for debugging
     pv7: 150,
     pvPrev7: 120,
     weekDelta: 25
   },
-  generatedAt: '2026-01-19T04:45:00.000Z'
+  recommendedActions: [              // What to do about it
+    { label: 'Capitalize with a post', type: 'primary' },
+    { label: 'Check traffic sources', route: '/analytics/{bandId}', type: 'secondary' }
+  ]
 }
 ```
+
+### Categories
+
+| Category | Description |
+|----------|-------------|
+| `growth` | Traffic momentum, volume changes |
+| `engagement` | Click-through, plays, interaction quality |
+| `cities` | Geographic spikes, new cities |
+| `platforms` | Platform dominance (Spotify, IG, etc.) |
+| `share` | Fan sharing activity |
+| `tour` | Pre-show and post-show windows |
+| `audience` | Device mix, audience composition |
+| `source` | Traffic source shifts |
 
 ## Severity Levels
 
@@ -82,39 +99,51 @@ Every insight follows this structure:
 | `good` | 🟢 | Positive signal (growth, high engagement) |
 | `info` | 💡 | Neutral information (top city, platform stats) |
 
-## Current Analyzers
+## Current Analyzers (ELITE v2)
 
 ### 1. Traffic Momentum (`analyzeTrafficMomentum`)
 - Compares 7-day traffic to previous 7 days
+- **ELITE:** Requires baseline >= 50 views (was 5)
 - Only triggers on >15% change
 - Confidence increases with traffic volume
 
 ### 2. Engagement Quality (`analyzeEngagement`)
 - Measures (clicks + plays) / views
+- **ELITE:** Uses 7d smoothing to avoid single-day noise
+- **ELITE:** Requires >= 30 views (was 10)
 - High engagement (>40%): `good` severity
-- Low engagement (<15% with 30+ views): `warning` severity
+- Low engagement (<15% with 50+ views): `warning` severity
 
 ### 3. City Spike (`analyzeCitySpike`)
-- Detects cities with >100% growth
-- Or new cities with 10+ views
+- Detects cities with >100% growth or new cities
+- **ELITE:** Ignores city="Unknown"
+- **ELITE:** Requires >= 10 views (was 5)
 - Suggests geo-targeting
 
 ### 4. Platform Pull (`analyzePlatformPull`)
 - Identifies dominant platform (>50% of clicks)
+- **ELITE:** Requires >= 10 clicks
 - Helps bands know where fans want to go
 
 ### 5. Share Chain (`analyzeShareChain`)
 - Detects when content is being shared
-- Triggers on 5+ shares/week or 50%+ growth
+- **ELITE:** Requires >= 5 shares (was 3)
 
 ### 6. Tour State (`analyzeTourState`)
-- **Pre-show**: 0-7 days before event
-- **Post-show**: 1-3 days after event
-- Suggests timely actions
+- **Pre-show (72h)**: Push QR placements, announce show
+- **Post-show (72h)**: Publish recap, shareable moment
+- Show day = `critical` severity
+- 1 day before = `warning` severity
 
 ### 7. Mobile Audience (`analyzeMobileAudience`)
 - Flags when >75% of traffic is mobile
-- Suggests mobile optimization
+- **ELITE:** Requires >= 30 total visitors
+- Uses 7d aggregate for stability
+
+### 8. Source Shift (`analyzeSourceShift`) — NEW
+- Detects when traffic source mix changes significantly
+- Triggers on >15% share change with >= 10 visits
+- Suggests "double down on winning channel"
 
 ## Adding a New Insight
 
@@ -170,18 +199,20 @@ module.exports = {
 };
 ```
 
-## Thresholds & Tuning
+## Thresholds & Tuning (ELITE v2)
 
-Key thresholds are defined inline in each analyzer. To reduce noise:
+Key thresholds are defined inline in each analyzer. ELITE thresholds are higher to reduce noise:
 
-| Analyzer | Threshold | Purpose |
-|----------|-----------|---------|
-| Traffic Momentum | 15% change | Avoid reporting minor fluctuations |
-| Engagement | 10+ views minimum | Need enough data |
-| City Spike | 5+ views minimum | Avoid noise from 1-2 visits |
-| Platform Pull | 50% share | Only report clear dominance |
-| Share Chain | 5+ shares | Meaningful sharing activity |
-| Mobile | 75% mobile | Clear mobile-first audience |
+| Analyzer | Threshold | ELITE Minimum | Purpose |
+|----------|-----------|---------------|---------|
+| Traffic Momentum | 15% change | 50 views baseline | Avoid reporting minor fluctuations |
+| Engagement | 40% good / 15% low | 30 views (50 for warning) | Need enough data |
+| City Spike | 100% growth | 10 views, ignore "Unknown" | Avoid noise from 1-2 visits |
+| Platform Pull | 50% share | 10 clicks | Only report clear dominance |
+| Share Chain | — | 5 shares | Meaningful sharing activity |
+| Tour State | 72h window | — | Pre/post show opportunities |
+| Mobile | 75% mobile | 30 visitors | Clear mobile-first audience |
+| Source Shift | 15% share change | 10 visits from source | Meaningful channel shift |
 
 ## Confidence Scoring
 
@@ -203,20 +234,53 @@ const confidence = Math.min(95, baseConfidence + dataVolume / scale);
 - `bandId` (required): Band ID
 - `days` (optional): Days of data to analyze (default: 30)
 
-**Response:**
+**Response (ELITE v2):**
 ```json
 {
   "ok": true,
   "bandId": 123,
   "count": 3,
   "insights": [
-    { /* insight object */ },
-    { /* insight object */ },
-    { /* insight object */ }
+    {
+      "key": "traffic_momentum_week",
+      "category": "growth",
+      "title": "Traffic Growing",
+      "summary": "Your page traffic is up 25% this week.",
+      "severity": "good",
+      "confidence": 75,
+      "window": "7d",
+      "why": ["This week: 150 views", "Last week: 120 views"],
+      "metrics": { "pv7": 150, "pvPrev7": 120, "weekDelta": 25 },
+      "recommendedActions": [
+        { "label": "Capitalize with a post", "type": "primary" }
+      ]
+    }
   ],
-  "generatedAt": "2026-01-19T04:45:00.000Z"
+  "computedAt": "2026-01-19T04:45:00.000Z",
+  "dataSourcesUsed": ["rollups", "raw_today_partial"],
+  "rollupLastDateUsed": "2026-01-18"
 }
 ```
+
+**Response Metadata:**
+| Field | Description |
+|-------|-------------|
+| `computedAt` | ISO timestamp when insights were computed (always fresh) |
+| `dataSourcesUsed` | Array: `["rollups"]` or `["rollups", "raw_today_partial"]` |
+| `rollupLastDateUsed` | Date of most recent rollup used |
+
+### Recompute Behavior
+
+**Every request recomputes insights.** There is no caching.
+
+**Data sources:**
+1. **Rollups (primary)** — Pre-aggregated `band-insight-daily` records (fast)
+2. **Today Partial (optional)** — Raw events from last 24h if today not in rollups
+
+**Raw event caps (safety):**
+- Max 5,000 rows per event type
+- If cap exceeded, today partial is skipped
+- Response metadata indicates which sources were used
 
 ## Frontend Component
 
@@ -290,6 +354,18 @@ describe('analyzeTrafficMomentum', () => {
 | `qr/components/analytics/InsightsPanel.vue` | Frontend component |
 
 ## Changelog
+
+### v2.1.0 ELITE (2026-01-19)
+- **Always recompute** — No caching, fresh on every request
+- **Rollups + Today Partial** — Fast rollups with optional live data merge
+- **Elite thresholds** — Higher minimums to reduce noise
+- **New insight shape** — Added `category`, `window`, `metrics` fields
+- **Impact ranking** — Insights ranked by `severityWeight * confidence`
+- **Category deduplication** — Max 1 insight per category (except tour)
+- **Max 7 insights** — Capped output to avoid overwhelm
+- **New analyzer: Source Shift** — Detects traffic source mix changes
+- **Graceful degradation** — Returns "insufficient data" when needed
+- **Response metadata** — `computedAt`, `dataSourcesUsed`, `rollupLastDateUsed`
 
 ### v2.0.0 (2026-01-19)
 - Complete rewrite with new insight shape

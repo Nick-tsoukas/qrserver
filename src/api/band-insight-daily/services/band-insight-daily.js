@@ -222,11 +222,17 @@ const mpRows = await strapi.db.query(UID_MP).findMany({
 },
 
 /**
- * Generate V2 insights using the new insights engine
+ * Generate ELITE V2 insights using the new insights engine
+ * ALWAYS recomputes on every request (no caching)
  * Returns structured insights with confidence, why, and recommended actions
  */
 async generateInsightsV2({ bandId, days = 30 }) {
-  // 1) Fetch recent daily rows
+  const computedAt = new Date().toISOString();
+  const dataSourcesUsed = ['rollups'];
+  let todayPartial = null;
+  let rollupLastDateUsed = null;
+  
+  // 1) Fetch recent daily rows (rollups - primary data source)
   const dailyRows = await strapi.entityService.findMany(
     'api::band-insight-daily.band-insight-daily',
     {
@@ -235,8 +241,83 @@ async generateInsightsV2({ bandId, days = 30 }) {
       pagination: { limit: days },
     }
   );
+  
+  if (dailyRows && dailyRows.length > 0) {
+    rollupLastDateUsed = dailyRows[0].date;
+  }
 
-  // 2) Fetch upcoming events for tour state insights
+  // 2) ELITE: Fetch "today partial" from raw events (last 24h, capped)
+  const RAW_EVENT_CAP = 5000;
+  try {
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    
+    // Only fetch if we have rollups and today isn't already in rollups
+    const todayStr = now.toISOString().slice(0, 10);
+    const hasToday = dailyRows.some(r => r.date === todayStr);
+    
+    if (!hasToday) {
+      // Fetch raw page views (capped)
+      const rawPVs = await strapi.db.query('api::band-page-view.band-page-view').findMany({
+        where: { 
+          band: { id: bandId }, 
+          createdAt: { $gte: twentyFourHoursAgo.toISOString() } 
+        },
+        limit: RAW_EVENT_CAP,
+      });
+      
+      if (rawPVs.length < RAW_EVENT_CAP) {
+        // Safe to use - not capped
+        let deviceMobile = 0, deviceDesktop = 0, deviceTablet = 0;
+        const cityMap = {};
+        
+        for (const pv of rawPVs) {
+          const device = pv.deviceType || 'unknown';
+          if (device === 'mobile') deviceMobile++;
+          else if (device === 'desktop') deviceDesktop++;
+          else if (device === 'tablet') deviceTablet++;
+          
+          const city = pv.city || 'Unknown';
+          cityMap[city] = (cityMap[city] || 0) + 1;
+        }
+        
+        // Fetch raw link clicks (capped)
+        const rawClicks = await strapi.db.query('api::link-click.link-click').count({
+          where: { 
+            band: { id: bandId }, 
+            createdAt: { $gte: twentyFourHoursAgo.toISOString() } 
+          },
+        });
+        
+        // Fetch raw media plays (capped)
+        const rawPlays = await strapi.db.query('api::media-play.media-play').count({
+          where: { 
+            band: { id: bandId }, 
+            createdAt: { $gte: twentyFourHoursAgo.toISOString() } 
+          },
+        });
+        
+        todayPartial = {
+          pageViews: rawPVs.length,
+          linkClicks: rawClicks,
+          mediaPlays: rawPlays,
+          deviceMobile,
+          deviceDesktop,
+          deviceTablet,
+          topCities: Object.entries(cityMap).sort((a, b) => b[1] - a[1]).slice(0, 10),
+        };
+        
+        dataSourcesUsed.push('raw_today_partial');
+      } else {
+        // Cap exceeded - skip raw merge
+        strapi.log.info(`[generateInsightsV2] Raw event cap exceeded for band ${bandId}, skipping today partial`);
+      }
+    }
+  } catch (e) {
+    strapi.log.warn('[generateInsightsV2] Could not fetch today partial:', e.message);
+  }
+
+  // 3) Fetch upcoming events for tour state insights
   let events = [];
   try {
     const now = new Date();
@@ -259,7 +340,7 @@ async generateInsightsV2({ bandId, days = 30 }) {
     strapi.log.warn('[generateInsightsV2] Could not fetch events:', e.message);
   }
 
-  // 3) Fetch share data if available
+  // 4) Fetch share data if available
   let shareData = null;
   try {
     const shares = await strapi.entityService.findMany(
@@ -289,20 +370,49 @@ async generateInsightsV2({ bandId, days = 30 }) {
     strapi.log.warn('[generateInsightsV2] Could not fetch shares:', e.message);
   }
 
-  // 4) Generate insights using the engine
+  // 5) Generate insights using the engine (ALWAYS recomputes)
   const insights = await generateInsights({
     bandId,
     dailyRows,
     events,
     shareData,
+    todayPartial,
   });
+
+  // 6) Handle insufficient data gracefully
+  if (!dailyRows || dailyRows.length === 0) {
+    return {
+      ok: true,
+      bandId,
+      count: 0,
+      insights: [{
+        key: 'insufficient_data',
+        category: 'info',
+        title: 'Insufficient Data',
+        summary: 'Not enough traffic data yet to generate insights. Check back after you get some visitors.',
+        severity: 'info',
+        confidence: 100,
+        window: '7d',
+        why: ['No daily rollup data available'],
+        metrics: {},
+        recommendedActions: [
+          { label: 'Share your link', type: 'primary' },
+        ],
+      }],
+      computedAt,
+      dataSourcesUsed,
+      rollupLastDateUsed: null,
+    };
+  }
 
   return {
     ok: true,
     bandId,
     count: insights.length,
     insights,
-    generatedAt: new Date().toISOString(),
+    computedAt,
+    dataSourcesUsed,
+    rollupLastDateUsed,
   };
 }
 
