@@ -19,12 +19,15 @@ module.exports = async (policyContext, config, { strapi }) => {
     populate: ['users_permissions_user'],
   });
 
+  strapi.log.debug(`[owns-qr] QR ${qrId}: owner=${qr?.users_permissions_user?.id}, user=${user.id}`);
+
   if (!qr) {
     return response.notFound('QR not found.');
   }
 
   // Compare the owner ID
   if (String(qr.users_permissions_user?.id) !== String(user.id)) {
+    strapi.log.debug(`[owns-qr] DENIED: QR owner ${qr.users_permissions_user?.id} !== user ${user.id}`);
     return response.forbidden('You do not have permission to modify this QR.');
   }
 

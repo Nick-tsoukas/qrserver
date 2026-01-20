@@ -9,8 +9,7 @@ module.exports = {
       path: '/qrs',
       handler: 'qr.find',
       config: {
-        policies: [
-        ],
+        auth: false,  // Match bands pattern - filtering by user happens in query
       },
     },
     {

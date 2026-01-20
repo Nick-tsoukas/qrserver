@@ -17,6 +17,7 @@ module.exports = async (policyContext, config, { strapi }) => {
     'info@rocksnaps.com',
     'novamusic@aol.com',
     'partner@musicbizqr.com',
+    'test101@gmail.com',
   ];
 
   // Default QR limit
