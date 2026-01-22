@@ -352,19 +352,30 @@ async function onSubscriptionUpdated(subscription) {
   strapi.log.debug('[Webhook] customer.subscription.updated', {
     id:                   subscription.id,
     status:               subscription.status,
+    customer:             subscription.customer,
     cancel_at_period_end: subscription.cancel_at_period_end,
     cancel_at:            subscription.cancel_at
   });
 
-  // Find user by subscriptionId (leave as-is to avoid breaking changes)
-  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
+  // Try to find user by subscriptionId first
+  let [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
     filters: { subscriptionId: subscription.id },
     limit: 1,
-    fields: ['id', 'subscriptionStatus', 'plan', 'trialEndsAt', 'gracePeriodStart', 'cancelAt']
+    fields: ['id', 'subscriptionStatus', 'subscriptionId', 'plan', 'trialEndsAt', 'gracePeriodStart', 'cancelAt']
   });
 
+  // Fallback: find by customerId if subscriptionId lookup fails
+  if (!user && subscription.customer) {
+    strapi.log.debug('[Webhook] No user found by subscriptionId, trying customerId', subscription.customer);
+    [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
+      filters: { customerId: subscription.customer },
+      limit: 1,
+      fields: ['id', 'subscriptionStatus', 'subscriptionId', 'plan', 'trialEndsAt', 'gracePeriodStart', 'cancelAt']
+    });
+  }
+
   if (!user) {
-    strapi.log.warn('[Webhook] No user for subscription', subscription.id);
+    strapi.log.warn('[Webhook] No user for subscription', { subscriptionId: subscription.id, customerId: subscription.customer });
     return;
   }
 
@@ -384,6 +395,11 @@ async function onSubscriptionUpdated(subscription) {
     plan:               planNickname,
     trialEndsAt:        trialEndsAtDate,
   };
+
+  // Ensure subscriptionId is set (for users found by customerId fallback)
+  if (!user.subscriptionId && subscription.id) {
+    data.subscriptionId = subscription.id;
+  }
 
   // If set to cancel at period end, persist cancelAt date
   if (subscription.cancel_at_period_end && subscription.cancel_at) {
@@ -419,11 +435,24 @@ async function onSubscriptionUpdated(subscription) {
 
 
 async function onSubscriptionCanceled(subscription) {
-  strapi.log.debug('[Webhook] customer.subscription.deleted', subscription.id);
-  const [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
+  strapi.log.debug('[Webhook] customer.subscription.deleted', { subscriptionId: subscription.id, customerId: subscription.customer });
+  
+  // Try to find user by subscriptionId first
+  let [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
     filters: { subscriptionId: subscription.id }
   });
-  if (!user) return;
+
+  // Fallback: find by customerId if subscriptionId lookup fails
+  if (!user && subscription.customer) {
+    [user] = await strapi.entityService.findMany('plugin::users-permissions.user', {
+      filters: { customerId: subscription.customer }
+    });
+  }
+
+  if (!user) {
+    strapi.log.warn('[Webhook] No user for canceled subscription', { subscriptionId: subscription.id, customerId: subscription.customer });
+    return;
+  }
 
   await strapi.entityService.update('plugin::users-permissions.user', user.id, {
     data: { subscriptionStatus: 'canceled', gracePeriodStart: null, cancelAt: null }
