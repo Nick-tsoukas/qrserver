@@ -1003,7 +1003,9 @@ export interface ApiBandBand extends Schema.CollectionType {
     >;
     layoutConfig: Attribute.JSON;
     layoutVersion: Attribute.Integer & Attribute.DefaultTo<1>;
-    pageStyle: Attribute.Enumeration<['default', 'compact', 'bold']> &
+    pageStyle: Attribute.Enumeration<
+      ['default', 'compact', 'bold', 'smartlink']
+    > &
       Attribute.DefaultTo<'default'>;
     buttonStyle: Attribute.Enumeration<['classic', 'modern']> &
       Attribute.DefaultTo<'classic'>;

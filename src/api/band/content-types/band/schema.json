@@ -205,7 +205,7 @@
     },
     "pageStyle": {
       "type": "enumeration",
-      "enum": ["default", "compact", "bold"],
+      "enum": ["default", "compact", "bold", "smartlink"],
       "default": "default"
     },
     "buttonStyle": {
