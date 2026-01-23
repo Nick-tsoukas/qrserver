@@ -59,6 +59,51 @@ module.exports = createCoreController("api::band.band", ({ strapi }) => ({
     }
   },
 
+  // PUBLIC: search bands by name (fuzzy)
+  async search(ctx) {
+    try {
+      const { q = '', limit = 12 } = ctx.query;
+      
+      if (!q || q.trim().length < 2) {
+        return { data: [], meta: { total: 0 } };
+      }
+
+      const searchTerm = q.trim().toLowerCase();
+      
+      // Search bands by name (case-insensitive contains)
+      const bands = await strapi.entityService.findMany("api::band.band", {
+        filters: {
+          name: { $containsi: searchTerm },
+        },
+        populate: {
+          bandImg: true,
+        },
+        limit: Math.min(parseInt(limit) || 12, 50),
+      });
+
+      // Return simplified band data for search results
+      const results = bands.map(band => ({
+        id: band.id,
+        name: band.name,
+        slug: band.slug,
+        genre: band.genre || null,
+        bio: band.bio ? band.bio.substring(0, 120) + (band.bio.length > 120 ? '...' : '') : null,
+        imageUrl: band.bandImg?.url || null,
+      }));
+
+      return { 
+        data: results, 
+        meta: { 
+          total: results.length,
+          query: q,
+        } 
+      };
+    } catch (error) {
+      console.error("Error searching bands:", error);
+      ctx.throw(500, "Internal Server Error");
+    }
+  },
+
   // POST method to create a new band
   async create(ctx) {
     try {

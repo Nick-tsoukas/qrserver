@@ -11,18 +11,25 @@ module.exports = {
       handler: 'band.find',
       config: { auth: false },
     },
+    // PUBLIC: search bands (must be before :id to avoid matching "search" as an ID)
+    {
+      method: 'GET',
+      path: '/bands/search',
+      handler: 'band.search',
+      config: { auth: false },
+    },
+    // PUBLIC: get by slug (must be before :id)
+    {
+      method: 'GET',
+      path: '/bands/slug/:slug',
+      handler: 'band.findBySlug',
+      config: { auth: false },
+    },
     // PUBLIC: get by ID
     {
       method: 'GET',
       path: '/bands/:id',
       handler: 'band.findOne',
-      config: { auth: false },
-    },
-    // PUBLIC: get by slug
-    {
-      method: 'GET',
-      path: '/bands/slug/:slug',
-      handler: 'band.findBySlug',
       config: { auth: false },
     },
 
