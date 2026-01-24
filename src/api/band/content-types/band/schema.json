@@ -220,6 +220,60 @@
       "type": "enumeration",
       "enum": ["SHOW_TONIGHT", "ON_TOUR", "NEW_RELEASE", "POST_SHOW_THANKS", "QUIET_DEFAULT"],
       "default": null
+    },
+    "youtubeMusic": {
+      "type": "string"
+    },
+    "amazonMusic": {
+      "type": "string"
+    },
+    "tidal": {
+      "type": "string"
+    },
+    "pandora": {
+      "type": "string"
+    },
+    "audiomack": {
+      "type": "string"
+    },
+    "mixcloud": {
+      "type": "string"
+    },
+    "beatport": {
+      "type": "string"
+    },
+    "napster": {
+      "type": "string"
+    },
+    "vimeo": {
+      "type": "string"
+    },
+    "kick": {
+      "type": "string"
+    },
+    "threads": {
+      "type": "string"
+    },
+    "discord": {
+      "type": "string"
+    },
+    "telegram": {
+      "type": "string"
+    },
+    "reddit": {
+      "type": "string"
+    },
+    "pinterest": {
+      "type": "string"
+    },
+    "linkedin": {
+      "type": "string"
+    },
+    "bandsintown": {
+      "type": "string"
+    },
+    "songkick": {
+      "type": "string"
     }
   }
 }

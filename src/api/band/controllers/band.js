@@ -43,6 +43,7 @@ module.exports = createCoreController("api::band.band", ({ strapi }) => ({
     }
   },
 
+
   async findBySlug(ctx) {
     try {
       const { slug } = ctx.params;

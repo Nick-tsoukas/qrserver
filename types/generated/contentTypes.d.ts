@@ -1019,6 +1019,24 @@ export interface ApiBandBand extends Schema.CollectionType {
         'QUIET_DEFAULT'
       ]
     >;
+    youtubeMusic: Attribute.String;
+    amazonMusic: Attribute.String;
+    tidal: Attribute.String;
+    pandora: Attribute.String;
+    audiomack: Attribute.String;
+    mixcloud: Attribute.String;
+    beatport: Attribute.String;
+    napster: Attribute.String;
+    vimeo: Attribute.String;
+    kick: Attribute.String;
+    threads: Attribute.String;
+    discord: Attribute.String;
+    telegram: Attribute.String;
+    reddit: Attribute.String;
+    pinterest: Attribute.String;
+    linkedin: Attribute.String;
+    bandsintown: Attribute.String;
+    songkick: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
