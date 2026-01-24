@@ -48,12 +48,15 @@ module.exports = createCoreController("api::band.band", ({ strapi }) => ({
     try {
       const { slug } = ctx.params;
       if (!slug) return ctx.badRequest("Slug parameter is required");
+      
+      // Fetch band with all scalar fields (default behavior) and specified relations
       const band = await strapi.entityService.findMany("api::band.band", {
         filters: { slug },
         populate: populateOptions,
       });
+      
       if (!band || band.length === 0) return ctx.notFound("Band not found");
-      return { data: band[0] }; // Return the first match
+      return { data: band[0] }; // Return the first match with ALL fields
     } catch (error) {
       console.error("Error fetching band by slug:", error);
       ctx.throw(500, "Internal Server Error");

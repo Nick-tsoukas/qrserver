@@ -29,7 +29,7 @@ module.exports = {
     {
       method: 'GET',
       path: '/bands/:id',
-      handler: 'band.findOne',
+      handler: 'band.findById',
       config: { auth: false },
     },
 
