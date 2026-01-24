@@ -274,6 +274,9 @@
     },
     "songkick": {
       "type": "string"
+    },
+    "patreon": {
+      "type": "string"
     }
   }
 }

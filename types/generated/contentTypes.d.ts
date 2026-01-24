@@ -1037,6 +1037,7 @@ export interface ApiBandBand extends Schema.CollectionType {
     linkedin: Attribute.String;
     bandsintown: Attribute.String;
     songkick: Attribute.String;
+    patreon: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
