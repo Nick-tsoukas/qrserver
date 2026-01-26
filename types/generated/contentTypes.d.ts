@@ -777,6 +777,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       Attribute.DefaultTo<'trialing'>;
     subscriptionId: Attribute.String;
     customerId: Attribute.String;
+    plan: Attribute.String;
     trialEndsAt: Attribute.Date;
     gracePeriodStart: Attribute.Date;
     cancelAt: Attribute.Date;
