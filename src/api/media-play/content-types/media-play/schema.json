@@ -32,6 +32,9 @@
     "timestamp": {
       "type": "datetime",
       "default": null
+    },
+    "mediaTitle": {
+      "type": "string"
     }
   }
 }

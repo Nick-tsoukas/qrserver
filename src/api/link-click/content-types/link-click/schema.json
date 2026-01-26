@@ -26,6 +26,12 @@
     },
     "timestamp": {
       "type": "datetime"
+    },
+    "linkUrl": {
+      "type": "string"
+    },
+    "linkLabel": {
+      "type": "string"
     }
   }
 }

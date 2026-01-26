@@ -1728,6 +1728,8 @@ export interface ApiLinkClickLinkClick extends Schema.CollectionType {
     platform: Attribute.String;
     clickCount: Attribute.Integer & Attribute.DefaultTo<0>;
     timestamp: Attribute.DateTime;
+    linkUrl: Attribute.String;
+    linkLabel: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1766,6 +1768,7 @@ export interface ApiMediaPlayMediaPlay extends Schema.CollectionType {
     mediaType: Attribute.Enumeration<['song', 'video']> & Attribute.Required;
     title: Attribute.String & Attribute.Required;
     timestamp: Attribute.DateTime;
+    mediaTitle: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
