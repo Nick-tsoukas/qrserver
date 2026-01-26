@@ -1,6 +1,6 @@
 # MusicBizQR - Strapi Backend
 
-Strapi CMS backend for MusicBizQR.
+Strapi CMS backend for MusicBizQR. ff
 
 ## Setup
 
