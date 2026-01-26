@@ -132,6 +132,9 @@
     "customerId": {
       "type": "string"
     },
+    "plan": {
+      "type": "string"
+    },
     "trialEndsAt": {
       "type": "date"
     },
