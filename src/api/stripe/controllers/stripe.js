@@ -162,7 +162,7 @@ async subscriptionStatus(ctx) {
     }
   },
 
-  // 4) Create a Stripe Customer
+  // 4) Create a Stripe Customer (with deduplication)
   async createCustomer(ctx) {
     strapi.log.debug('[createCustomer] entry', { body: ctx.request.body });
     try {
@@ -171,8 +171,17 @@ async subscriptionStatus(ctx) {
         strapi.log.warn('[createCustomer] Missing email or name', { email, name });
         return ctx.badRequest('Missing email or name.');
       }
-      const customer = await stripe.customers.create({ email, name });
-      strapi.log.debug('[createCustomer] Stripe customer created', { customer });
+      
+      // Check for existing Stripe customer by email (prevent duplicates)
+      const existingCustomers = await stripe.customers.list({ email, limit: 1 });
+      let customer;
+      if (existingCustomers.data.length > 0) {
+        customer = existingCustomers.data[0];
+        strapi.log.info('[createCustomer] Found existing Stripe customer', { customerId: customer.id });
+      } else {
+        customer = await stripe.customers.create({ email, name });
+        strapi.log.debug('[createCustomer] Stripe customer created', { customer });
+      }
       return ctx.send({ customerId: customer.id });
     } catch (error) {
       strapi.log.error('[createCustomer] error', error);
@@ -329,12 +338,62 @@ async confirmSocial(ctx) {
 
   if (existingUser) {
     strapi.log.debug('[confirmSocial] User exists, logging in', { id: existingUser.id })
+    
+    // Check if existing user needs Stripe customer (might have been created without one)
+    if (!existingUser.customerId) {
+      strapi.log.debug('[confirmSocial] Existing user has no Stripe customer, checking/creating')
+      try {
+        const existingCustomers = await stripe.customers.list({ email, limit: 1 });
+        let customer;
+        if (existingCustomers.data.length > 0) {
+          customer = existingCustomers.data[0];
+          strapi.log.info('[confirmSocial] Found existing Stripe customer', { customerId: customer.id });
+        } else {
+          customer = await stripe.customers.create({ email, name });
+          strapi.log.info('[confirmSocial] Created Stripe customer for existing user', { customerId: customer.id });
+        }
+        
+        // Create subscription if they don't have one
+        const subscription = await stripe.subscriptions.create({
+          customer: customer.id,
+          items: [{ price: process.env.STRIPE_DEFAULT_PRICE_ID }],
+          trial_period_days: 30,
+        });
+        
+        // Update user with Stripe data
+        await strapi.entityService.update('plugin::users-permissions.user', existingUser.id, {
+          data: {
+            customerId: customer.id,
+            subscriptionId: subscription.id,
+            subscriptionStatus: 'trialing',
+            trialEndsAt: new Date(subscription.trial_end * 1000),
+          }
+        });
+      } catch (stripeErr) {
+        strapi.log.error('[confirmSocial] Stripe setup for existing user failed', stripeErr);
+        // Continue with login even if Stripe fails
+      }
+    }
+    
     const jwt = strapi.plugins['users-permissions'].services.jwt.issue({ id: existingUser.id })
     return ctx.send({ jwt })
   }
 
-  // 2️⃣ Create Stripe customer
-  const customer = await stripe.customers.create({ email, name })
+  // 2️⃣ Check for existing Stripe customer by email (prevent duplicates)
+  let customer;
+  try {
+    const existingCustomers = await stripe.customers.list({ email, limit: 1 });
+    if (existingCustomers.data.length > 0) {
+      customer = existingCustomers.data[0];
+      strapi.log.info('[confirmSocial] Found existing Stripe customer', { customerId: customer.id });
+    } else {
+      customer = await stripe.customers.create({ email, name });
+      strapi.log.info('[confirmSocial] Stripe customer created', { customerId: customer.id });
+    }
+  } catch (err) {
+    strapi.log.error('[confirmSocial] Stripe customer lookup/creation failed', err);
+    return ctx.internalServerError('Failed to create Stripe customer.');
+  }
 
   // 3️⃣ Create user with provider
   const authRole = await strapi.db.query('plugin::users-permissions.role').findOne({
@@ -342,7 +401,7 @@ async confirmSocial(ctx) {
   })
   const subscription = await stripe.subscriptions.create({
     customer: customer.id,
-    items: [{ price: process.env.STRIPE_DEFAULT_PRICE_ID }], // make sure this is set!
+    items: [{ price: process.env.STRIPE_DEFAULT_PRICE_ID }],
     trial_period_days: 30,
   })
 
@@ -355,7 +414,7 @@ async confirmSocial(ctx) {
     customerId: customer.id,
     subscriptionId: subscription.id,
     subscriptionStatus: 'trialing',
-    trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30-day trial
+    trialEndsAt: new Date(subscription.trial_end * 1000),
   })
 
   const jwt = strapi.plugins['users-permissions'].services.jwt.issue({ id: newUser.id })

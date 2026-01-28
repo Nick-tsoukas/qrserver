@@ -176,17 +176,32 @@ async register(ctx) {
     return ctx.badRequest('Missing name, email or password.');
   }
 
+  // ─── Check if user already exists ─────────────────────────────────
+  const existingUser = await strapi.db.query('plugin::users-permissions.user').findOne({
+    where: { email }
+  });
+  if (existingUser) {
+    strapi.log.warn('[register] User already exists', { email });
+    return ctx.badRequest('An account with this email already exists. Please login instead.');
+  }
+
   // ─── Determine Price ID ─────────────────────────────────────────
   const priceId = process.env.STRIPE_DEFAULT_PRICE_ID || 'price_1RmcQ5C26iqgLxbxnMSy4JFY';
   strapi.log.debug('[register] using Stripe price ID:', priceId);
 
-  // 1️⃣ Create Stripe Customer
+  // 1️⃣ Check for existing Stripe customer by email (prevent duplicates)
   let customer;
   try {
-    customer = await stripe.customers.create({ email, name });
-    strapi.log.info('[register] Stripe customer created', { customerId: customer.id });
+    const existingCustomers = await stripe.customers.list({ email, limit: 1 });
+    if (existingCustomers.data.length > 0) {
+      customer = existingCustomers.data[0];
+      strapi.log.info('[register] Found existing Stripe customer', { customerId: customer.id });
+    } else {
+      customer = await stripe.customers.create({ email, name });
+      strapi.log.info('[register] Stripe customer created', { customerId: customer.id });
+    }
   } catch (err) {
-    strapi.log.error('[register] Stripe customer creation failed', err);
+    strapi.log.error('[register] Stripe customer lookup/creation failed', err);
     return ctx.internalServerError('Failed to create Stripe customer.');
   }
 
