@@ -1,8 +1,24 @@
-// Custom controller for updating users via API token
+// Custom controller for updating users - secured by secret header
 'use strict';
+
+const ADMIN_SECRET = process.env.USER_ADMIN_SECRET || process.env.STRAPI_API_TOKEN;
+
+function validateSecret(ctx) {
+  const authHeader = ctx.request.headers.authorization;
+  const token = authHeader?.replace('Bearer ', '');
+  
+  if (!token || token !== ADMIN_SECRET) {
+    return false;
+  }
+  return true;
+}
 
 module.exports = {
   async update(ctx) {
+    if (!validateSecret(ctx)) {
+      return ctx.unauthorized('Invalid or missing authorization');
+    }
+
     const { id } = ctx.params;
     const data = ctx.request.body;
 
@@ -22,6 +38,10 @@ module.exports = {
   },
 
   async findByEmail(ctx) {
+    if (!validateSecret(ctx)) {
+      return ctx.unauthorized('Invalid or missing authorization');
+    }
+
     const { email } = ctx.params;
 
     try {

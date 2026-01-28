@@ -1,4 +1,4 @@
-// Custom route for updating users via API token
+// Custom route for updating users - uses secret header for auth
 module.exports = {
   routes: [
     {
@@ -6,6 +6,7 @@ module.exports = {
       path: '/user-admin/:id',
       handler: 'user-admin.update',
       config: {
+        auth: false,
         policies: [],
         middlewares: [],
       },
@@ -15,6 +16,7 @@ module.exports = {
       path: '/user-admin/by-email/:email',
       handler: 'user-admin.findByEmail',
       config: {
+        auth: false,
         policies: [],
         middlewares: [],
       },
