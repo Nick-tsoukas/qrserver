@@ -74,18 +74,22 @@ async function checkUserExists(identifier) {
 
 async function main() {
   console.log('=== Login Debug Script ===');
-  console.log('Make sure your Strapi server is running on http://localhost:1337');
+  console.log('Testing against:', BASE_URL);
+  
+  // First test with a clearly invalid user to see if we get 400 (expected) vs 500 (server issue)
+  console.log('\n--- Testing invalid user to check server health ---');
+  await testLogin('nonexistent-test-user-12345@example.com', 'wrongpassword');
   
   // Test your specific credentials
-  await testLogin('nick.tsoukas101', 'password101');
+  await testLogin('nick.tsoukas101@gmail.com', 'password101');
   
   // Test some variations
-  await testLogin('nick.tsoukas101@gmail.com', 'password101');
-  await testLogin('nick.tsoukas101', 'password101!');
-  await testLogin('nick.tsoukas101', 'Password101');
+  await testLogin('nick.tsoukas101', 'password101');
+  await testLogin('nick.tsoukas101@gmail.com', 'password101!');
+  await testLogin('nick.tsoukas101@gmail.com', 'Password101');
   
   // Check if user exists
-  await checkUserExists('nick.tsoukas101');
+  await checkUserExists('nick.tsoukas101@gmail.com');
 }
 
 main().catch(console.error);
