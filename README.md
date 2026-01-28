@@ -2,7 +2,7 @@
 
 Strapi CMS backend for MusicBizQR. ff
 
-## Setup
+## Setup .
 
 ```bash
 npm install
