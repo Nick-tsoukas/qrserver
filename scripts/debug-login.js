@@ -3,7 +3,8 @@
  * Run: node scripts/debug-login.js
  */
 
-const BASE_URL = 'http://localhost:1337';
+// Change this to your production URL
+const BASE_URL = 'https://qrserver-production.up.railway.app';
 
 async function testLogin(identifier, password) {
   try {
@@ -76,14 +77,15 @@ async function main() {
   console.log('Make sure your Strapi server is running on http://localhost:1337');
   
   // Test your specific credentials
-  await testLogin('nick.tsoukas101@gmail.com', 'password101');
+  await testLogin('nick.tsoukas101', 'password101');
   
   // Test some variations
-  await testLogin('nick.tsoukas101@gmail.com', 'password101!');
-  await testLogin('nick.tsoukas101@gmail.com', 'Password101');
+  await testLogin('nick.tsoukas101@gmail.com', 'password101');
+  await testLogin('nick.tsoukas101', 'password101!');
+  await testLogin('nick.tsoukas101', 'Password101');
   
   // Check if user exists
-  await checkUserExists('nick.tsoukas101@gmail.com');
+  await checkUserExists('nick.tsoukas101');
 }
 
 main().catch(console.error);
