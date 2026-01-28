@@ -1,4 +1,4 @@
-// config/env/production/plugins.ts
+// config/plugins.js
 module.exports = ({ env }) => ({
   jwt: {
     secret: env('JWT_SECRET'),
