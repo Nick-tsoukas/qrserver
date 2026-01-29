@@ -191,11 +191,19 @@ async register(ctx) {
 
   // 1️⃣ Check for existing Stripe customer by email (prevent duplicates)
   let customer;
+  let subscription;
   try {
     const existingCustomers = await stripe.customers.list({ email, limit: 1 });
     if (existingCustomers.data.length > 0) {
       customer = existingCustomers.data[0];
       strapi.log.info('[register] Found existing Stripe customer', { customerId: customer.id });
+      
+      // Check for existing active/trialing subscription
+      const existingSubs = await stripe.subscriptions.list({ customer: customer.id, status: 'all', limit: 1 });
+      if (existingSubs.data.length > 0 && (existingSubs.data[0].status === 'active' || existingSubs.data[0].status === 'trialing')) {
+        subscription = existingSubs.data[0];
+        strapi.log.info('[register] Found existing subscription', { subscriptionId: subscription.id, status: subscription.status });
+      }
     } else {
       customer = await stripe.customers.create({ email, name });
       strapi.log.info('[register] Stripe customer created', { customerId: customer.id });
@@ -205,21 +213,22 @@ async register(ctx) {
     return ctx.internalServerError('Failed to create Stripe customer.');
   }
 
-  // 2️⃣ Create Subscription with 30-day trial
-  let subscription;
-  try {
-    subscription = await stripe.subscriptions.create({
-      customer:          customer.id,
-      items:             [{ price: priceId }],
-      trial_period_days: Number(process.env.STRIPE_TRIAL_DAYS || 30),
-    });
-    strapi.log.info('[register] Stripe subscription created', {
-      subscriptionId: subscription.id,
-      trialEndsAt:    subscription.trial_end,
-    });
-  } catch (err) {
-    strapi.log.error('[register] Stripe subscription creation failed', err);
-    return ctx.internalServerError('Failed to create Stripe subscription.');
+  // 2️⃣ Create Subscription only if none exists
+  if (!subscription) {
+    try {
+      subscription = await stripe.subscriptions.create({
+        customer:          customer.id,
+        items:             [{ price: priceId }],
+        trial_period_days: Number(process.env.STRIPE_TRIAL_DAYS || 30),
+      });
+      strapi.log.info('[register] Stripe subscription created', {
+        subscriptionId: subscription.id,
+        trialEndsAt:    subscription.trial_end,
+      });
+    } catch (err) {
+      strapi.log.error('[register] Stripe subscription creation failed', err);
+      return ctx.internalServerError('Failed to create Stripe subscription.');
+    }
   }
 
   // 3️⃣ Generate confirmation token & create Strapi user
@@ -270,7 +279,7 @@ async register(ctx) {
 
   // 5️⃣ Update user record with Stripe metadata (best-effort)
   try {
-    const trialEndsAtDate = new Date(subscription.trial_end * 1000);
+    const trialEndsAtDate = subscription.trial_end ? new Date(subscription.trial_end * 1000) : null;
     await strapi.entityService.update(
       'plugin::users-permissions.user',
       newUser.id,
@@ -278,7 +287,7 @@ async register(ctx) {
         data: {
           customerId:         customer.id,
           subscriptionId:     subscription.id,
-          subscriptionStatus: 'trialing',
+          subscriptionStatus: subscription.status === 'trialing' ? 'trialing' : 'active',
           trialEndsAt:        trialEndsAtDate,
         },
       }
