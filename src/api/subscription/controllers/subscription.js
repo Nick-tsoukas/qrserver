@@ -239,8 +239,8 @@ async register(ctx) {
         email,
         password,
         provider:          'local',
-        confirmed:         false,
-        confirmationToken, // store token for confirmation link
+        confirmed:         true, // Auto-confirm since email sending is broken
+        confirmationToken, // store token for confirmation link (if needed later)
         role:              authRole.id,
       });
     strapi.log.info('[register] Strapi user created', { userId: newUser.id });
