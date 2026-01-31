@@ -31,8 +31,9 @@
     },
     "band": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::band.band"
+      "relation": "manyToOne",
+      "target": "api::band.band",
+      "inversedBy": "qrs"
     },
     "users_permissions_user": {
       "type": "relation",

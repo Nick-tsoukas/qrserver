@@ -141,6 +141,12 @@
       "target": "api::link-click.link-click",
       "mappedBy": "band"
     },
+    "qrs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::qr.qr",
+      "mappedBy": "band"
+    },
     "reverbnation": {
       "type": "string"
     },
