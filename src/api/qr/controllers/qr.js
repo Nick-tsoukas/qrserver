@@ -12,9 +12,18 @@ module.exports = createCoreController('api::qr.qr', ({ strapi }) => ({
     const { id } = ctx.params;
     
     try {
-      // Get QR with band populated
-      const qr = await strapi.entityService.findOne('api::qr.qr', id, {
+      // Get QR with band populated (full)
+      const qrFull = await strapi.entityService.findOne('api::qr.qr', id, {
         populate: ['band'],
+      });
+      
+      // Try with only specific band fields (no media)
+      const qrMinimal = await strapi.entityService.findOne('api::qr.qr', id, {
+        populate: {
+          band: {
+            fields: ['id', 'slug', 'name'],
+          },
+        },
       });
       
       // Also try raw query
@@ -24,9 +33,13 @@ module.exports = createCoreController('api::qr.qr', ({ strapi }) => ({
       });
       
       return {
-        entityService: {
-          id: qr?.id,
-          band: qr?.band || null,
+        entityServiceFull: {
+          id: qrFull?.id,
+          band: qrFull?.band || null,
+        },
+        entityServiceMinimal: {
+          id: qrMinimal?.id,
+          band: qrMinimal?.band || null,
         },
         dbQuery: {
           id: raw?.id,
