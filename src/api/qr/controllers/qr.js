@@ -61,6 +61,59 @@ module.exports = createCoreController('api::qr.qr', ({ strapi }) => ({
     }
   },
 
+  // Lookup endpoint that bypasses entityService permission sanitization
+  // Uses db.query directly to get the band relation
+  async lookup(ctx) {
+    const { url, id } = ctx.query;
+    
+    try {
+      let qr = null;
+      
+      // Try by URL first
+      if (url) {
+        qr = await strapi.db.query('api::qr.qr').findOne({
+          where: { url },
+          populate: ['band', 'event'],
+        });
+      }
+      
+      // Fallback to ID search in options.data
+      if (!qr && id) {
+        const all = await strapi.db.query('api::qr.qr').findMany({
+          populate: ['band', 'event'],
+        });
+        qr = all.find(q => q.options?.data?.includes(id));
+      }
+      
+      if (!qr) {
+        return ctx.notFound('QR not found');
+      }
+      
+      // Return minimal data needed for redirect
+      return {
+        data: {
+          id: qr.id,
+          q_type: qr.q_type,
+          link: qr.link,
+          arEnabled: qr.arEnabled,
+          template: qr.template,
+          band: qr.band ? {
+            id: qr.band.id,
+            slug: qr.band.slug,
+            name: qr.band.name,
+          } : null,
+          event: qr.event ? {
+            id: qr.event.id,
+            slug: qr.event.slug,
+          } : null,
+        },
+      };
+    } catch (error) {
+      strapi.log.error('QR lookup error:', error);
+      return ctx.badRequest(error.message);
+    }
+  },
+
   // Custom find that allows filtering by users_permissions_user
   async find(ctx) {
     // Extract user filter from query
