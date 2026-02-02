@@ -301,6 +301,9 @@
     },
     "bookingAgent": {
       "type": "string"
+    },
+    "recordLabel": {
+      "type": "string"
     }
   }
 }
