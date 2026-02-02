@@ -302,7 +302,10 @@
     "bookingAgent": {
       "type": "string"
     },
-    "recordLabel": {
+    "labelUrl": {
+      "type": "string"
+    },
+    "labelName": {
       "type": "string"
     }
   }
