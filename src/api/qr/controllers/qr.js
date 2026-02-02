@@ -90,7 +90,23 @@ module.exports = createCoreController('api::qr.qr', ({ strapi }) => ({
         });
       }
       
-      // Fallback to ID search in options.data
+      // Try by slugId field directly (most reliable for UUID-based lookups)
+      if (!qr && id) {
+        qr = await strapi.db.query('api::qr.qr').findOne({
+          where: { slugId: id },
+          populate: ['band', 'event'],
+        });
+      }
+      
+      // Try by numeric Strapi ID
+      if (!qr && id && /^\d+$/.test(id)) {
+        qr = await strapi.db.query('api::qr.qr').findOne({
+          where: { id: parseInt(id, 10) },
+          populate: ['band', 'event'],
+        });
+      }
+      
+      // Last resort: search options.data for the id
       if (!qr && id) {
         const all = await strapi.db.query('api::qr.qr').findMany({
           populate: ['band', 'event'],
