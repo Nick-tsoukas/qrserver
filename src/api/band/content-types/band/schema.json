@@ -283,6 +283,24 @@
     },
     "patreon": {
       "type": "string"
+    },
+    "jambase": {
+      "type": "string"
+    },
+    "relix": {
+      "type": "string"
+    },
+    "bookingEmail": {
+      "type": "string"
+    },
+    "managementEmail": {
+      "type": "string"
+    },
+    "pressEmail": {
+      "type": "string"
+    },
+    "bookingAgent": {
+      "type": "string"
     }
   }
 }
