@@ -973,6 +973,7 @@ export interface ApiBandBand extends Schema.CollectionType {
       'oneToMany',
       'api::link-click.link-click'
     >;
+    qrs: Attribute.Relation<'api::band.band', 'oneToMany', 'api::qr.qr'>;
     reverbnation: Attribute.String;
     isBandNameInLogo: Attribute.Boolean & Attribute.DefaultTo<false>;
     slug: Attribute.String & Attribute.Unique;
@@ -1039,6 +1040,14 @@ export interface ApiBandBand extends Schema.CollectionType {
     bandsintown: Attribute.String;
     songkick: Attribute.String;
     patreon: Attribute.String;
+    jambase: Attribute.String;
+    relix: Attribute.String;
+    bookingEmail: Attribute.String;
+    managementEmail: Attribute.String;
+    pressEmail: Attribute.String;
+    bookingAgent: Attribute.String;
+    labelUrl: Attribute.String;
+    labelName: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::band.band', 'oneToOne', 'admin::user'> &
@@ -1985,7 +1994,7 @@ export interface ApiQrQr extends Schema.CollectionType {
     q_image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     url: Attribute.String;
     q_type: Attribute.String;
-    band: Attribute.Relation<'api::qr.qr', 'oneToOne', 'api::band.band'>;
+    band: Attribute.Relation<'api::qr.qr', 'manyToOne', 'api::band.band'>;
     users_permissions_user: Attribute.Relation<
       'api::qr.qr',
       'manyToOne',
