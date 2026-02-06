@@ -71,6 +71,13 @@ export interface SinglesongSinglesong extends Schema.Component {
     embedUrl: Attribute.String;
     embedHtml: Attribute.Text;
     trackId: Attribute.String;
+    spotifyUrl: Attribute.String;
+    spotifyOembedTitle: Attribute.String;
+    spotifyOembedThumbnailUrl: Attribute.String;
+    spotifyOembedType: Attribute.Enumeration<
+      ['track', 'album', 'playlist', 'artist']
+    >;
+    spotifyOembedHtml: Attribute.Text;
   };
 }
 

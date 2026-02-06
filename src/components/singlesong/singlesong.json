@@ -32,7 +32,16 @@
     "url": { "type": "string" },
     "embedUrl": { "type": "string" },
     "embedHtml": { "type": "text" },
+    "trackId": { "type": "string" },
 
-    "trackId": { "type": "string" }
+    "spotifyUrl": { "type": "string" },
+    "spotifyOembedTitle": { "type": "string" },
+    "spotifyOembedThumbnailUrl": { "type": "string" },
+    "spotifyOembedType": {
+      "type": "enumeration",
+      "enum": ["track", "album", "playlist", "artist"],
+      "required": false
+    },
+    "spotifyOembedHtml": { "type": "text" }
   }
 }
